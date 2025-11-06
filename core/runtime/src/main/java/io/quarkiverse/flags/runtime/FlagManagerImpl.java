@@ -50,7 +50,7 @@ public class FlagManagerImpl implements FlagManager {
             lastPriority = provider.getPriority();
         }
         this.providers = List.copyOf(sortedProviders);
-        this.interceptors = interceptors;
+        this.interceptors = interceptors.stream().sorted().collect(Collectors.toUnmodifiableList());
     }
 
     @Override
