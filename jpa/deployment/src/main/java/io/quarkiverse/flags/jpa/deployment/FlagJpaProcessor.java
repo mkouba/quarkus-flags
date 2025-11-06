@@ -19,7 +19,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.jpa.FlagDefinition;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkiverse.flags.spi.ImmutableFlag;
-import io.quarkiverse.flags.spi.ImmutableStringState;
+import io.quarkiverse.flags.spi.ImmutableStringValue;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
 import io.quarkus.arc.deployment.GeneratedBeanGizmo2Adaptor;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -109,14 +109,14 @@ public class FlagJpaProcessor {
                     // List<Flag> ret = new ArrayList(all.size());
                     LocalVar ret = bc.localVar("ret", bc.new_(ArrayList.class, bc.withList(flags).size()));
                     // for (MyFlag myFlag : all) {
-                    //    ret.add(new ImmutableFlag(myFlag.feature, new ImmutableStringState(myFlag.state)));
+                    //    ret.add(new ImmutableFlag(myFlag.feature, new ImmutableStringValue(myFlag.value)));
                     // }
                     bc.forEach(flags, (ibc, item) -> {
                         Expr feature = flagDefinition.getFeature().read(item, ibc);
-                        Expr state = flagDefinition.getState().read(item, ibc);
+                        Expr value = flagDefinition.getValue().read(item, ibc);
                         ibc.withList(ret)
-                                .add(ibc.new_(ConstructorDesc.of(ImmutableFlag.class, String.class, Flag.State.class), feature,
-                                        ibc.new_(ImmutableStringState.class, state)));
+                                .add(ibc.new_(ConstructorDesc.of(ImmutableFlag.class, String.class, Flag.Value.class), feature,
+                                        ibc.new_(ImmutableStringValue.class, value)));
                     });
                     bc.return_(ret);
                 });

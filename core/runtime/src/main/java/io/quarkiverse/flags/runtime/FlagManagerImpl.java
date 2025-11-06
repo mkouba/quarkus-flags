@@ -119,19 +119,19 @@ public class FlagManagerImpl implements FlagManager {
         }
 
         @Override
-        public Uni<State> compute(ComputationContext computationContext) {
-            Uni<State> state = delegate.compute();
+        public Uni<Value> compute(ComputationContext computationContext) {
+            Uni<Value> state = delegate.compute();
             if (!interceptors.isEmpty()) {
                 return applyNextInterceptor(state, computationContext, interceptors.iterator());
             }
             return state;
         }
 
-        Uni<State> applyNextInterceptor(Uni<State> state, ComputationContext computationContext, Iterator<FlagInterceptor> it) {
+        Uni<Value> applyNextInterceptor(Uni<Value> state, ComputationContext computationContext, Iterator<FlagInterceptor> it) {
             if (it.hasNext()) {
                 return state.chain(s -> {
                     FlagInterceptor interceptor = it.next();
-                    Uni<State> nextState = interceptor.afterCompute(delegate, s, computationContext);
+                    Uni<Value> nextState = interceptor.afterCompute(delegate, s, computationContext);
                     return applyNextInterceptor(nextState, computationContext, it);
                 });
             }

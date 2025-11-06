@@ -4,26 +4,26 @@ import java.util.NoSuchElementException;
 
 import io.quarkiverse.flags.Flag;
 
-public class ImmutableStringState implements Flag.State {
+public class ImmutableStringValue implements Flag.Value {
 
     private final String value;
 
-    public ImmutableStringState(String value) {
+    public ImmutableStringValue(String value) {
         this.value = value;
     }
 
     @Override
-    public boolean getBoolean() {
+    public boolean asBoolean() {
         return Boolean.parseBoolean(value);
     }
 
     @Override
-    public String getString() {
+    public String asString() {
         return value;
     }
 
     @Override
-    public int getInteger() {
+    public int asInt() {
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {

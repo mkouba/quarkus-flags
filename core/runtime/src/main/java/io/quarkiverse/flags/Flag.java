@@ -18,7 +18,7 @@ public interface Flag {
     String feature();
 
     /**
-     * Computes the current state of the feature flag.
+     * Computes the current value of the feature flag.
      * <p>
      * Does not block the caller thread.
      *
@@ -26,68 +26,68 @@ public interface Flag {
      * @return the computed state
      */
     @CheckReturnValue
-    Uni<State> compute(ComputationContext context);
+    Uni<Value> compute(ComputationContext context);
 
     /**
-     * Computes the current state of the feature flag.
+     * Computes the current value of the feature flag.
      * <p>
      * Does not block the caller thread.
      *
      * @return the computed state
      */
     @CheckReturnValue
-    default Uni<State> compute() {
+    default Uni<Value> compute() {
         return compute(null);
     }
 
     /**
-     * Computes the current state of the feature flag.
+     * Computes the current value of the feature flag.
      * <p>
      * Blocks the caller thread.
      *
      * @return the computed state
      */
-    default State computeAndAwait() {
+    default Value computeAndAwait() {
         return computeAndAwait(null);
     }
 
     /**
-     * Computes the current state of the feature flag.
+     * Computes the current value of the feature flag.
      * <p>
      * Blocks the caller thread.
      *
      * @param context (not {@code null})
      * @return the computed state
      */
-    default State computeAndAwait(ComputationContext context) {
+    default Value computeAndAwait(ComputationContext context) {
         return compute(context).await().indefinitely();
     }
 
     /**
-     * Represents the state of a feature flag.
+     * Represents the value of a feature flag.
      */
-    interface State {
+    interface Value {
 
         /**
          *
          * @return the boolean value
-         * @throws NoSuchElementException if no boolean value is present
+         * @throws NoSuchElementException if the value cannot be represented as boolean
          */
-        boolean getBoolean();
+        boolean asBoolean();
 
         /**
          *
          * @return the string value
-         * @throws NoSuchElementException if no string value is present
+         * @throws NoSuchElementException if the value cannot be represented as string
          */
-        String getString();
+        String asString();
 
         /**
          *
          * @return the integer value
-         * @throws NoSuchElementException if no integer value is present
+         * @throws NoSuchElementException if the value cannot be represented as integer
          */
-        int getInteger();
+        int asInt();
     }
 
     /**

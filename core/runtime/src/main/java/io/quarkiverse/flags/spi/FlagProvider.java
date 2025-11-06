@@ -8,6 +8,8 @@ public interface FlagProvider extends Comparable<FlagProvider> {
     int DEFAULT_PRIORITY = 1;
 
     /**
+     * The result must not contain flags with duplicate feature names.
+     *
      * @return the flags
      */
     Iterable<Flag> getFlags();

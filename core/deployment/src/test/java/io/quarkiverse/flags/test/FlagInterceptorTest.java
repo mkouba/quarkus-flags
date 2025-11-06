@@ -11,11 +11,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
-import io.quarkiverse.flags.Flag.State;
+import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.FlagManager;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.spi.FlagInterceptor;
-import io.quarkiverse.flags.spi.ImmutableBooleanState;
+import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.test.QuarkusUnitTest;
 import io.smallrye.mutiny.Uni;
 
@@ -36,7 +36,7 @@ public class FlagInterceptorTest {
         inMemoryFlagProvider.newFlag("alpha")
                 .setEnabled(true)
                 .add();
-        assertFalse(manager.getFlag("alpha").orElseThrow().computeAndAwait().getBoolean());
+        assertFalse(manager.getFlag("alpha").orElseThrow().computeAndAwait().asBoolean());
     }
 
     @Priority(10)
@@ -44,11 +44,11 @@ public class FlagInterceptorTest {
     public static class FlagInterceptor1 implements FlagInterceptor {
 
         @Override
-        public Uni<State> afterCompute(Flag flag, State state, ComputationContext computationContext) {
-            if (!state.getBoolean()) {
+        public Uni<Value> afterCompute(Flag flag, Value value, ComputationContext computationContext) {
+            if (!value.asBoolean()) {
                 throw new IllegalStateException();
             }
-            return Uni.createFrom().item(state);
+            return Uni.createFrom().item(value);
         }
 
     }
@@ -58,9 +58,9 @@ public class FlagInterceptorTest {
     public static class FlagInterceptor2 implements FlagInterceptor {
 
         @Override
-        public Uni<State> afterCompute(Flag flag, State state, ComputationContext computationContext) {
+        public Uni<Value> afterCompute(Flag flag, Value value, ComputationContext computationContext) {
             // just invert the state
-            return Uni.createFrom().item(ImmutableBooleanState.from(!state.getBoolean()));
+            return Uni.createFrom().item(ImmutableBooleanValue.from(!value.asBoolean()));
         }
 
     }

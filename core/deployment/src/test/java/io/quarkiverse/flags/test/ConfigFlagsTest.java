@@ -41,14 +41,14 @@ public class ConfigFlagsTest {
     @Test
     public void testFlags() {
         assertEquals(4, manager.getFlags().size());
-        assertTrue(manager.getFlag("alpha").orElseThrow().computeAndAwait().getBoolean());
-        assertFalse(manager.getFlag("bravo").orElseThrow().computeAndAwait().getBoolean());
-        assertEquals(0, manager.getFlag("bravo").orElseThrow().computeAndAwait().getInteger());
-        assertTrue(manager.getFlag("charlie").orElseThrow().computeAndAwait().getBoolean());
-        assertFalse(manager.getFlag("delta").orElseThrow().computeAndAwait().getBoolean());
-        assertTrue(alpha.computeAndAwait().getBoolean());
+        assertTrue(manager.getFlag("alpha").orElseThrow().computeAndAwait().asBoolean());
+        assertFalse(manager.getFlag("bravo").orElseThrow().computeAndAwait().asBoolean());
+        assertEquals(0, manager.getFlag("bravo").orElseThrow().computeAndAwait().asInt());
+        assertTrue(manager.getFlag("charlie").orElseThrow().computeAndAwait().asBoolean());
+        assertFalse(manager.getFlag("delta").orElseThrow().computeAndAwait().asBoolean());
+        assertTrue(alpha.computeAndAwait().asBoolean());
         assertTrue(foo.isEmpty());
-        assertFalse(delta.orElseThrow().computeAndAwait().getBoolean());
+        assertFalse(delta.orElseThrow().computeAndAwait().asBoolean());
     }
 
 }

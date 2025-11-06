@@ -10,7 +10,7 @@ import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
-import io.quarkiverse.flags.Flag.State;
+import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.FlagAdded;
 import io.quarkiverse.flags.FlagRemoved;
 import io.quarkiverse.flags.InMemoryFlagProvider;
@@ -56,14 +56,14 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
         private final String feature;
 
-        private Function<ComputationContext, Uni<State>> fun;
+        private Function<ComputationContext, Uni<Value>> fun;
 
         FlagDefinitionImpl(String feature) {
             this.feature = feature;
         }
 
         @Override
-        public FlagDefinition setComputeAsync(Function<ComputationContext, Uni<State>> fun) {
+        public FlagDefinition setComputeAsync(Function<ComputationContext, Uni<Value>> fun) {
             this.fun = fun;
             return this;
         }
@@ -85,9 +85,9 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
         private final String feature;
 
-        private final Function<ComputationContext, Uni<State>> fun;
+        private final Function<ComputationContext, Uni<Value>> fun;
 
-        InMemoryFlag(String feature, Function<ComputationContext, Uni<State>> fun) {
+        InMemoryFlag(String feature, Function<ComputationContext, Uni<Value>> fun) {
             this.feature = feature;
             this.fun = fun;
         }
@@ -98,7 +98,7 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
         }
 
         @Override
-        public Uni<State> compute(ComputationContext context) {
+        public Uni<Value> compute(ComputationContext context) {
             return fun.apply(context);
         }
 

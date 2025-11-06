@@ -21,8 +21,8 @@ import io.quarkiverse.flags.FlagAdded;
 import io.quarkiverse.flags.FlagManager;
 import io.quarkiverse.flags.FlagRemoved;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.spi.ImmutableBooleanState;
-import io.quarkiverse.flags.spi.ImmutableStringState;
+import io.quarkiverse.flags.spi.ImmutableBooleanValue;
+import io.quarkiverse.flags.spi.ImmutableStringValue;
 import io.quarkus.test.QuarkusUnitTest;
 import io.smallrye.mutiny.Uni;
 
@@ -54,26 +54,26 @@ public class InMemoryFlagsTest {
                 .setEnabled(false)
                 .add();
         inMemoryFlagProvider.newFlag("charlie")
-                .setCompute(cc -> ImmutableBooleanState.TRUE)
+                .setCompute(cc -> ImmutableBooleanValue.TRUE)
                 .add();
         inMemoryFlagProvider.newFlag("delta")
-                .setComputeAsync(cc -> Uni.createFrom().item(new ImmutableStringState("no")))
+                .setComputeAsync(cc -> Uni.createFrom().item(new ImmutableStringValue("no")))
                 .add();
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 
-        Flag.State alphaState = manager.getFlag("alpha").orElseThrow().computeAndAwait();
-        assertTrue(alphaState.getBoolean());
-        assertEquals("true", alphaState.getString());
-        assertEquals(1, alphaState.getInteger());
+        Flag.Value alphaValue = manager.getFlag("alpha").orElseThrow().computeAndAwait();
+        assertTrue(alphaValue.asBoolean());
+        assertEquals("true", alphaValue.asString());
+        assertEquals(1, alphaValue.asInt());
 
-        assertFalse(manager.getFlag("bravo").orElseThrow().computeAndAwait().getBoolean());
-        assertTrue(manager.getFlag("charlie").orElseThrow().computeAndAwait().getBoolean());
+        assertFalse(manager.getFlag("bravo").orElseThrow().computeAndAwait().asBoolean());
+        assertTrue(manager.getFlag("charlie").orElseThrow().computeAndAwait().asBoolean());
 
-        Flag.State deltaState = manager.getFlag("delta").orElseThrow().computeAndAwait();
-        assertFalse(deltaState.getBoolean());
-        assertEquals("no", deltaState.getString());
-        assertThrows(NoSuchElementException.class, () -> deltaState.getInteger());
+        Flag.Value deltaValue = manager.getFlag("delta").orElseThrow().computeAndAwait();
+        assertFalse(deltaValue.asBoolean());
+        assertEquals("no", deltaValue.asString());
+        assertThrows(NoSuchElementException.class, () -> deltaValue.asInt());
 
         manager.getFlags().forEach(f -> inMemoryFlagProvider.removeFlag(f.feature()));
         assertEquals(0, manager.getFlags().size());

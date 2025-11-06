@@ -48,7 +48,7 @@ public class ConfigFlagProvider implements FlagProvider {
         return List.copyOf(ret);
     }
 
-    class ConfigState implements Flag.State {
+    class ConfigState implements Flag.Value {
 
         final String propertyName;
 
@@ -57,17 +57,17 @@ public class ConfigFlagProvider implements FlagProvider {
         }
 
         @Override
-        public boolean getBoolean() {
+        public boolean asBoolean() {
             return config.getOptionalValue(propertyName, Boolean.class).orElseThrow();
         }
 
         @Override
-        public String getString() {
+        public String asString() {
             return config.getOptionalValue(propertyName, String.class).orElseThrow();
         }
 
         @Override
-        public int getInteger() {
+        public int asInt() {
             return config.getOptionalValue(propertyName, Integer.class).orElseThrow();
         }
 

@@ -18,7 +18,7 @@ import org.jboss.jandex.Type;
 
 import io.quarkiverse.flags.jpa.FlagDefinition;
 import io.quarkiverse.flags.jpa.FlagFeature;
-import io.quarkiverse.flags.jpa.FlagState;
+import io.quarkiverse.flags.jpa.FlagValue;
 import io.quarkus.builder.item.SimpleBuildItem;
 import io.quarkus.deployment.bean.JavaBeanUtil;
 import io.quarkus.gizmo2.Expr;
@@ -35,7 +35,7 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
 
     private final Property feature;
 
-    private final Property state;
+    private final Property value;
 
     FlagDefinitionBuildItem(ClassInfo entityClass, boolean isPanache) {
         this.entityClass = entityClass;
@@ -45,11 +45,11 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
         }
         this.feature = flagFeature.target().kind() == Kind.FIELD ? new FieldProperty(flagFeature.target().asField(), isPanache)
                 : new GetterProperty(flagFeature.target().asMethod());
-        AnnotationInstance flagState = entityClass.annotation(FlagState.class);
+        AnnotationInstance flagState = entityClass.annotation(FlagValue.class);
         if (flagState == null) {
             throw new IllegalStateException("@FlagState not declared on " + entityClass);
         }
-        this.state = flagState.target().kind() == Kind.FIELD ? new FieldProperty(flagState.target().asField(), isPanache)
+        this.value = flagState.target().kind() == Kind.FIELD ? new FieldProperty(flagState.target().asField(), isPanache)
                 : new GetterProperty(flagState.target().asMethod());
     }
 
@@ -72,8 +72,8 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
         return feature;
     }
 
-    public Property getState() {
-        return state;
+    public Property getValue() {
+        return value;
     }
 
     interface Property {

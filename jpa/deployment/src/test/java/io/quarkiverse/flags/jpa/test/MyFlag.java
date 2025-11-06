@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 
 import io.quarkiverse.flags.jpa.FlagDefinition;
 import io.quarkiverse.flags.jpa.FlagFeature;
-import io.quarkiverse.flags.jpa.FlagState;
+import io.quarkiverse.flags.jpa.FlagValue;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @FlagDefinition
@@ -14,7 +14,7 @@ public class MyFlag extends PanacheEntity {
     @FlagFeature
     public String feature;
 
-    @FlagState
+    @FlagValue
     public String state;
 
 }

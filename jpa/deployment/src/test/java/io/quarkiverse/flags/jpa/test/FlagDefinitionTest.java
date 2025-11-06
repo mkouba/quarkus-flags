@@ -33,9 +33,9 @@ public class FlagDefinitionTest {
         alpha.persist();
 
         Flag alphaFlag = manager.getFlag("alpha").orElseThrow();
-        Flag.State alphaState = alphaFlag.computeAndAwait();
-        assertTrue(alphaState.getBoolean());
-        assertEquals("true", alphaState.getString());
+        Flag.Value alphaState = alphaFlag.computeAndAwait();
+        assertTrue(alphaState.asBoolean());
+        assertEquals("true", alphaState.asString());
     }
 
 }

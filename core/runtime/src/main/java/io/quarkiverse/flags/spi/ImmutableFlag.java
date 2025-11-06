@@ -6,9 +6,9 @@ import io.smallrye.mutiny.Uni;
 public final class ImmutableFlag implements Flag {
 
     private final String feature;
-    private final Flag.State state;
+    private final Flag.Value state;
 
-    public ImmutableFlag(String feature, Flag.State state) {
+    public ImmutableFlag(String feature, Flag.Value state) {
         this.feature = feature;
         this.state = state;
     }
@@ -19,7 +19,7 @@ public final class ImmutableFlag implements Flag {
     }
 
     @Override
-    public Uni<State> compute(ComputationContext context) {
+    public Uni<Value> compute(ComputationContext context) {
         return Uni.createFrom().item(state);
     }
 
