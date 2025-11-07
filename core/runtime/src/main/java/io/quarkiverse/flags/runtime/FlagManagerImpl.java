@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
@@ -22,9 +23,9 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
-import io.quarkiverse.flags.FlagManager;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagInterceptor;
+import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.arc.All;
 import io.quarkus.runtime.Startup;
@@ -64,14 +65,13 @@ public class FlagManagerImpl implements FlagManager {
     }
 
     @Override
-    public Optional<Flag> getFlag(String feature) {
+    public Optional<Flag> find(String feature) {
         return getFlags().stream()
                 .filter(f -> f.feature().equals(feature))
                 .findFirst();
     }
 
-    @Override
-    public Set<Flag> getFlags() {
+    Set<Flag> getFlags() {
         Set<Flag> ret = new HashSet<>();
         for (FlagProvider provider : providers) {
             for (Flag flag : provider.getFlags()) {
@@ -101,7 +101,7 @@ public class FlagManagerImpl implements FlagManager {
             }
         }
         if (feature != null) {
-            return getFlag(feature.value()).orElse(null);
+            return find(feature.value()).orElse(null);
         }
         return null;
     }
@@ -116,9 +116,19 @@ public class FlagManagerImpl implements FlagManager {
             }
         }
         if (feature != null) {
-            return getFlag(feature.value());
+            return find(feature.value());
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Iterator<Flag> iterator() {
+        return getFlags().iterator();
+    }
+
+    @Override
+    public Stream<Flag> stream() {
+        return getFlags().stream();
     }
 
     class InterceptedFlag implements Flag {

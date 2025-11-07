@@ -9,8 +9,6 @@ import io.smallrye.mutiny.Uni;
 
 /**
  * A feature flag.
- *
- * @see FlagManager
  */
 public interface Flag {
 
@@ -70,6 +68,39 @@ public interface Flag {
      */
     default Value computeAndAwait(ComputationContext context) {
         return compute(context).await().indefinitely();
+    }
+
+    /**
+     * Computes the current value and returns its boolean representation.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @return the computed boolean value
+     */
+    default boolean isOn() {
+        return computeAndAwait().asBoolean();
+    }
+
+    /**
+     * Computes the current value and returns its string representation.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @return the computed string value
+     */
+    default String getString() {
+        return computeAndAwait().asString();
+    }
+
+    /**
+     * Computes the current value and returns its integer representation.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @return the computed integer value
+     */
+    default int getInt() {
+        return computeAndAwait().asInt();
     }
 
     /**

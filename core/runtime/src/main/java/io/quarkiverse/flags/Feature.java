@@ -10,7 +10,7 @@ import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
 
 /**
- * Qualifier used to identify {@link Flag} injection points.
+ * Qualifies an injection point of a feature {@link Flag}.
  *
  * @see Flag
  */
@@ -19,6 +19,9 @@ import jakarta.inject.Qualifier;
 @Target({ ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD, ElementType.TYPE })
 public @interface Feature {
 
+    /**
+     * @see Flag#feature()
+     */
     @Nonbinding
     String value();
 

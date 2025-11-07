@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
-import io.quarkiverse.flags.FlagManager;
+import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.spi.FlagInterceptor;
 import io.quarkiverse.flags.spi.ImmutableBooleanValue;
@@ -29,14 +29,14 @@ public class FlagInterceptorTest {
     InMemoryFlagProvider inMemoryFlagProvider;
 
     @Inject
-    FlagManager manager;
+    Flags flags;
 
     @Test
     public void testFlags() {
         inMemoryFlagProvider.newFlag("alpha")
                 .setEnabled(true)
                 .register();
-        assertFalse(manager.getFlag("alpha").orElseThrow().computeAndAwait().asBoolean());
+        assertFalse(flags.find("alpha").orElseThrow().computeAndAwait().asBoolean());
     }
 
     @Priority(10)

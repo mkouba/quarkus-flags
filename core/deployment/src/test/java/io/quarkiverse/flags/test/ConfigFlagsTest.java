@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -19,7 +20,7 @@ import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
-import io.quarkiverse.flags.FlagManager;
+import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.test.QuarkusUnitTest;
@@ -42,7 +43,7 @@ public class ConfigFlagsTest {
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.usernames", "foo,bar,baz");
 
     @Inject
-    FlagManager manager;
+    Flags flags;
 
     @Feature("alpha")
     Flag alpha;
@@ -53,17 +54,23 @@ public class ConfigFlagsTest {
     @Feature("delta")
     Optional<Flag> delta;
 
+    @Feature("bravo")
+    Instance<Flag> bravo;
+
     @Test
     public void testFlags() {
-        Set<Flag> flags = manager.getFlags();
-        assertEquals(4, flags.size(), flags.toString());
-        assertTrue(manager.getFlag("alpha").orElseThrow().computeAndAwait().asBoolean());
-        assertFalse(manager.getFlag("bravo").orElseThrow().computeAndAwait().asBoolean());
-        assertEquals(0, manager.getFlag("bravo").orElseThrow().computeAndAwait().asInt());
-        assertTrue(manager.getFlag("charlie").orElseThrow().computeAndAwait().asBoolean());
-        assertFalse(manager.getFlag("delta").orElseThrow().computeAndAwait().asBoolean());
-        assertTrue(alpha.computeAndAwait().asBoolean());
+        List<Flag> all = flags.asList();
+        assertEquals(4, all.size(), all.toString());
+        assertTrue(flags.find("alpha").orElseThrow().isOn());
+        assertFalse(flags.find("bravo").orElseThrow().computeAndAwait().asBoolean());
+        assertEquals(0, flags.find("bravo").orElseThrow().getInt());
+        assertTrue(flags.find("charlie").orElseThrow().computeAndAwait().asBoolean());
+        assertFalse(flags.find("delta").orElseThrow().computeAndAwait().asBoolean());
+        assertTrue(alpha.isOn());
         assertTrue(foo.isEmpty());
+
+        assertFalse(bravo.get().computeAndAwait().asBoolean());
+        assertEquals("0", bravo.get().getString());
 
         Flag deltaFlag = delta.orElseThrow();
         assertEquals("deltaEval", deltaFlag.metadata().get(FlagEvaluator.METADATA_KEY));

@@ -1,7 +1,6 @@
 package io.quarkiverse.flags.spi;
 
 import io.quarkiverse.flags.Flag;
-import io.quarkiverse.flags.FlagManager;
 
 public interface FlagProvider extends Comparable<FlagProvider> {
 

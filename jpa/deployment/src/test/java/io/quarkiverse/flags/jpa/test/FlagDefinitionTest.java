@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.Flag;
-import io.quarkiverse.flags.FlagManager;
+import io.quarkiverse.flags.Flags;
 import io.quarkus.test.QuarkusUnitTest;
 import io.quarkus.test.TestTransaction;
 
@@ -22,12 +22,12 @@ public class FlagDefinitionTest {
             .withApplicationRoot(root -> root.addClass(MyFlag.class));
 
     @Inject
-    FlagManager manager;
+    Flags flags;
 
     @TestTransaction
     @Test
     public void testFlagDefinition() {
-        assertEquals(0, manager.getFlags().size());
+        assertEquals(0, flags.asList().size());
 
         MyFlag alpha = new MyFlag();
         alpha.feature = "alpha";
@@ -35,7 +35,7 @@ public class FlagDefinitionTest {
         alpha.metadata = Map.of("foo", "bar");
         alpha.persist();
 
-        Flag alphaFlag = manager.getFlag("alpha").orElseThrow();
+        Flag alphaFlag = flags.find("alpha").orElseThrow();
         assertEquals("bar", alphaFlag.metadata().get("foo"));
         Flag.Value alphaState = alphaFlag.computeAndAwait();
         assertTrue(alphaState.asBoolean());

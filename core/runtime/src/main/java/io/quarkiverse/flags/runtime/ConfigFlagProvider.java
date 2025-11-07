@@ -9,9 +9,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
-import io.quarkiverse.flags.FlagManager;
 import io.quarkiverse.flags.spi.EvaluatedFlag;
 import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkiverse.flags.spi.ImmutableFlag;
 import io.quarkiverse.flags.spi.ImmutableStringValue;

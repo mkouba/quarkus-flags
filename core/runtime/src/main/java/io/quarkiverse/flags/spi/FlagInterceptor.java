@@ -5,6 +5,9 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
 
+/**
+ * TODO not sure if this SPI actually makes any sense
+ */
 public interface FlagInterceptor extends Comparable<FlagInterceptor> {
 
     int DEFAULT_PRIORITY = 1;
