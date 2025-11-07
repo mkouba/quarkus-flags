@@ -49,16 +49,16 @@ public class InMemoryFlagsTest {
 
         inMemoryFlagProvider.newFlag("alpha")
                 .setEnabled(true)
-                .add();
+                .register();
         inMemoryFlagProvider.newFlag("bravo")
                 .setEnabled(false)
-                .add();
+                .register();
         inMemoryFlagProvider.newFlag("charlie")
                 .setCompute(cc -> ImmutableBooleanValue.TRUE)
-                .add();
+                .register();
         inMemoryFlagProvider.newFlag("delta")
                 .setComputeAsync(cc -> Uni.createFrom().item(new ImmutableStringValue("no")))
-                .add();
+                .register();
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 

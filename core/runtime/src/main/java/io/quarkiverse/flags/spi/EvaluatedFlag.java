@@ -5,20 +5,21 @@ import java.util.Map;
 import io.quarkiverse.flags.Flag;
 import io.smallrye.mutiny.Uni;
 
-public final class ImmutableFlag implements Flag {
+public class EvaluatedFlag implements Flag {
 
     private final String feature;
+
     private final Map<String, String> metadata;
-    private final Flag.Value state;
 
-    public ImmutableFlag(String feature, Flag.Value value) {
-        this(feature, Map.of(), value);
-    }
+    private final Flag.Value initialValue;
 
-    public ImmutableFlag(String feature, Map<String, String> metadata, Value value) {
+    private final FlagEvaluator evaluator;
+
+    public EvaluatedFlag(String feature, Map<String, String> metadata, Flag.Value initialValue, FlagEvaluator evaluator) {
         this.feature = feature;
         this.metadata = metadata;
-        this.state = value;
+        this.initialValue = initialValue;
+        this.evaluator = evaluator;
     }
 
     @Override
@@ -33,12 +34,7 @@ public final class ImmutableFlag implements Flag {
 
     @Override
     public Uni<Value> compute(ComputationContext context) {
-        return Uni.createFrom().item(state);
-    }
-
-    @Override
-    public String toString() {
-        return "ImmutableFlag [feature=" + feature + "]";
+        return evaluator.evaluate(this, initialValue, context);
     }
 
 }

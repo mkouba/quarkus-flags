@@ -3,6 +3,7 @@ package io.quarkiverse.flags.jpa.deployment;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.inject.Inject;
@@ -17,6 +18,7 @@ import org.jboss.jandex.DotName;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.jpa.FlagDefinition;
+import io.quarkiverse.flags.jpa.deployment.FlagDefinitionBuildItem.Property;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkiverse.flags.spi.ImmutableFlag;
 import io.quarkiverse.flags.spi.ImmutableStringValue;
@@ -109,13 +111,22 @@ public class FlagJpaProcessor {
                     // List<Flag> ret = new ArrayList(all.size());
                     LocalVar ret = bc.localVar("ret", bc.new_(ArrayList.class, bc.withList(flags).size()));
                     // for (MyFlag myFlag : all) {
-                    //    ret.add(new ImmutableFlag(myFlag.feature, new ImmutableStringValue(myFlag.value)));
+                    //    ret.add(new ImmutableFlag(myFlag.feature, myFlag.metadata, new ImmutableStringValue(myFlag.value)));
                     // }
                     bc.forEach(flags, (ibc, item) -> {
                         Expr feature = flagDefinition.getFeature().read(item, ibc);
+                        Expr metadata;
+                        Property metadataProperty = flagDefinition.getMetadata();
+                        if (metadataProperty != null) {
+                            metadata = metadataProperty.read(item, ibc);
+                        } else {
+                            metadata = Const.ofNull(Map.class);
+                        }
                         Expr value = flagDefinition.getValue().read(item, ibc);
                         ibc.withList(ret)
-                                .add(ibc.new_(ConstructorDesc.of(ImmutableFlag.class, String.class, Flag.Value.class), feature,
+                                .add(ibc.new_(
+                                        ConstructorDesc.of(ImmutableFlag.class, String.class, Map.class, Flag.Value.class),
+                                        feature, metadata,
                                         ibc.new_(ImmutableStringValue.class, value)));
                     });
                     bc.return_(ret);

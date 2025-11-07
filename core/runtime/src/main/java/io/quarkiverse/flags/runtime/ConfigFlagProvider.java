@@ -1,26 +1,32 @@
 package io.quarkiverse.flags.runtime;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.FlagManager;
+import io.quarkiverse.flags.spi.EvaluatedFlag;
+import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkiverse.flags.spi.ImmutableFlag;
-import io.smallrye.config.SmallRyeConfig;
+import io.quarkiverse.flags.spi.ImmutableStringValue;
 
 @Singleton
 public class ConfigFlagProvider implements FlagProvider {
 
     @Inject
-    SmallRyeConfig config;
+    FlagManager manager;
 
     @Inject
     FlagsBuildTimeConfig buildConfig;
+
+    @Inject
+    FlagsRuntimeConfig runtimeConfig;
 
     @Override
     public int getPriority() {
@@ -29,48 +35,25 @@ public class ConfigFlagProvider implements FlagProvider {
 
     @Override
     public Iterable<Flag> getFlags() {
-        String prefix = buildConfig.configPrefix();
-        Set<String> flagPropertyNames = new HashSet<>();
-        for (String name : config.getPropertyNames()) {
-            if (name.startsWith(prefix)) {
-                flagPropertyNames.add(name);
-            }
-        }
-
-        if (flagPropertyNames.isEmpty()) {
-            return List.of();
-        }
-
         List<Flag> ret = new ArrayList<>();
-        for (String name : flagPropertyNames) {
-            ret.add(new ImmutableFlag(name.substring(prefix.length()), new ConfigState(name)));
-        }
+        addFlags(ret, buildConfig.flags());
+        addFlags(ret, runtimeConfig.flags());
         return List.copyOf(ret);
     }
 
-    class ConfigState implements Flag.Value {
-
-        final String propertyName;
-
-        ConfigState(String propertyName) {
-            this.propertyName = propertyName;
+    private void addFlags(List<Flag> ret, Map<String, FlagConfig> flags) {
+        for (Entry<String, FlagConfig> entry : flags.entrySet()) {
+            String feature = entry.getKey();
+            Map<String, String> metadata = entry.getValue().meta();
+            String evaluatorId = metadata.get(FlagEvaluator.METADATA_KEY);
+            Flag.Value value = new ImmutableStringValue(entry.getValue().value());
+            if (evaluatorId != null) {
+                FlagEvaluator evaluator = manager.getEvaluator(evaluatorId).orElseThrow();
+                ret.add(new EvaluatedFlag(feature, metadata, value, evaluator));
+            } else {
+                ret.add(new ImmutableFlag(feature, metadata, value));
+            }
         }
-
-        @Override
-        public boolean asBoolean() {
-            return config.getOptionalValue(propertyName, Boolean.class).orElseThrow();
-        }
-
-        @Override
-        public String asString() {
-            return config.getOptionalValue(propertyName, String.class).orElseThrow();
-        }
-
-        @Override
-        public int asInt() {
-            return config.getOptionalValue(propertyName, Integer.class).orElseThrow();
-        }
-
     }
 
 }

@@ -1,7 +1,9 @@
 package io.quarkiverse.flags;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
+import io.quarkiverse.flags.spi.ComputationContextImpl;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -18,12 +20,19 @@ public interface Flag {
     String feature();
 
     /**
+     * @return the metadata
+     */
+    default Map<String, String> metadata() {
+        return Map.of();
+    }
+
+    /**
      * Computes the current value of the feature flag.
      * <p>
      * Does not block the caller thread.
      *
      * @param context (not {@code null})
-     * @return the computed state
+     * @return the computed value
      */
     @CheckReturnValue
     Uni<Value> compute(ComputationContext context);
@@ -33,11 +42,11 @@ public interface Flag {
      * <p>
      * Does not block the caller thread.
      *
-     * @return the computed state
+     * @return the computed value
      */
     @CheckReturnValue
     default Uni<Value> compute() {
-        return compute(null);
+        return compute(ComputationContext.EMPTY);
     }
 
     /**
@@ -45,10 +54,10 @@ public interface Flag {
      * <p>
      * Blocks the caller thread.
      *
-     * @return the computed state
+     * @return the computed value
      */
     default Value computeAndAwait() {
-        return computeAndAwait(null);
+        return computeAndAwait(ComputationContext.EMPTY);
     }
 
     /**
@@ -57,7 +66,7 @@ public interface Flag {
      * Blocks the caller thread.
      *
      * @param context (not {@code null})
-     * @return the computed state
+     * @return the computed value
      */
     default Value computeAndAwait(ComputationContext context) {
         return compute(context).await().indefinitely();
@@ -91,22 +100,33 @@ public interface Flag {
     }
 
     /**
-     * Context of a single state computation.
+     * Context of a single computation.
      */
     interface ComputationContext {
 
-        /**
-         * @param key
-         * @param data
-         * @return this
-         */
-        ComputationContext put(String key, Object obj);
+        static ComputationContext EMPTY = builder().build();
+
+        static ComputationContext of(String key, Object value) {
+            return builder().put(key, value).build();
+        }
+
+        static Builder builder() {
+            return new ComputationContextImpl.BuilderImpl();
+        }
 
         /**
          * @param key
          * @return the data or {@code null}
          */
         <T> T get(String key);
+
+        interface Builder {
+
+            Builder put(String key, Object value);
+
+            ComputationContext build();
+
+        }
 
     }
 

@@ -18,6 +18,7 @@ import org.jboss.jandex.Type;
 
 import io.quarkiverse.flags.jpa.FlagDefinition;
 import io.quarkiverse.flags.jpa.FlagFeature;
+import io.quarkiverse.flags.jpa.FlagMetadata;
 import io.quarkiverse.flags.jpa.FlagValue;
 import io.quarkus.builder.item.SimpleBuildItem;
 import io.quarkus.deployment.bean.JavaBeanUtil;
@@ -37,6 +38,8 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
 
     private final Property value;
 
+    private final Property metadata;
+
     FlagDefinitionBuildItem(ClassInfo entityClass, boolean isPanache) {
         this.entityClass = entityClass;
         AnnotationInstance flagFeature = entityClass.annotation(FlagFeature.class);
@@ -45,12 +48,20 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
         }
         this.feature = flagFeature.target().kind() == Kind.FIELD ? new FieldProperty(flagFeature.target().asField(), isPanache)
                 : new GetterProperty(flagFeature.target().asMethod());
-        AnnotationInstance flagState = entityClass.annotation(FlagValue.class);
-        if (flagState == null) {
+        AnnotationInstance flagValue = entityClass.annotation(FlagValue.class);
+        if (flagValue == null) {
             throw new IllegalStateException("@FlagState not declared on " + entityClass);
         }
-        this.value = flagState.target().kind() == Kind.FIELD ? new FieldProperty(flagState.target().asField(), isPanache)
-                : new GetterProperty(flagState.target().asMethod());
+        this.value = flagValue.target().kind() == Kind.FIELD ? new FieldProperty(flagValue.target().asField(), isPanache)
+                : new GetterProperty(flagValue.target().asMethod());
+        AnnotationInstance flagMetadata = entityClass.annotation(FlagMetadata.class);
+        if (flagMetadata == null) {
+            this.metadata = null;
+        } else {
+            this.metadata = flagMetadata.target().kind() == Kind.FIELD
+                    ? new FieldProperty(flagMetadata.target().asField(), isPanache)
+                    : new GetterProperty(flagMetadata.target().asMethod());
+        }
     }
 
     public String getEntityName() {
@@ -74,6 +85,10 @@ public final class FlagDefinitionBuildItem extends SimpleBuildItem {
 
     public Property getValue() {
         return value;
+    }
+
+    public Property getMetadata() {
+        return metadata;
     }
 
     interface Property {

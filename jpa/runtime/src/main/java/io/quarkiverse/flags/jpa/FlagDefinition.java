@@ -7,8 +7,14 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import io.quarkiverse.flags.Flag;
+
 /**
  * Indicates that annotated entity class should be used as a feature flag.
+ *
+ * @see Flag
+ * @see FlagFeature
+ * @see FlagValue
  */
 @Retention(RUNTIME)
 @Target(TYPE)

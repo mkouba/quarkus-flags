@@ -1,13 +1,23 @@
 package io.quarkiverse.flags.runtime;
 
+import java.util.Map;
+
 import io.smallrye.config.WithDefault;
 
+/**
+ * Configuration of a feature flag.
+ */
 public interface FlagConfig {
 
     /**
-     * If flag is on or off.
+     * The value.
      */
     @WithDefault("true")
-    boolean enabled();
+    String value();
+
+    /**
+     * The metadata.
+     */
+    Map<String, String> meta();
 
 }

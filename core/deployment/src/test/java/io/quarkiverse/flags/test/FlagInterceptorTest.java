@@ -35,7 +35,7 @@ public class FlagInterceptorTest {
     public void testFlags() {
         inMemoryFlagProvider.newFlag("alpha")
                 .setEnabled(true)
-                .add();
+                .register();
         assertFalse(manager.getFlag("alpha").orElseThrow().computeAndAwait().asBoolean());
     }
 

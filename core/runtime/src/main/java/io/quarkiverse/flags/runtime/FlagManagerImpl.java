@@ -1,24 +1,29 @@
 package io.quarkiverse.flags.runtime;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
-import jakarta.inject.Singleton;
 
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.FlagManager;
+import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagInterceptor;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.arc.All;
@@ -26,7 +31,7 @@ import io.quarkus.runtime.Startup;
 import io.smallrye.mutiny.Uni;
 
 @Startup
-@Singleton
+@ApplicationScoped
 public class FlagManagerImpl implements FlagManager {
 
     private static final Logger LOG = Logger.getLogger(FlagManagerImpl.class);
@@ -35,7 +40,11 @@ public class FlagManagerImpl implements FlagManager {
 
     private final List<FlagInterceptor> interceptors;
 
-    private FlagManagerImpl(@All List<FlagProvider> providers, @All List<FlagInterceptor> interceptors) {
+    private final Map<String, FlagEvaluator> evaluators;
+
+    private FlagManagerImpl(@All List<FlagProvider> providers,
+            @All List<FlagInterceptor> interceptors,
+            @All List<FlagEvaluator> evaluators) {
         List<FlagProvider> sortedProviders = new ArrayList<>();
         int lastPriority = Integer.MAX_VALUE;
         for (FlagProvider provider : providers.stream().sorted().toList()) {
@@ -51,6 +60,7 @@ public class FlagManagerImpl implements FlagManager {
         }
         this.providers = List.copyOf(sortedProviders);
         this.interceptors = interceptors.stream().sorted().collect(Collectors.toUnmodifiableList());
+        this.evaluators = evaluators.stream().collect(toMap(FlagEvaluator::id, Function.identity()));
     }
 
     @Override
@@ -73,6 +83,12 @@ public class FlagManagerImpl implements FlagManager {
             }
         }
         return ret;
+    }
+
+    @Override
+    public Optional<FlagEvaluator> getEvaluator(String id) {
+        FlagEvaluator evaluator = evaluators.get(id);
+        return Optional.ofNullable(evaluator);
     }
 
     @Feature("")
@@ -119,8 +135,13 @@ public class FlagManagerImpl implements FlagManager {
         }
 
         @Override
+        public Map<String, String> metadata() {
+            return delegate.metadata();
+        }
+
+        @Override
         public Uni<Value> compute(ComputationContext computationContext) {
-            Uni<Value> state = delegate.compute();
+            Uni<Value> state = delegate.compute(computationContext);
             if (!interceptors.isEmpty()) {
                 return applyNextInterceptor(state, computationContext, interceptors.iterator());
             }
@@ -151,6 +172,11 @@ public class FlagManagerImpl implements FlagManager {
                 return false;
             Flag other = (Flag) obj;
             return Objects.equals(delegate.feature(), other.feature());
+        }
+
+        @Override
+        public String toString() {
+            return "InterceptedFlag [delegate=" + delegate + "]";
         }
 
     }

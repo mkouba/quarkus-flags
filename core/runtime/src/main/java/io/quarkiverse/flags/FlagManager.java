@@ -3,6 +3,8 @@ package io.quarkiverse.flags;
 import java.util.Optional;
 import java.util.Set;
 
+import io.quarkiverse.flags.spi.FlagEvaluator;
+
 /**
  * A feature flag manager.
  */
@@ -23,5 +25,11 @@ public interface FlagManager {
      * @return an immutable set of feature flags
      */
     Set<Flag> getFlags();
+
+    /**
+     * @param id
+     * @return the evaluator for the given id
+     */
+    Optional<FlagEvaluator> getEvaluator(String id);
 
 }

@@ -1,5 +1,6 @@
 package io.quarkiverse.flags;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import io.quarkiverse.flags.Flag.ComputationContext;
@@ -36,7 +37,9 @@ public interface InMemoryFlagProvider extends FlagProvider {
 
         FlagDefinition setComputeAsync(Function<ComputationContext, Uni<Flag.Value>> fun);
 
-        Flag add();
+        FlagDefinition setMetadata(Map<String, String> metadata);
+
+        Flag register();
 
     }
 

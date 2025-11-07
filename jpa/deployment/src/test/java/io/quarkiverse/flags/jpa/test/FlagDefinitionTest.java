@@ -3,6 +3,8 @@ package io.quarkiverse.flags.jpa.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
@@ -29,10 +31,12 @@ public class FlagDefinitionTest {
 
         MyFlag alpha = new MyFlag();
         alpha.feature = "alpha";
-        alpha.state = "true";
+        alpha.value = "true";
+        alpha.metadata = Map.of("foo", "bar");
         alpha.persist();
 
         Flag alphaFlag = manager.getFlag("alpha").orElseThrow();
+        assertEquals("bar", alphaFlag.metadata().get("foo"));
         Flag.Value alphaState = alphaFlag.computeAndAwait();
         assertTrue(alphaState.asBoolean());
         assertEquals("true", alphaState.asString());

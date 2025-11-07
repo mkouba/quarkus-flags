@@ -1,5 +1,6 @@
 package io.quarkiverse.flags.runtime;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -56,6 +57,8 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
         private final String feature;
 
+        private Map<String, String> metadata = Map.of();
+
         private Function<ComputationContext, Uni<Value>> fun;
 
         FlagDefinitionImpl(String feature) {
@@ -69,8 +72,14 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
         }
 
         @Override
-        public Flag add() {
-            Flag newFlag = new InMemoryFlag(feature, fun);
+        public FlagDefinition setMetadata(Map<String, String> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        @Override
+        public Flag register() {
+            Flag newFlag = new InMemoryFlag(feature, metadata, fun);
             Flag existing = flags.putIfAbsent(feature, newFlag);
             if (existing == null) {
                 flagAdded.fire(new FlagAdded(newFlag));
@@ -85,16 +94,24 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
         private final String feature;
 
+        private final Map<String, String> metadata;
+
         private final Function<ComputationContext, Uni<Value>> fun;
 
-        InMemoryFlag(String feature, Function<ComputationContext, Uni<Value>> fun) {
+        InMemoryFlag(String feature, Map<String, String> metadata, Function<ComputationContext, Uni<Value>> fun) {
             this.feature = feature;
+            this.metadata = metadata;
             this.fun = fun;
         }
 
         @Override
         public String feature() {
             return feature;
+        }
+
+        @Override
+        public Map<String, String> metadata() {
+            return metadata;
         }
 
         @Override

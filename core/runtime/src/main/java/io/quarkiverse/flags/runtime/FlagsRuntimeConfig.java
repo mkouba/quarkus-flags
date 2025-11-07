@@ -9,9 +9,9 @@ import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefaults;
 import io.smallrye.config.WithParentName;
 
-@ConfigMapping(prefix = "quarkus.flags.build")
-@ConfigRoot(phase = ConfigPhase.BUILD_AND_RUN_TIME_FIXED)
-public interface FlagsBuildTimeConfig {
+@ConfigMapping(prefix = "quarkus.flags.runtime")
+@ConfigRoot(phase = ConfigPhase.RUN_TIME)
+public interface FlagsRuntimeConfig {
 
     /**
      * Flag configurations.
