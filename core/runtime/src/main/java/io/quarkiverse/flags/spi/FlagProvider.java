@@ -8,6 +8,9 @@ public interface FlagProvider extends Comparable<FlagProvider> {
 
     /**
      * The result must not contain flags with duplicate feature names.
+     * <p>
+     * A flag from a provider with higher priority takes precedence and overrides flags with the same {@link Flag#feature()}
+     * from providers with lower priority.
      *
      * @return the flags
      */

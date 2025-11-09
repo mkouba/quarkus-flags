@@ -5,9 +5,6 @@ import java.util.Optional;
 
 /**
  * Represents a central point to access feature flags.
- * <p>
- * A flag from a provider with higher priority takes precedence and overrides flags with the same {@link Flag#feature()}
- * from providers with lower priority.
  *
  * @see Flag
  */

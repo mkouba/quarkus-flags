@@ -5,40 +5,27 @@ import java.util.Map;
 import io.quarkiverse.flags.Flag;
 import io.smallrye.mutiny.Uni;
 
-public final class ImmutableFlag implements Flag {
+public final class ImmutableFlag extends AbstractFlag {
 
-    private final String feature;
-    private final Map<String, String> metadata;
-    private final Flag.Value state;
+    private final Flag.Value value;
 
     public ImmutableFlag(String feature, Flag.Value value) {
         this(feature, Map.of(), value);
     }
 
     public ImmutableFlag(String feature, Map<String, String> metadata, Value value) {
-        this.feature = feature;
-        this.metadata = metadata;
-        this.state = value;
-    }
-
-    @Override
-    public String feature() {
-        return feature;
-    }
-
-    @Override
-    public Map<String, String> metadata() {
-        return metadata;
+        super(feature, metadata);
+        this.value = value;
     }
 
     @Override
     public Uni<Value> compute(ComputationContext context) {
-        return Uni.createFrom().item(state);
+        return Uni.createFrom().item(value);
     }
 
     @Override
     public String toString() {
-        return "ImmutableFlag [feature=" + feature + "]";
+        return "ImmutableFlag [feature=" + feature() + "]";
     }
 
 }
