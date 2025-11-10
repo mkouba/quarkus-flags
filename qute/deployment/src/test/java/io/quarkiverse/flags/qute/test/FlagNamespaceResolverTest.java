@@ -24,7 +24,7 @@ public class FlagNamespaceResolverTest {
         assertEquals("true", Qute.fmt("{flag:bool('alpha')}").render());
         assertEquals("true", Qute.fmt("{flag:string(data.0)}", "bravo"));
         assertEquals("5", Qute.fmt("{flag:int(\"charlie\")}").render());
-        assertEquals("ok", Qute.fmt("{#if flag:bool('alpha')}ok{/if}").render());
+        assertEquals("ok", Qute.fmt("{#if flag:enabled('alpha')}ok{/if}").render());
         assertEquals("true", Qute.fmt("{flag:meta('charlie').get('foo')}").render());
         String allFlags = Qute.fmt("""
                 {#for flag in flag:flags}{flag.feature}{#if flag_hasNext}:{/if}{/for}

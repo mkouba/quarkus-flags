@@ -13,7 +13,7 @@ public interface FlagEvaluator {
     /**
      * @see Flag#metadata()
      */
-    static String METADATA_KEY = "evaluator";
+    static String META_KEY = "evaluator";
 
     /**
      * The identifier must be unique.

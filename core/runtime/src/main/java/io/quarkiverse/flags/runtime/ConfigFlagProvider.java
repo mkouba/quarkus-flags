@@ -46,7 +46,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         for (Entry<String, FlagConfig> entry : flags.entrySet()) {
             String feature = entry.getKey();
             Map<String, String> metadata = entry.getValue().meta();
-            String evaluatorId = metadata.get(FlagEvaluator.METADATA_KEY);
+            String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
             Flag.Value value = new ImmutableStringValue(entry.getValue().value());
             if (evaluatorId != null) {
                 FlagEvaluator evaluator = manager.getEvaluator(evaluatorId).orElseThrow();

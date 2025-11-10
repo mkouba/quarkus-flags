@@ -61,19 +61,19 @@ public class ConfigFlagsTest {
     public void testFlags() {
         List<Flag> all = flags.findAll();
         assertEquals(4, all.size(), all.toString());
-        assertTrue(flags.find("alpha").orElseThrow().isOn());
+        assertTrue(flags.find("alpha").orElseThrow().isEnabled());
         assertFalse(flags.find("bravo").orElseThrow().computeAndAwait().asBoolean());
         assertEquals(0, flags.find("bravo").orElseThrow().getInt());
-        assertTrue(flags.find("charlie").orElseThrow().computeAndAwait().asBoolean());
-        assertFalse(flags.find("delta").orElseThrow().computeAndAwait().asBoolean());
-        assertTrue(alpha.isOn());
+        assertTrue(flags.isEnabled("charlie"));
+        assertFalse(flags.isEnabled("delta"));
+        assertTrue(alpha.isEnabled());
         assertTrue(foo.isEmpty());
 
         assertFalse(bravo.get().computeAndAwait().asBoolean());
         assertEquals("0", bravo.get().getString());
 
         Flag deltaFlag = delta.orElseThrow();
-        assertEquals("deltaEval", deltaFlag.metadata().get(FlagEvaluator.METADATA_KEY));
+        assertEquals("deltaEval", deltaFlag.metadata().get(FlagEvaluator.META_KEY));
         assertTrue(deltaFlag.computeAndAwait(Flag.ComputationContext.of("username", "foo")).asBoolean());
         assertFalse(deltaFlag.computeAndAwait(Flag.ComputationContext.of("username", "qux")).asBoolean());
     }

@@ -18,7 +18,7 @@ public class TestEndpoint {
 
     @GET
     public String get(HttpHeaders headers) {
-        if (flags.find("test.render-template").orElseThrow().isOn()) {
+        if (flags.isEnabled("test.render-template")) {
             return new template(headers.getRequestHeaders().entrySet()
                     .stream().map(e -> e.getKey() + ": " + e.getValue())
                     .toList()).render();

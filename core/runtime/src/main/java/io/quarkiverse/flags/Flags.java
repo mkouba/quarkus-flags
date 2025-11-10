@@ -1,6 +1,7 @@
 package io.quarkiverse.flags;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -20,5 +21,15 @@ public interface Flags {
      * @return an immutable list of feature flags
      */
     List<Flag> findAll();
+
+    /**
+     *
+     * @param feature
+     * @return the computed boolean value
+     * @throws NoSuchElementException If no such feature exists
+     */
+    default boolean isEnabled(String feature) {
+        return find(feature).orElseThrow().isEnabled();
+    }
 
 }

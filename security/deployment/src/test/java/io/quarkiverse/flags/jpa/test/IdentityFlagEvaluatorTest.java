@@ -40,19 +40,19 @@ public class IdentityFlagEvaluatorTest {
                 .setPrincipal(new QuarkusPrincipal("Foo"))
                 .addRole("foo")
                 .build());
-        assertTrue(delta.isOn());
+        assertTrue(delta.isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setAnonymous(true)
                 .build());
-        assertFalse(delta.isOn());
+        assertFalse(delta.isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setPrincipal(new QuarkusPrincipal("Foo"))
                 .addRole("baz")
                 .addRole("qux")
                 .build());
-        assertFalse(delta.isOn());
+        assertFalse(delta.isEnabled());
     }
 
 }

@@ -77,7 +77,7 @@ public interface Flag {
      *
      * @return the computed boolean value
      */
-    default boolean isOn() {
+    default boolean isEnabled() {
         return computeAndAwait().asBoolean();
     }
 

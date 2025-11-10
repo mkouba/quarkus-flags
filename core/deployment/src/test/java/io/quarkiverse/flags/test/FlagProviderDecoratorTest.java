@@ -37,7 +37,7 @@ public class FlagProviderDecoratorTest {
         inMemoryFlagProvider.newFlag("alpha")
                 .setEnabled(true)
                 .register();
-        assertFalse(flags.find("alpha").orElseThrow().isOn());
+        assertFalse(flags.find("alpha").orElseThrow().isEnabled());
     }
 
     @Priority(5)

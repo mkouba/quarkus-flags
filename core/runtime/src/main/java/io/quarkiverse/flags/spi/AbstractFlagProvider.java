@@ -13,7 +13,7 @@ public abstract class AbstractFlagProvider implements FlagProvider {
     }
 
     protected Flag createFlag(String feature, Flag.Value initialValue, Map<String, String> metadata) {
-        String evaluatorId = metadata.get(FlagEvaluator.METADATA_KEY);
+        String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
         if (evaluatorId != null) {
             FlagEvaluator evaluator = manager.getEvaluator(evaluatorId)
                     .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));

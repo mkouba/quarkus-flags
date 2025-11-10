@@ -47,7 +47,7 @@ public class FlagNamespaceResolver implements NamespaceResolver {
                 return Results.notFound(ctx);
             }
             return switch (ctx.getName()) {
-                case "bool" -> cast(flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
+                case "bool", "enabled" -> cast(flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
                 case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
                 case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
                 case "meta" -> CompletedStage.of(flag.get().metadata());

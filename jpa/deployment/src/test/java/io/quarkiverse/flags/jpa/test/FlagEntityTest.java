@@ -38,12 +38,12 @@ public class FlagEntityTest {
         MyFlag alpha = new MyFlag();
         alpha.feature = "alpha";
         alpha.value = "false";
-        alpha.metadata = Map.of("foo", "bar", FlagEvaluator.METADATA_KEY, "inverting");
+        alpha.metadata = Map.of("foo", "bar", FlagEvaluator.META_KEY, "inverting");
         alpha.persistAndFlush();
 
         Flag alphaFlag = flags.find("alpha").orElseThrow();
         assertEquals("bar", alphaFlag.metadata().get("foo"));
-        assertEquals("inverting", alphaFlag.metadata().get(FlagEvaluator.METADATA_KEY));
+        assertEquals("inverting", alphaFlag.metadata().get(FlagEvaluator.META_KEY));
         Flag.Value alphaState = alphaFlag.computeAndAwait();
         assertTrue(alphaState.asBoolean());
         assertEquals("true", alphaState.asString());
