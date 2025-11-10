@@ -30,7 +30,8 @@ public class FlagNamespaceResolver implements NamespaceResolver {
 
     @Override
     public CompletionStage<Object> resolve(EvalContext ctx) {
-        if ("flags".equals(ctx.getName())) {
+        String name = ctx.getName();
+        if ("flags".equals(name)) {
             return CompletedStage.of(flags.findAll());
         }
         // flag:bool('delta.feat.open')
@@ -49,6 +50,7 @@ public class FlagNamespaceResolver implements NamespaceResolver {
                 case "bool" -> cast(flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
                 case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
                 case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
+                case "meta" -> CompletedStage.of(flag.get().metadata());
                 default -> throw new IllegalArgumentException("Unexpected value: " + ctx.getName());
             };
         });

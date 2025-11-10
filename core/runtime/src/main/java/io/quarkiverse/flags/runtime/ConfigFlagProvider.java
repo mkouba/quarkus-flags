@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.EvaluatedFlag;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
@@ -16,16 +17,14 @@ import io.quarkiverse.flags.spi.ImmutableFlag;
 import io.quarkiverse.flags.spi.ImmutableStringValue;
 
 @Singleton
-public class ConfigFlagProvider implements FlagProvider {
-
-    private final FlagManager manager;
+public class ConfigFlagProvider extends AbstractFlagProvider {
 
     private final FlagsBuildTimeConfig buildConfig;
 
     private final FlagsRuntimeConfig runtimeConfig;
 
     public ConfigFlagProvider(FlagManager manager, FlagsBuildTimeConfig buildConfig, FlagsRuntimeConfig runtimeConfig) {
-        this.manager = manager;
+        super(manager);
         this.buildConfig = buildConfig;
         this.runtimeConfig = runtimeConfig;
     }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Test</title>
+</head>
+<body>
+   <h1>Test</h1>
+   <ul>
+   {#if flag:bool('test.show-headers') && flag:meta('test.show-headers').get('evaluator').equals('custom')} 
+   {#for header in headers}
+      <li>{header.toLowerCase}</li>
+   {/for}
+   {/if}
+   </ul>
+</body>
+</html>

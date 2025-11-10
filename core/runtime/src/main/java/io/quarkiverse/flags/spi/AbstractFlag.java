@@ -12,7 +12,7 @@ public abstract class AbstractFlag implements Flag {
 
     protected AbstractFlag(String feature, Map<String, String> metadata) {
         this.feature = feature;
-        this.metadata = metadata;
+        this.metadata = Map.copyOf(metadata);
     }
 
     @Override

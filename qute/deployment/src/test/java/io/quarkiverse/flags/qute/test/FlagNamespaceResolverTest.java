@@ -16,7 +16,8 @@ public class FlagNamespaceResolverTest {
             .withEmptyApplication()
             .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.bravo.value", "true")
-            .overrideRuntimeConfigKey("quarkus.flags.runtime.charlie.value", "5");
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.charlie.value", "5")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.charlie.meta.foo", "true");
 
     @Test
     public void testFlag() {
@@ -24,6 +25,7 @@ public class FlagNamespaceResolverTest {
         assertEquals("true", Qute.fmt("{flag:string(data.0)}", "bravo"));
         assertEquals("5", Qute.fmt("{flag:int(\"charlie\")}").render());
         assertEquals("ok", Qute.fmt("{#if flag:bool('alpha')}ok{/if}").render());
+        assertEquals("true", Qute.fmt("{flag:meta('charlie').get('foo')}").render());
         String allFlags = Qute.fmt("""
                 {#for flag in flag:flags}{flag.feature}{#if flag_hasNext}:{/if}{/for}
                 """).render();
