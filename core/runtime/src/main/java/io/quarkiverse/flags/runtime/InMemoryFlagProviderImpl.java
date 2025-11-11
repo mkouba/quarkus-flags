@@ -12,11 +12,16 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.InMemoryFlagProvider;
+import io.quarkiverse.flags.spi.AbstractEvaluatedFlag;
+import io.quarkiverse.flags.spi.AbstractFlag;
+import io.quarkiverse.flags.spi.AbstractFlagProvider;
+import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.smallrye.mutiny.Uni;
 
 @Singleton
-public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
+public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements InMemoryFlagProvider {
 
     private final ConcurrentMap<String, Flag> flags = new ConcurrentHashMap<>();
 
@@ -24,7 +29,8 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
     private final Event<FlagRemoved> flagRemoved;
 
-    public InMemoryFlagProviderImpl(Event<FlagAdded> flagAdded, Event<FlagRemoved> flagRemoved) {
+    public InMemoryFlagProviderImpl(FlagManager manager, Event<FlagAdded> flagAdded, Event<FlagRemoved> flagRemoved) {
+        super(manager);
         this.flagAdded = flagAdded;
         this.flagRemoved = flagRemoved;
     }
@@ -79,7 +85,14 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
         @Override
         public Flag register() {
-            Flag newFlag = new InMemoryFlag(feature, metadata, fun);
+            Flag newFlag;
+            String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
+            if (evaluatorId != null) {
+                FlagEvaluator evaluator = manager.getEvaluator(evaluatorId).orElseThrow();
+                newFlag = new InMemoryEvaluatedFlag(feature, metadata, fun, evaluator);
+            } else {
+                newFlag = new InMemoryFlag(feature, metadata, fun);
+            }
             Flag existing = flags.putIfAbsent(feature, newFlag);
             if (existing == null) {
                 flagAdded.fire(new FlagAdded(newFlag));
@@ -90,32 +103,34 @@ public class InMemoryFlagProviderImpl implements InMemoryFlagProvider {
 
     }
 
-    class InMemoryFlag implements Flag {
-
-        private final String feature;
-
-        private final Map<String, String> metadata;
+    class InMemoryFlag extends AbstractFlag {
 
         private final Function<ComputationContext, Uni<Value>> fun;
 
         InMemoryFlag(String feature, Map<String, String> metadata, Function<ComputationContext, Uni<Value>> fun) {
-            this.feature = feature;
-            this.metadata = metadata;
+            super(feature, metadata);
             this.fun = fun;
         }
 
         @Override
-        public String feature() {
-            return feature;
-        }
-
-        @Override
-        public Map<String, String> metadata() {
-            return metadata;
-        }
-
-        @Override
         public Uni<Value> compute(ComputationContext context) {
+            return fun.apply(context);
+        }
+
+    }
+
+    class InMemoryEvaluatedFlag extends AbstractEvaluatedFlag {
+
+        private final Function<ComputationContext, Uni<Value>> fun;
+
+        InMemoryEvaluatedFlag(String feature, Map<String, String> metadata, Function<ComputationContext, Uni<Value>> fun,
+                FlagEvaluator evaluator) {
+            super(feature, metadata, evaluator);
+            this.fun = fun;
+        }
+
+        @Override
+        protected Uni<Value> initialValue(ComputationContext context) {
             return fun.apply(context);
         }
 

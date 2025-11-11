@@ -9,11 +9,8 @@ import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
-import io.quarkiverse.flags.spi.EvaluatedFlag;
-import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
-import io.quarkiverse.flags.spi.ImmutableFlag;
 import io.quarkiverse.flags.spi.ImmutableStringValue;
 
 @Singleton
@@ -46,14 +43,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         for (Entry<String, FlagConfig> entry : flags.entrySet()) {
             String feature = entry.getKey();
             Map<String, String> metadata = entry.getValue().meta();
-            String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
-            Flag.Value value = new ImmutableStringValue(entry.getValue().value());
-            if (evaluatorId != null) {
-                FlagEvaluator evaluator = manager.getEvaluator(evaluatorId).orElseThrow();
-                ret.add(new EvaluatedFlag(feature, metadata, value, evaluator));
-            } else {
-                ret.add(new ImmutableFlag(feature, metadata, value));
-            }
+            ret.add(createFlag(feature, new ImmutableStringValue(entry.getValue().value()), metadata));
         }
     }
 

@@ -17,7 +17,7 @@ public abstract class AbstractFlagProvider implements FlagProvider {
         if (evaluatorId != null) {
             FlagEvaluator evaluator = manager.getEvaluator(evaluatorId)
                     .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));
-            return new EvaluatedFlag(feature, metadata, initialValue, evaluator);
+            return new InitializedEvaluatedFlag(feature, metadata, initialValue, evaluator);
         } else {
             return new ImmutableFlag(feature, metadata, initialValue);
         }
