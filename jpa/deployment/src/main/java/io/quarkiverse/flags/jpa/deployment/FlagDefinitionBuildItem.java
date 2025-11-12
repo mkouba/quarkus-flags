@@ -20,7 +20,7 @@ import io.quarkiverse.flags.jpa.FlagDefinition;
 import io.quarkiverse.flags.jpa.FlagFeature;
 import io.quarkiverse.flags.jpa.FlagMetadata;
 import io.quarkiverse.flags.jpa.FlagValue;
-import io.quarkus.builder.item.SimpleBuildItem;
+import io.quarkus.builder.item.MultiBuildItem;
 import io.quarkus.deployment.bean.JavaBeanUtil;
 import io.quarkus.gizmo2.Expr;
 import io.quarkus.gizmo2.Var;
@@ -30,7 +30,7 @@ import io.quarkus.gizmo2.creator.BlockCreator;
  *
  * @see FlagDefinition
  */
-final class FlagDefinitionBuildItem extends SimpleBuildItem {
+final class FlagDefinitionBuildItem extends MultiBuildItem {
 
     private final ClassInfo entityClass;
 

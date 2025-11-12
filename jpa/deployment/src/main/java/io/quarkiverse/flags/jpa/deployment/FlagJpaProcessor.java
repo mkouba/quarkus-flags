@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import jakarta.inject.Singleton;
@@ -48,30 +47,25 @@ public class FlagJpaProcessor {
     private static final Logger LOG = Logger.getLogger(FlagJpaProcessor.class);
 
     @BuildStep
-    void flagDefinition(ApplicationIndexBuildItem index, List<PanacheEntityClassesBuildItem> panacheEntityClasses,
+    void collectFlagDefinitions(ApplicationIndexBuildItem index, List<PanacheEntityClassesBuildItem> panacheEntityClasses,
             BuildProducer<FlagDefinitionBuildItem> flagDefinition) {
         List<AnnotationInstance> flagDefinitions = index.getIndex().getAnnotations(DotName.createSimple(FlagDefinition.class));
-        if (flagDefinitions.size() > 1) {
-            throw new RuntimeException("At most one entity class can be annotated with @FlagDefinition");
+        for (AnnotationInstance flagDefinitionAnnotation : flagDefinitions) {
+            Set<String> panacheEntities = new HashSet<>();
+            for (PanacheEntityClassesBuildItem entityClasses : panacheEntityClasses) {
+                panacheEntities.addAll(entityClasses.getEntityClasses());
+            }
+            ClassInfo entityClass = flagDefinitionAnnotation.target().asClass();
+            flagDefinition.produce(
+                    new FlagDefinitionBuildItem(entityClass, panacheEntities.contains(entityClass.name().toString())));
         }
-        if (flagDefinitions.isEmpty()) {
-            return;
-        }
-        AnnotationInstance flagDefinitionAnnotation = flagDefinitions.get(0);
-        Set<String> panacheEntities = new HashSet<>();
-        for (PanacheEntityClassesBuildItem entityClasses : panacheEntityClasses) {
-            panacheEntities.addAll(entityClasses.getEntityClasses());
-        }
-        ClassInfo entityClass = flagDefinitionAnnotation.target().asClass();
-        flagDefinition.produce(
-                new FlagDefinitionBuildItem(entityClass, panacheEntities.contains(entityClass.name().toString())));
     }
 
     @BuildStep
     void generateFlagProvider(FlagJpaBuildTimeConfig config, List<PersistenceUnitDescriptorBuildItem> descriptors,
-            Optional<FlagDefinitionBuildItem> flagDefinition, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
-        if (flagDefinition.isEmpty()) {
-            LOG.debugf("No @FlagDefinition found - JPA FlagProvider will not be generated");
+            List<FlagDefinitionBuildItem> flagDefinitions, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
+        if (flagDefinitions.isEmpty()) {
+            LOG.debugf("No @FlagDefinition found - no JPA FlagProvider will be generated");
             return;
         }
         if (descriptors.stream().noneMatch(pud -> pud.getPersistenceUnitName().equals(config.persistenceUnitName()))) {
@@ -80,88 +74,88 @@ public class FlagJpaProcessor {
         ClassOutput classOutput = new GeneratedBeanGizmo2Adaptor(generatedBeans);
         Gizmo gizmo = Gizmo.create(classOutput);
 
-        ClassInfo entityClass = flagDefinition.get().getEntityClass();
+        for (FlagDefinitionBuildItem flagDefinition : flagDefinitions) {
+            ClassInfo entityClass = flagDefinition.getEntityClass();
 
-        gizmo.class_(entityClass.name() + "_JpaFlagProvider", cc -> {
-            This this_ = cc.this_();
-            cc.addAnnotation(Singleton.class);
-            cc.extends_(AbstractJpaFlagProvider.class);
+            gizmo.class_(entityClass.name() + "_JpaFlagProvider", cc -> {
+                This this_ = cc.this_();
+                cc.addAnnotation(Singleton.class);
+                cc.extends_(AbstractJpaFlagProvider.class);
 
-            // private final EntityManager em;
-            FieldDesc emField = cc.field("em", fc -> {
-                fc.setType(EntityManager.class);
-                fc.private_();
-                fc.final_();
-            });
-
-            cc.constructor(constructor -> {
-                // MyFlag_JpaFlagProvider(EntityManager em, FlagManager fm) {
-                //    super(fm);
-                //    this.em = em;
-                // }
-                constructor.public_();
-                ParamVar em = constructor.parameter("em", pc -> {
-                    pc.setType(EntityManager.class);
-                    if (!config.persistenceUnitName().equals(PersistenceUnitUtil.DEFAULT_PERSISTENCE_UNIT_NAME)) {
-                        // Non-default persistence unit used
-                        pc.addAnnotation(new PersistenceUnit.PersistenceUnitLiteral(config.persistenceUnitName()));
-                    }
+                // private final EntityManager em;
+                FieldDesc emField = cc.field("em", fc -> {
+                    fc.setType(EntityManager.class);
+                    fc.private_();
+                    fc.final_();
                 });
-                ParamVar manager = constructor.parameter("fm", FlagManager.class);
-                constructor.body(bc -> {
-                    bc.invokeSpecial(ConstructorDesc.of(AbstractJpaFlagProvider.class, FlagManager.class), this_, manager);
-                    bc.set(this_.field(emField), em);
-                    bc.return_();
-                });
-            });
 
-            cc.method("getPriority", mc -> {
-                mc.returning(int.class);
-                mc.body(bc -> {
-                    bc.return_(FlagProvider.DEFAULT_PRIORITY + 5);
-                });
-            });
-
-            cc.method("getFlags", mc -> {
-                mc.returning(Iterable.class);
-                mc.addAnnotation(Transactional.class);
-                mc.body(bc -> {
-                    // List<MyFlag> flags = em.createQuery("from MyFlag").getResultList();
-                    Expr query = bc.invokeInterface(
-                            MethodDesc.of(EntityManager.class, "createQuery", Query.class, String.class),
-                            this_.field(emField),
-                            Const.of("from " + flagDefinition.get().getEntityName()));
-                    LocalVar flags = bc.localVar("flags",
-                            bc.invokeInterface(MethodDesc.of(Query.class, "getResultList", List.class),
-                                    query));
-                    // List<Flag> ret = new ArrayList(all.size());
-                    LocalVar ret = bc.localVar("ret", bc.new_(ArrayList.class, bc.withList(flags).size()));
-                    // for (MyFlag myFlag : all) {
-                    //    ret.add(this.createFlag(myFlag.feature, myFlag.metadata, myFlag.value));
+                cc.constructor(constructor -> {
+                    // MyFlag_JpaFlagProvider(EntityManager em, FlagManager fm) {
+                    //    super(fm);
+                    //    this.em = em;
                     // }
-                    bc.forEach(flags, (ibc, item) -> {
-                        Expr feature = flagDefinition.get().getFeature().read(item, ibc);
-                        Expr value = flagDefinition.get().getValue().read(item, ibc);
-                        Expr metadata;
-                        Property metadataProperty = flagDefinition.get().getMetadata();
-                        if (metadataProperty != null) {
-                            metadata = metadataProperty.read(item, ibc);
-                        } else {
-                            metadata = Const.ofNull(Map.class);
+                    constructor.public_();
+                    ParamVar em = constructor.parameter("em", pc -> {
+                        pc.setType(EntityManager.class);
+                        if (!config.persistenceUnitName().equals(PersistenceUnitUtil.DEFAULT_PERSISTENCE_UNIT_NAME)) {
+                            // Non-default persistence unit used
+                            pc.addAnnotation(new PersistenceUnit.PersistenceUnitLiteral(config.persistenceUnitName()));
                         }
-                        ibc.withList(ret)
-                                .add(ibc.invokeVirtual(
-                                        MethodDesc.of(AbstractJpaFlagProvider.class, "createFlag", Flag.class, String.class,
-                                                String.class,
-                                                Map.class),
-                                        this_, feature, value, metadata));
                     });
-                    bc.return_(ret);
+                    ParamVar manager = constructor.parameter("fm", FlagManager.class);
+                    constructor.body(bc -> {
+                        bc.invokeSpecial(ConstructorDesc.of(AbstractJpaFlagProvider.class, FlagManager.class), this_, manager);
+                        bc.set(this_.field(emField), em);
+                        bc.return_();
+                    });
+                });
+
+                cc.method("getPriority", mc -> {
+                    mc.returning(int.class);
+                    mc.body(bc -> {
+                        bc.return_(FlagProvider.DEFAULT_PRIORITY + 5);
+                    });
+                });
+
+                cc.method("getFlags", mc -> {
+                    mc.returning(Iterable.class);
+                    mc.addAnnotation(Transactional.class);
+                    mc.body(bc -> {
+                        // List<MyFlag> flags = em.createQuery("from MyFlag").getResultList();
+                        Expr query = bc.invokeInterface(
+                                MethodDesc.of(EntityManager.class, "createQuery", Query.class, String.class),
+                                this_.field(emField),
+                                Const.of("from " + flagDefinition.getEntityName()));
+                        LocalVar flags = bc.localVar("flags",
+                                bc.invokeInterface(MethodDesc.of(Query.class, "getResultList", List.class),
+                                        query));
+                        // List<Flag> ret = new ArrayList(all.size());
+                        LocalVar ret = bc.localVar("ret", bc.new_(ArrayList.class, bc.withList(flags).size()));
+                        // for (MyFlag myFlag : all) {
+                        //    ret.add(this.createFlag(myFlag.feature, myFlag.metadata, myFlag.value));
+                        // }
+                        bc.forEach(flags, (ibc, item) -> {
+                            Expr feature = flagDefinition.getFeature().read(item, ibc);
+                            Expr value = flagDefinition.getValue().read(item, ibc);
+                            Expr metadata;
+                            Property metadataProperty = flagDefinition.getMetadata();
+                            if (metadataProperty != null) {
+                                metadata = metadataProperty.read(item, ibc);
+                            } else {
+                                metadata = Const.ofNull(Map.class);
+                            }
+                            ibc.withList(ret)
+                                    .add(ibc.invokeVirtual(
+                                            MethodDesc.of(AbstractJpaFlagProvider.class, "createFlag", Flag.class, String.class,
+                                                    String.class,
+                                                    Map.class),
+                                            this_, feature, value, metadata));
+                        });
+                        bc.return_(ret);
+                    });
                 });
             });
-
-        });
-
+        }
     }
 
 }
