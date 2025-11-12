@@ -46,8 +46,9 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-test-security</artifactId>
-      <scope>test</scope>
+      <artifactId>quarkus-elytron-security-properties-file</artifactId>
+      <!-- The default scope is needed for security integration tests -->
+      <!-- scope>test</scope-->
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>

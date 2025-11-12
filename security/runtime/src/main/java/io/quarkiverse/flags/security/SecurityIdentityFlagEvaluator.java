@@ -3,6 +3,8 @@ package io.quarkiverse.flags.security;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.jboss.logging.Logger;
+
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
@@ -12,11 +14,13 @@ import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 
 @Singleton
-public class IdentityFlagEvaluator implements FlagEvaluator {
+public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
 
-    public static final String ID = "quarkus.identity";
+    public static final String ID = "quarkus.security.identity";
     public static final String ROLES_ALLOWED = "roles-allowed";
     public static final String AUTHENTICATED = "authenticated";
+
+    private static final Logger LOG = Logger.getLogger(SecurityIdentityFlagEvaluator.class);
 
     @Inject
     SecurityIdentity identity;
@@ -33,6 +37,7 @@ public class IdentityFlagEvaluator implements FlagEvaluator {
             if (authenticated != null
                     && Boolean.parseBoolean(authenticated)
                     && identity.isAnonymous()) {
+                LOG.debugf("User not authenticated");
                 return Uni.createFrom().item(ImmutableBooleanValue.FALSE);
             }
             String rolesAllowed = flag.metadata().get(ROLES_ALLOWED);
@@ -43,6 +48,7 @@ public class IdentityFlagEvaluator implements FlagEvaluator {
                         return Uni.createFrom().item(ImmutableBooleanValue.TRUE);
                     }
                 }
+                LOG.debugf("User [%s] has none of the allowed roles: %s", identity.getPrincipal().getName(), rolesAllowed);
                 return Uni.createFrom().item(ImmutableBooleanValue.FALSE);
             }
         }
