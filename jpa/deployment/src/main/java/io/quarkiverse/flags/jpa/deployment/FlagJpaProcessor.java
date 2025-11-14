@@ -113,7 +113,7 @@ public class FlagJpaProcessor {
                 cc.method("getPriority", mc -> {
                     mc.returning(int.class);
                     mc.body(bc -> {
-                        bc.return_(FlagProvider.DEFAULT_PRIORITY + 5);
+                        bc.return_(FlagProvider.DEFAULT_PRIORITY + 3);
                     });
                 });
 

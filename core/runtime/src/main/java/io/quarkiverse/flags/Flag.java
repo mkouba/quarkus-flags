@@ -2,8 +2,10 @@ package io.quarkiverse.flags;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 import io.quarkiverse.flags.spi.ComputationContextImpl;
+import io.quarkiverse.flags.spi.FlagBuilder;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -11,6 +13,10 @@ import io.smallrye.mutiny.Uni;
  * A feature flag.
  */
 public interface Flag {
+
+    static Builder builder(String feature) {
+        return new FlagBuilder(feature);
+    }
 
     /**
      * @return the name of the feature (not {@code null})
@@ -158,6 +164,26 @@ public interface Flag {
             ComputationContext build();
 
         }
+
+    }
+
+    interface Builder {
+
+        Builder setEnabled(boolean value);
+
+        Builder setString(String value);
+
+        Builder setInt(int value);
+
+        default Builder setCompute(Function<ComputationContext, Flag.Value> fun) {
+            return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
+        }
+
+        Builder setComputeAsync(Function<ComputationContext, Uni<Flag.Value>> fun);
+
+        Builder setMetadata(Map<String, String> metadata);
+
+        Flag build();
 
     }
 

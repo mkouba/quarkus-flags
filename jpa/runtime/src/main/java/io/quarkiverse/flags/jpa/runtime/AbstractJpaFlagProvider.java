@@ -5,7 +5,6 @@ import java.util.Map;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
-import io.quarkiverse.flags.spi.ImmutableStringValue;
 
 public abstract class AbstractJpaFlagProvider extends AbstractFlagProvider {
 
@@ -14,7 +13,7 @@ public abstract class AbstractJpaFlagProvider extends AbstractFlagProvider {
     }
 
     protected Flag createFlag(String feature, String value, Map<String, String> metadata) {
-        return createFlag(feature, new ImmutableStringValue(value), metadata);
+        return Flag.builder(feature).setMetadata(metadata).setString(value).build();
     }
 
 }

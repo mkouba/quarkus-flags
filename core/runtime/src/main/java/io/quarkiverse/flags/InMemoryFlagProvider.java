@@ -1,24 +1,25 @@
 package io.quarkiverse.flags;
 
-import java.util.Map;
-import java.util.function.Function;
-
-import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.spi.FlagProvider;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
-import io.smallrye.mutiny.Uni;
 
 /**
- * An in-memory feature flag provider can be used to add/remove a feature flag.
+ * An in-memory feature flag provider.
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
+    static int PRIORITY = FlagProvider.DEFAULT_PRIORITY + 5;
+
+    @Override
+    default int getPriority() {
+        return PRIORITY;
+    }
+
     /**
-     * @param feature
-     * @return a new definition
+     * @return {@code true} if the flag was added sucessfully, {@code false} otherwise
      * @see FlagAdded
+     * @see Flag#builder(String)
      */
-    FlagDefinition newFlag(String feature);
+    boolean addFlag(Flag flag);
 
     /**
      * @param feature
@@ -37,25 +38,6 @@ public interface InMemoryFlagProvider extends FlagProvider {
      * A CDI event that is fired synchronously when a feature flag is removed from the system.
      */
     record FlagRemoved(Flag flag) {
-    }
-
-    interface FlagDefinition {
-
-        default FlagDefinition setEnabled(boolean value) {
-            Flag.Value val = ImmutableBooleanValue.from(value);
-            return setCompute(cc -> val);
-        }
-
-        default FlagDefinition setCompute(Function<ComputationContext, Flag.Value> fun) {
-            return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
-        }
-
-        FlagDefinition setComputeAsync(Function<ComputationContext, Uni<Flag.Value>> fun);
-
-        FlagDefinition setMetadata(Map<String, String> metadata);
-
-        Flag register();
-
     }
 
 }
