@@ -11,10 +11,11 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
-import io.quarkiverse.flags.spi.ImmutableStringValue;
 
 @Singleton
 public class ConfigFlagProvider extends AbstractFlagProvider {
+
+    public static final int PRIORITY = FlagProvider.DEFAULT_PRIORITY + 1;
 
     private final FlagsBuildTimeConfig buildConfig;
 
@@ -28,7 +29,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
 
     @Override
     public int getPriority() {
-        return FlagProvider.DEFAULT_PRIORITY + 1;
+        return PRIORITY;
     }
 
     @Override
@@ -43,7 +44,10 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         for (Entry<String, FlagConfig> entry : flags.entrySet()) {
             String feature = entry.getKey();
             Map<String, String> metadata = entry.getValue().meta();
-            ret.add(createFlag(feature, new ImmutableStringValue(entry.getValue().value()), metadata));
+            ret.add(Flag.builder(feature)
+                    .setMetadata(metadata)
+                    .setString(entry.getValue().value())
+                    .build());
         }
     }
 

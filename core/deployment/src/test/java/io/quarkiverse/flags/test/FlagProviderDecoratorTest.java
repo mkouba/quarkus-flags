@@ -34,9 +34,9 @@ public class FlagProviderDecoratorTest {
 
     @Test
     public void testFlags() {
-        inMemoryFlagProvider.newFlag("alpha")
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha")
                 .setEnabled(true)
-                .register();
+                .build());
         assertFalse(flags.find("alpha").orElseThrow().isEnabled());
     }
 

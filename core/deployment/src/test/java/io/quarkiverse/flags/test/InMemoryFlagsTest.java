@@ -47,18 +47,16 @@ public class InMemoryFlagsTest {
         assertEquals(0, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 
-        inMemoryFlagProvider.newFlag("alpha")
-                .setEnabled(true)
-                .register();
-        inMemoryFlagProvider.newFlag("bravo")
-                .setEnabled(false)
-                .register();
-        inMemoryFlagProvider.newFlag("charlie")
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha")
+                .setEnabled(true).build());
+        inMemoryFlagProvider.addFlag(Flag.builder("bravo")
+                .setEnabled(false).build());
+        inMemoryFlagProvider.addFlag(Flag.builder("charlie")
                 .setCompute(cc -> ImmutableBooleanValue.TRUE)
-                .register();
-        inMemoryFlagProvider.newFlag("delta")
+                .build());
+        inMemoryFlagProvider.addFlag(Flag.builder("delta")
                 .setComputeAsync(cc -> Uni.createFrom().item(new ImmutableStringValue("no")))
-                .register();
+                .build());
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 

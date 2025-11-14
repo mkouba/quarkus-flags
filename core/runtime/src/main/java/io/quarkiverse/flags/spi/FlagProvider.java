@@ -22,6 +22,7 @@ public interface FlagProvider {
      * @return the flags
      * @see Flags#find(String)
      * @see Flags#findAll()
+     * @see Flag#builder(String)
      */
     Iterable<Flag> getFlags();
 
