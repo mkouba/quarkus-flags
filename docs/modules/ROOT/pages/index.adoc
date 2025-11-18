@@ -85,8 +85,8 @@ quarkus.flags.runtime."my-feature-bravo".value=false <2>
 quarkus.flags.runtime."my-feature-bravo".meta.foo=bar <3>
 ----
 <1> Define a _build time_ flag for feature `my-feature-alpha` with initial value `true`.
-<1> Define a _runtime_ flag for feature `my-feature-bravo` with value `false`.
-<2> The metadata of `my-feature-bravo` will contain key "foo" with value "bar".
+<2> Define a _runtime_ flag for feature `my-feature-bravo` with value `false`.
+<3> The metadata of `my-feature-bravo` will contain key "foo" with value "bar".
 
 The other built-in flag provider provides an in-memory repository that can be useful for testing and dynamic registration.
 
@@ -103,11 +103,11 @@ public class MyService {
     
     void addFlag() {
         provider.addFlag(Flag.builder("my-feature-alpha")
-                .setEnabled(true).build());
+                .setEnabled(true).build()); <2>
     }
     
     void removeFlag() {
-        provider.removeFlag("my-feature-alpha");
+        provider.removeFlag("my-feature-alpha"); <3>
     }
 }
 ----

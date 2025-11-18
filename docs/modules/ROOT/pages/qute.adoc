@@ -2,4 +2,39 @@
 
 include::./includes/attributes.adoc[]
 
-TODO
+The extension provides integration with Qute.
+It provides a namespace resolver that makes it possible to use the flags directly in templates. 
+
+If you want to use the Qute integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-qute` extension to your build file first.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags-qute</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+
+Then you can access the flags directly in a template.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Flags</title>
+</head>
+<body>
+   <h1>Hello - Quarkus Club 2025</h1>
+   {#if flag:enabled('my-feature-alpha')}
+   <p>Feature alpha is enabled!
+   {/if}  
+   <ul>
+   <h2>List of all flags</h2>
+   {#for flag in flag:flags}
+      <li>{flag.feature}</li>
+   {/for}
+   </ul>
+</body>
+</html>
+```
