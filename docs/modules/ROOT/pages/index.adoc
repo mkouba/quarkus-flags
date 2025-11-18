@@ -2,7 +2,130 @@
 
 include::./includes/attributes.adoc[]
 
-TODO
+This projects aims to provide a lightweight and extensible feature flag Quarkus extension.
+More specifically, it provides:
+
+* An API to access feature flags.
+* An SPI to provide flags and externalize the computation of a flag value.
+* Several built-in flag providers 
+** Leverage Quarkus config to define feature flags,
+** In-memory repository (useful for testing and dynamic registration).
+* *JPA module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
+* *Security module*, so that it's possible to evaluate flags based on the current `SecurityIdentity`.
+* *Qute module* so that it's possible to use the flags directly in templates.
+
+== What is a feature flag?
+
+A feature flag makes it possible to turn on/off or configure a specific functionality in your application.
+It's also referred to as toggles or switches.
+In this extension, a feature flag is represented by the `io.quarkiverse.flags.Flag` interface.
+It refers to a specific feature with `Flag#feature()` and provides several convenient methods to compute the _current value_.
+The value of a feature flag can be represented as boolean, string or integer.
+A flag can also define metadata with `Flag#metadata()`.
+Metadata enable further configuration which can be leveraged in <<spi,SPI>>.
+
+== Accessing feature flags
+
+The `io.quarkiverse.flags.Flags` represents a central point to access feature flags.
+A CDI bean that implements `Flags` is automatically registered.
+
+[source,java]
+----
+import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.Feature;
+import jakarta.inject.Inject;
+
+@ApplicanScoped
+public class MyService {
+
+    @Inject
+    Flags flags; <1>
+    
+    @Feature("my-feature-alpha")
+    Flag alpha; <2>
+    
+    void serviceCall1() {
+        if (flags.isEnabled("my-feature-alpha")) { <3>
+            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true 
+        }
+    }
+    
+    void serviceCall2() {
+        if (alpha.isEnabled()) { <4>
+            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true 
+        }
+    }
+}
+----
+<1> You can inject `Flags` in any CDI bean.
+<2> You can also inject a `Flag` for a given feature. In this particular case, `null` will be injected if no such feature flag exists.
+<3> `Flags#isEnabled(String)` is a shortcut for `find(feature).orElseThrow().isEnabled()`.
+<4> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
+
+TIP: If the `quarkus-flags-qute` module is present, you can access feature flags directly in templates, e.g. `{#if flag:enabled('my-feature-alpha')}...{/if}`
+
+== Flags provider SPI
+
+The feature flags are collected at runtime.
+More specifically, the extension injects all CDI beans that implement `io.quarkiverse.flags.spi.FlagProvider` and calls the `FlagProvider#getFlags()` method.
+The result must not contain flags with duplicate feature names.
+A flag from a provider with higher priority takes precedence and overrides flags with the same `Flag#feature()` from providers with lower priority.
+
+This extension provides two built-in flag providers.
+The first one is built on top of Quarkus config service.
+It allows users to configure _build time_ and _runtime_ feature flags.
+The _build time_ feature flags are configured through properties with prefix `quarkus.flags.build` and the initial value is fixed at build time.
+The _runtime_ feature flags are configured through properties with prefix `quarkus.flags.runtime` and the initial value is determined when the application starts.
+
+.A feature flag defined in Quarkus config
+[source,properties]
+----
+quarkus.flags.build."my-feature-alpha".value=true <1>
+quarkus.flags.runtime."my-feature-bravo".value=false <2>
+quarkus.flags.runtime."my-feature-bravo".meta.foo=bar <3>
+----
+<1> Define a _build time_ flag for feature `my-feature-alpha` with initial value `true`.
+<1> Define a _runtime_ flag for feature `my-feature-bravo` with value `false`.
+<2> The metadata of `my-feature-bravo` will contain key "foo" with value "bar".
+
+The other built-in flag provider provides an in-memory repository that can be useful for testing and dynamic registration.
+
+[source,java]
+----
+import io.quarkiverse.flags.InMemoryFlagProvider;
+import jakarta.inject.Inject;
+
+@ApplicanScoped
+public class MyService {
+
+    @Inject
+    InMemoryFlagProvider provider; <1>
+    
+    void addFlag() {
+        provider.addFlag(Flag.builder("my-feature-alpha")
+                .setEnabled(true).build());
+    }
+    
+    void removeFlag() {
+        provider.removeFlag("my-feature-alpha");
+    }
+}
+----
+<1> You can inject `InMemoryFlagProvider` in any CDI bean.
+<2> It's possible to register a new feature flag at any time.
+<3> You can also remove the flag.
+
+[[spi]]
+== Flag evaluator SPI
+
+The `io.quarkiverse.flags.spi.FlagEvaluator` SPI makes it possible to externalize the computation of the current value of a feature flag.
+This allows for more dynamic evaluation logic based on some external state, such as the current `SecurityIdentity`.
+Flag evaluators must be CDI beans.
+Qualifiers are ignored. 
+`@Dependent` beans are reused.
+
+By default, a `Flag` can reference one `FlagEvaluator` in its metadata with a key `evaluator`.
+This evaluator is automatically used to compute the current value for any `Flag` produced by means of `Flag.Builder` (i.e. created by `Flag#builder(String)`).
 
 [[extension-configuration-reference]]
 == Extension configuration reference
