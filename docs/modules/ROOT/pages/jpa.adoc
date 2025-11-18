@@ -2,7 +2,61 @@
 
 include::./includes/attributes.adoc[]
 
-TODO
+The extension provides integration with JPA.
+It attempts to discover all entities annotated with `@io.quarkiverse.flags.jpa.FlagDefinition` and generates a `FlagProvider` automatically.
+
+If you want to use the JPA integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-jpa` extension to your build file first.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags-jpa</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+
+TIP: We recommend to use the `quarkus-hibernate-orm-panache` extension as well to simplify your entities.
+
+Then you can map an entity that represents a feature flag.
+
+[source,java]
+----
+import java.util.Map;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+
+import io.quarkiverse.flags.jpa.FlagDefinition;
+import io.quarkiverse.flags.jpa.FlagFeature;
+import io.quarkiverse.flags.jpa.FlagMetadata;
+import io.quarkiverse.flags.jpa.FlagValue;
+import io.quarkus.hibernate.orm.panache.PanacheEntity; 
+
+@FlagDefinition <1>
+@Entity
+public class MyFlag extends PanacheEntity {
+
+    @FlagFeature <2>
+    public String feature;
+
+    @FlagValue <3>
+    public String value;
+
+    @FlagMetadata <4>
+    @ElementCollection
+    @CollectionTable
+    public Map<String, String> metadata;
+
+}
+----
+<1> Marks a flag definition entity.
+<2> Defines the feature name of a feature flag.
+<3> Defines the value of a feature flag.
+<4> Defines the metadata of a feature flag.
+
+A `FlagProvider` is generated automatically.
 
 [[extension-configuration-reference]]
 == Extension configuration reference
