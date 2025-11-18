@@ -11,3 +11,7 @@ More specifically, it provides:
 * *JPA module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
 * *Security module*, so that it's possible to evaluate flags based on the current `SecurityIdentity`.
 * *Qute module* so that it's possible to use the flags directly in templates.
+
+## Documentation
+
+The documentation is available at https://docs.quarkiverse.io/quarkus-flags/dev/.
