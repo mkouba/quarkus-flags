@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-qute-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0.Beta1</version>
     </parent>
     <artifactId>quarkus-flags-qute-deployment</artifactId>
     <name>Quarkus Feature Flags - Qute - Deployment</name>
