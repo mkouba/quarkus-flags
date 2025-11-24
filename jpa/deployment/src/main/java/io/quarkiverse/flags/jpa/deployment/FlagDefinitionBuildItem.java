@@ -44,13 +44,13 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
         this.entityClass = entityClass;
         AnnotationInstance flagFeature = entityClass.annotation(FlagFeature.class);
         if (flagFeature == null) {
-            throw new IllegalStateException("@FlagFeature not declared on " + entityClass);
+            throw new IllegalArgumentException("@FlagFeature not declared on " + entityClass);
         }
         this.feature = flagFeature.target().kind() == Kind.FIELD ? new FieldProperty(flagFeature.target().asField(), isPanache)
                 : new GetterProperty(flagFeature.target().asMethod());
         AnnotationInstance flagValue = entityClass.annotation(FlagValue.class);
         if (flagValue == null) {
-            throw new IllegalStateException("@FlagState not declared on " + entityClass);
+            throw new IllegalArgumentException("@FlagValue not declared on " + entityClass);
         }
         this.value = flagValue.target().kind() == Kind.FIELD ? new FieldProperty(flagValue.target().asField(), isPanache)
                 : new GetterProperty(flagValue.target().asMethod());
