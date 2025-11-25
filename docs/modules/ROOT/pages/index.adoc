@@ -71,7 +71,7 @@ More specifically, the extension injects all CDI beans that implement `io.quarki
 The result must not contain flags with duplicate feature names.
 A flag from a provider with higher priority takes precedence and overrides flags with the same `Flag#feature()` from providers with lower priority.
 
-This extension provides two built-in flag providers.
+The core extension provides two built-in flag providers.
 The first one is built on top of Quarkus config service.
 It allows users to configure _build time_ and _runtime_ feature flags.
 The _build time_ feature flags are configured through properties with prefix `quarkus.flags.build` and the initial value is fixed at build time.
@@ -126,6 +126,21 @@ Qualifiers are ignored.
 
 By default, a `Flag` can reference one `FlagEvaluator` in its metadata with a key `evaluator`.
 This evaluator is automatically used to compute the current value for any `Flag` produced by means of `Flag.Builder` (i.e. created by `Flag#builder(String)`).
+
+=== Time span flag evaluator
+
+The core extension provides one built-in flag evaluator - `io.quarkiverse.flags.TimeSpanFlagEvaluator`.
+It evaluates a flag based on the current date-time obtained from the system clock in the default time-zone.
+
+.A feature flag defined in Quarkus config
+[source,properties]
+----
+quarkus.flags.runtime."my-feature-alpha".value=true
+quarkus.flags.runtime."my-feature-alpha".meta.evaluator=quarkus.time-span <1>
+quarkus.flags.runtime."my-feature-alpha".meta.start-time=2001-01-01T10:15:30+01:00[Europe/Prague] <2>
+----
+<1> The `TimeSpanFlagEvaluator` is used to compute the current value of the feature flag.
+<2> The current date-time must be after the specified start-time. The `java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME` is used to parse the start-time value.
 
 [[extension-configuration-reference]]
 == Extension configuration reference
