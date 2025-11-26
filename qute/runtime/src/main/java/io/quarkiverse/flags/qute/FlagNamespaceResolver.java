@@ -32,11 +32,15 @@ public class FlagNamespaceResolver implements NamespaceResolver {
     public CompletionStage<Object> resolve(EvalContext ctx) {
         String name = ctx.getName();
         if ("flags".equals(name)) {
+            // flag:flags
             return CompletedStage.of(flags.findAll());
         }
-        // flag:bool('delta.feat.open')
-        // flag:string('delta.feat.open')
-        // flag:int('delta.feat.open')
+        // flag:bool('delta-feature')
+        // flag:enabled('delta-feature')
+        // flag:disabled('delta-feature')
+        // flag:string('delta-feature')
+        // flag:int('delta-feature')
+        // flag:find('delta-feature')
         List<Expression> params = ctx.getParams();
         if (params.isEmpty()) {
             return Results.notFound(ctx);
@@ -48,9 +52,11 @@ public class FlagNamespaceResolver implements NamespaceResolver {
             }
             return switch (ctx.getName()) {
                 case "bool", "enabled" -> cast(flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
+                case "disabled" -> cast(flag.get().compute().map(v -> !v.asBoolean()).subscribeAsCompletionStage());
                 case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
                 case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
                 case "meta" -> CompletedStage.of(flag.get().metadata());
+                case "find" -> CompletedStage.of(flag.get());
                 default -> throw new IllegalArgumentException("Unexpected value: " + ctx.getName());
             };
         });
