@@ -1,5 +1,6 @@
 package io.quarkiverse.flags.deployment;
 
+import io.quarkiverse.flags.CompositeFlagEvaluator;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
 import io.quarkiverse.flags.runtime.ConfigFlagProvider;
 import io.quarkiverse.flags.runtime.FlagManagerImpl;
@@ -14,7 +15,7 @@ public class FlagsProcessor {
     void beans(BuildProducer<AdditionalBeanBuildItem> beans) {
         beans.produce(AdditionalBeanBuildItem.builder()
                 .addBeanClasses(FlagManagerImpl.class, ConfigFlagProvider.class,
-                        InMemoryFlagProviderImpl.class, TimeSpanFlagEvaluator.class)
+                        InMemoryFlagProviderImpl.class, TimeSpanFlagEvaluator.class, CompositeFlagEvaluator.class)
                 .build());
     }
 

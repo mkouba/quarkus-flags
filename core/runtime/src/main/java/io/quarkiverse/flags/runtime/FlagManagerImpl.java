@@ -60,6 +60,12 @@ public class FlagManagerImpl implements FlagManager {
             lastPriority = provider.getPriority();
         }
         this.providers = List.copyOf(sortedProviders);
+        Set<String> evaluatorIds = evaluators.stream().map(FlagEvaluator::id).collect(Collectors.toSet());
+        if (evaluatorIds.size() != evaluators.size()) {
+            throw new IllegalStateException("Multiple flag evaluators with the same id detected:\n"
+                    + evaluators.stream().map(e -> "\t-" + e.id() + ": " + e.getClass().getName())
+                            .collect(Collectors.joining("\n")));
+        }
         this.evaluators = evaluators.stream().collect(toMap(FlagEvaluator::id, Function.identity()));
     }
 
