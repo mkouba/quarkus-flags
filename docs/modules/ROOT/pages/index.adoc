@@ -129,8 +129,7 @@ This evaluator is automatically used to compute the current value for any `Flag`
 
 === Time span flag evaluator
 
-The core extension provides one built-in flag evaluator - `io.quarkiverse.flags.TimeSpanFlagEvaluator`.
-It evaluates a flag based on the current date-time obtained from the system clock in the default time-zone.
+The core extension provides a built-in flag evaluator - `io.quarkiverse.flags.TimeSpanFlagEvaluator` that evaluates a flag based on the current date-time obtained from the system clock in the default time-zone.
 
 .A feature flag defined in Quarkus config
 [source,properties]
@@ -141,6 +140,25 @@ quarkus.flags.runtime."my-feature-alpha".meta.start-time=2001-01-01T10:15:30+01:
 ----
 <1> The `TimeSpanFlagEvaluator` is used to compute the current value of the feature flag.
 <2> The current date-time must be after the specified start-time. The `java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME` is used to parse the start-time value.
+
+=== Composite flag evaluator
+
+Sometimes it might be useful to combine some evaluators to compute the value of a flag.
+The core extension provides `io.quarkiverse.flags.CompositeFlagEvaluator` that evaluates a flag with the specified sub-evaluators.
+
+.A feature flag defined in Quarkus config
+[source,properties]
+----
+quarkus.flags.runtime."my-feature-alpha".value=true
+quarkus.flags.runtime."my-feature-alpha".meta.evaluator=quarkus.composite <1>
+quarkus.flags.runtime."my-feature-alpha".meta.sub-evaluators=quarkus.time-span, quarkus.security.identity <2>
+quarkus.flags.runtime."my-feature-alpha".meta.start-time=2026-01-01T12:00:00+01:00[Europe/Prague] <3>
+quarkus.flags.runtime."my-feature-alpha".meta.roles-allowed=admin <4>
+----
+<1> The `CompositeFlagEvaluator` is used to compute the current value of the feature flag.
+<2> The value of `sub-evaluators` represents a comma-separated list of sub-evaluator identifiers. They are executed in the specified order. In this particular case, first the `TimeSpanFlagEvaluator` is executed and then the `SecurityIdentityFlagEvaluator`.
+<3> The current date-time must be after the specified start-time.
+<4> The current user must have the role `admin`.
 
 [[extension-configuration-reference]]
 == Extension configuration reference

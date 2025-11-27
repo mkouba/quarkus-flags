@@ -1,0 +1,82 @@
+package io.quarkiverse.flags.test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkiverse.flags.CompositeFlagEvaluator;
+import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flag.ComputationContext;
+import io.quarkiverse.flags.Flag.Value;
+import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.quarkiverse.flags.spi.ImmutableBooleanValue;
+import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.mutiny.Uni;
+
+public class CompositeFlagEvaluatorTest {
+
+    @RegisterExtension
+    static final QuarkusUnitTest config = new QuarkusUnitTest()
+            .withApplicationRoot(root -> root.addClasses(FooEvaluator.class, BarEvaluator.class))
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.value", "true")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.meta.evaluator", CompositeFlagEvaluator.ID)
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.meta.sub-evaluators", "foo, bar")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.meta.baz", "1");
+
+    static final List<String> EVALS = new CopyOnWriteArrayList<>();
+
+    @Inject
+    Flags flags;
+
+    @Test
+    public void testFlag() {
+        assertTrue(flags.isEnabled("alpha"));
+        assertEquals(2, EVALS.size());
+        assertEquals("foo", EVALS.get(0));
+    }
+
+    @Singleton
+    public static class FooEvaluator implements FlagEvaluator {
+
+        @Override
+        public String id() {
+            return "foo";
+        }
+
+        @Override
+        public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
+            EVALS.add(id());
+            if ("1".equals(flag.metadata().get("baz"))) {
+                return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+            }
+            throw new IllegalStateException();
+        }
+
+    }
+
+    @Singleton
+    public static class BarEvaluator implements FlagEvaluator {
+
+        @Override
+        public String id() {
+            return "bar";
+        }
+
+        @Override
+        public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
+            EVALS.add(id());
+            return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+        }
+
+    }
+
+}
