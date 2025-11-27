@@ -2,10 +2,7 @@
 
 include::./includes/attributes.adoc[]
 
-The extension provides integration with Quarkus Security.
-It provides the `SecurityIdentityFlagEvaluator` that can be used to compute the current value of a feature flag based on the current `SecurityIdentity`. 
-
-If you want to use the Security integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-security` extension to your build file first.
+If you want to use the Quarkus Security integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-security` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
 ```xml
@@ -15,7 +12,7 @@ For instance, with Maven, add the following dependency to your POM file:
     <version>{project-version}</version>
 </dependency>
 ```
-
+The extension provides the `SecurityIdentityFlagEvaluator` that can be used to compute the current value of a feature flag based on the current `SecurityIdentity`. 
 A typical feature flag configuration looks like:
 
 ```properties
@@ -28,3 +25,16 @@ quarkus.flags.runtime.delta.meta.roles-allowed=foo,bar <4>
 <2> The `SecurityIdentityFlagEvaluator` is used to compute the current value of the feature flag.
 <3> A user must be authenticated.
 <4> A user must have one of the defined roles.
+
+Furthermore, it also provides the `UsernameRolloutFlagEvaluator`, an evaluator using a simple percentage-based rollout strategy, based on a consistent numerical representation of the current user.
+It can be used to implement gradual rollout by increasing the `rollout-percentage` metadata value.
+A typical feature flag configuration may look like:
+
+```properties
+quarkus.flags.runtime.delta.value=true <1>
+quarkus.flags.runtime.delta.meta.evaluator=quarkus.security.username-rollout <2>
+quarkus.flags.runtime.delta.meta.rollout-percentage=20 <3>
+``` 
+<1> Flag `delta` is enabled by default.
+<2> The `UsernameRolloutFlagEvaluator` is used to compute the current value of the feature flag.
+<3> Enable the flag for the given percentage of users.
