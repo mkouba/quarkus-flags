@@ -9,7 +9,8 @@ More specifically, it provides:
    * Leverage Quarkus config to define feature flags,
    * In-memory repository (useful for testing and dynamic registration).
 * Built-in flag evaluators:
-   * Evaluator based on the current date-time obtained from the system clock in the default time-zone.
+   * Time span evaluator - based on the current date-time obtained from the system clock in the default time-zone.
+   * Composite evaluator - evaluates a flag with the specified sub-evaluators.
 * *JPA module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
 * *Security module*, so that it's possible to evaluate flags based on the current `SecurityIdentity`.
 * *Qute module* so that it's possible to use the flags directly in templates.
