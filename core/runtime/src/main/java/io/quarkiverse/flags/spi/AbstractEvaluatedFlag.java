@@ -8,8 +8,8 @@ public abstract class AbstractEvaluatedFlag extends AbstractFlag {
 
     protected final FlagEvaluator evaluator;
 
-    public AbstractEvaluatedFlag(String feature, Map<String, String> metadata, FlagEvaluator evaluator) {
-        super(feature, metadata);
+    public AbstractEvaluatedFlag(String feature, String origin, Map<String, String> metadata, FlagEvaluator evaluator) {
+        super(feature, origin, metadata);
         this.evaluator = evaluator;
     }
 

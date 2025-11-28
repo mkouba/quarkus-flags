@@ -1,9 +1,10 @@
 name: Feature Flags
+description: Lightweight and extensible feature flag extension
 metadata:
   keywords:
     - flags
     - toggles
-  #guide:
+  guide: https://docs.quarkiverse.io/quarkus-flags/dev
   categories:
     - "miscellaneous"
   status: "preview"

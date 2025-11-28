@@ -9,9 +9,9 @@ public class InitializedEvaluatedFlag extends AbstractEvaluatedFlag {
 
     private final Flag.Value initialValue;
 
-    public InitializedEvaluatedFlag(String feature, Map<String, String> metadata, Flag.Value initialValue,
+    public InitializedEvaluatedFlag(String feature, String origin, Map<String, String> metadata, Flag.Value initialValue,
             FlagEvaluator evaluator) {
-        super(feature, metadata, evaluator);
+        super(feature, origin, metadata, evaluator);
         this.initialValue = initialValue;
     }
 

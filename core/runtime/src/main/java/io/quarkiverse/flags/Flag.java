@@ -28,6 +28,11 @@ public interface Flag {
     String feature();
 
     /**
+     * @return the description of the source
+     */
+    String origin();
+
+    /**
      * @return the metadata
      */
     default Map<String, String> metadata() {
@@ -186,6 +191,8 @@ public interface Flag {
         Builder setComputeAsync(Function<ComputationContext, Uni<Value>> fun);
 
         Builder setMetadata(Map<String, String> metadata);
+
+        Builder setOrigin(String origin);
 
         Flag build();
 
