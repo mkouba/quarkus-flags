@@ -110,25 +110,36 @@ public class FlagManagerImpl implements FlagManager {
                 feature = (Feature) qualifier;
             }
         }
-        if (feature != null) {
-            return find(feature.value()).orElse(null);
+        if (feature == null) {
+            // This should never happen
+            throw new IllegalStateException("Injection point does not declare @Feature");
         }
-        return null;
+        return new InjectedFlag(feature.value());
     }
 
-    @Feature("")
-    @Produces
-    Optional<Flag> produceOptionalFlag(InjectionPoint injectionPoint) {
-        Feature feature = null;
-        for (Annotation qualifier : injectionPoint.getQualifiers()) {
-            if (qualifier.annotationType().equals(Feature.class)) {
-                feature = (Feature) qualifier;
-            }
+    class InjectedFlag implements Flag {
+
+        private final String feature;
+
+        private InjectedFlag(String feature) {
+            this.feature = feature;
         }
-        if (feature != null) {
-            return find(feature.value());
+
+        @Override
+        public String feature() {
+            return feature;
         }
-        return Optional.empty();
+
+        @Override
+        public Uni<Value> compute(ComputationContext context) {
+            return find(feature).orElseThrow().compute(context);
+        }
+
+        @Override
+        public Map<String, String> metadata() {
+            return find(feature).orElseThrow().metadata();
+        }
+
     }
 
     class DelegatingFlag implements Flag {

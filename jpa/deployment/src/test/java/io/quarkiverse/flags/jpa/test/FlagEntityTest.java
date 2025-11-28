@@ -59,7 +59,7 @@ public class FlagEntityTest {
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+            return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
         }
 
     }

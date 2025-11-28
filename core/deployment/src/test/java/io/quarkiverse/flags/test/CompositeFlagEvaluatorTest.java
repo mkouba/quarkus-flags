@@ -56,7 +56,7 @@ public class CompositeFlagEvaluatorTest {
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
             EVALS.add(id());
             if ("1".equals(flag.metadata().get("baz"))) {
-                return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+                return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
             }
             throw new IllegalStateException();
         }
@@ -74,7 +74,7 @@ public class CompositeFlagEvaluatorTest {
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
             EVALS.add(id());
-            return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+            return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
         }
 
     }

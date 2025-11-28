@@ -6,6 +6,8 @@ import java.util.Optional;
 
 /**
  * Represents a central point to access feature flags.
+ * <p>
+ * The container provides a CDI bean that implements this inteface.
  *
  * @see Flag
  */
@@ -26,7 +28,7 @@ public interface Flags {
      *
      * @param feature
      * @return the computed boolean value
-     * @throws NoSuchElementException If no such feature exists
+     * @throws NoSuchElementException If no such feature flag exists
      */
     default boolean isEnabled(String feature) {
         return find(feature).orElseThrow().isEnabled();

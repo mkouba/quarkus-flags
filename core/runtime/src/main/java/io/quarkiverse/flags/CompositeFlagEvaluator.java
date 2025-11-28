@@ -13,9 +13,9 @@ import io.quarkiverse.flags.spi.FlagManager;
 import io.smallrye.mutiny.Uni;
 
 /**
- * Evaluates a flag with the specified sub-evaluators.
+ * Evaluates a flag with the specified sub-evaluators executed in the given order.
  * <p>
- * The evaluator is configured through the {@link Flag#metadata()}. The value of {@value #SUB_EVALUATORS} represents
+ * The evaluator is configured through the {@link Flag#metadata()}. The value of {@value #SUB_EVALUATORS} represents a
  * comma-separated list of sub-evaluator identifiers.
  */
 public class CompositeFlagEvaluator implements FlagEvaluator {

@@ -4,6 +4,8 @@ import io.quarkiverse.flags.spi.FlagProvider;
 
 /**
  * An in-memory feature flag provider.
+ * <p>
+ * The container provides a CDI bean that implements this inteface.
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
