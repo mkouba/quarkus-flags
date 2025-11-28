@@ -1,12 +1,21 @@
 package io.quarkiverse.flags.spi;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flag.Value;
+import io.smallrye.mutiny.Uni;
 
-public class ImmutableIntValue implements Flag.Value {
+/**
+ * Immutable integer flag value.
+ */
+public class IntValue implements Flag.Value {
+
+    public static final Uni<Value> createUni(int value) {
+        return Uni.createFrom().item(new IntValue(value));
+    }
 
     private final int value;
 
-    public ImmutableIntValue(int value) {
+    public IntValue(int value) {
         this.value = value;
     }
 

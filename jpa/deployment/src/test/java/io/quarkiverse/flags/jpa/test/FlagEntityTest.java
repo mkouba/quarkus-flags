@@ -15,8 +15,8 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.test.QuarkusUnitTest;
 import io.quarkus.test.TestTransaction;
 import io.smallrye.mutiny.Uni;
@@ -59,7 +59,7 @@ public class FlagEntityTest {
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
+            return BooleanValue.createUni(!initialValue.asBoolean());
         }
 
     }

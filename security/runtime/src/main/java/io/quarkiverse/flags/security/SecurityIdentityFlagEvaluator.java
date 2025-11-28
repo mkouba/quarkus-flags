@@ -8,8 +8,8 @@ import org.jboss.logging.Logger;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
+import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 
@@ -45,18 +45,18 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
                     && Boolean.parseBoolean(authenticated)
                     && identity.isAnonymous()) {
                 LOG.debugf("User not authenticated");
-                return Uni.createFrom().item(ImmutableBooleanValue.FALSE);
+                return Uni.createFrom().item(BooleanValue.FALSE);
             }
             String rolesAllowed = flag.metadata().get(ROLES_ALLOWED);
             if (rolesAllowed != null) {
                 String[] roles = rolesAllowed.toString().split(",");
                 for (String role : roles) {
                     if (identity.hasRole(role)) {
-                        return Uni.createFrom().item(ImmutableBooleanValue.TRUE);
+                        return Uni.createFrom().item(BooleanValue.TRUE);
                     }
                 }
                 LOG.debugf("User [%s] has none of the allowed roles: %s", identity.getPrincipal().getName(), rolesAllowed);
-                return Uni.createFrom().item(ImmutableBooleanValue.FALSE);
+                return Uni.createFrom().item(BooleanValue.FALSE);
             }
         }
         return Uni.createFrom().item(initialValue);

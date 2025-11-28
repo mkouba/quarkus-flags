@@ -35,10 +35,10 @@ public abstract class RolloutFlagEvaluator implements FlagEvaluator {
                 }
                 OptionalInt userHash = getHash(flag);
                 if (userHash.isEmpty()) {
-                    return ImmutableBooleanValue.createUni(false);
+                    return BooleanValue.createUni(false);
                 }
                 int bucket = Math.abs(userHash.getAsInt() % 100);
-                return ImmutableBooleanValue.createUni(bucket < percentage);
+                return BooleanValue.createUni(bucket < percentage);
             }
         }
         return Uni.createFrom().item(initialValue);

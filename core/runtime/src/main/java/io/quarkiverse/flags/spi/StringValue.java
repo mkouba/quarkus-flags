@@ -3,12 +3,21 @@ package io.quarkiverse.flags.spi;
 import java.util.NoSuchElementException;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flag.Value;
+import io.smallrye.mutiny.Uni;
 
-public class ImmutableStringValue implements Flag.Value {
+/**
+ * Immutable string flag value.
+ */
+public class StringValue implements Flag.Value {
+
+    public static final Uni<Value> createUni(String value) {
+        return Uni.createFrom().item(new StringValue(value));
+    }
 
     private final String value;
 
-    public ImmutableStringValue(String value) {
+    public StringValue(String value) {
         this.value = value;
     }
 

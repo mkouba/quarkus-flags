@@ -27,19 +27,19 @@ public class FlagBuilder implements Flag.Builder {
 
     @Override
     public Builder setEnabled(boolean value) {
-        this.value = ImmutableBooleanValue.from(value);
+        this.value = BooleanValue.from(value);
         return this;
     }
 
     @Override
     public Builder setString(String value) {
-        this.value = new ImmutableStringValue(value);
+        this.value = new StringValue(value);
         return this;
     }
 
     @Override
     public Builder setInt(int value) {
-        this.value = new ImmutableIntValue(value);
+        this.value = new IntValue(value);
         return this;
     }
 

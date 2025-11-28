@@ -7,8 +7,8 @@ import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
+import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -42,9 +42,9 @@ public class TimeSpanFlagEvaluator implements FlagEvaluator {
             ZonedDateTime start = startTime != null ? parse(startTime) : now.minusSeconds(1);
             ZonedDateTime end = endTime != null ? parse(endTime) : now.plusSeconds(1);
             if (now.isAfter(start) && now.isBefore(end)) {
-                initialValue = ImmutableBooleanValue.TRUE;
+                initialValue = BooleanValue.TRUE;
             } else {
-                initialValue = ImmutableBooleanValue.FALSE;
+                initialValue = BooleanValue.FALSE;
             }
         }
         return Uni.createFrom().item(initialValue);

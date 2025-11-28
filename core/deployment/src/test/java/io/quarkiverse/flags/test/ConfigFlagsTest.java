@@ -20,8 +20,8 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.test.QuarkusUnitTest;
 import io.smallrye.mutiny.Uni;
 
@@ -87,11 +87,11 @@ public class ConfigFlagsTest {
             }
             String username = computationContext.get("username");
             if (username == null) {
-                return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
+                return BooleanValue.createUni(!initialValue.asBoolean());
             }
             String[] usernames = flag.metadata().get("usernames").split(",");
             String match = Arrays.stream(usernames).filter(u -> username.equals(u)).findFirst().orElse(null);
-            return Uni.createFrom().item(ImmutableBooleanValue.from(match != null));
+            return Uni.createFrom().item(BooleanValue.from(match != null));
         }
 
     }

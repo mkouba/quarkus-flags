@@ -17,8 +17,8 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
 import io.quarkus.test.QuarkusUnitTest;
 import io.smallrye.mutiny.Uni;
 
@@ -56,7 +56,7 @@ public class CompositeFlagEvaluatorTest {
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
             EVALS.add(id());
             if ("1".equals(flag.metadata().get("baz"))) {
-                return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
+                return BooleanValue.createUni(!initialValue.asBoolean());
             }
             throw new IllegalStateException();
         }
@@ -74,7 +74,7 @@ public class CompositeFlagEvaluatorTest {
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
             EVALS.add(id());
-            return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
+            return BooleanValue.createUni(!initialValue.asBoolean());
         }
 
     }
