@@ -21,10 +21,9 @@ import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.InMemoryFlagProvider.FlagAdded;
 import io.quarkiverse.flags.InMemoryFlagProvider.FlagRemoved;
-import io.quarkiverse.flags.spi.ImmutableBooleanValue;
-import io.quarkiverse.flags.spi.ImmutableStringValue;
+import io.quarkiverse.flags.spi.BooleanValue;
+import io.quarkiverse.flags.spi.StringValue;
 import io.quarkus.test.QuarkusUnitTest;
-import io.smallrye.mutiny.Uni;
 
 public class InMemoryFlagsTest {
 
@@ -52,10 +51,10 @@ public class InMemoryFlagsTest {
         inMemoryFlagProvider.addFlag(Flag.builder("bravo")
                 .setEnabled(false).build());
         inMemoryFlagProvider.addFlag(Flag.builder("charlie")
-                .setCompute(cc -> ImmutableBooleanValue.TRUE)
+                .setCompute(cc -> BooleanValue.TRUE)
                 .build());
         inMemoryFlagProvider.addFlag(Flag.builder("delta")
-                .setComputeAsync(cc -> Uni.createFrom().item(new ImmutableStringValue("no")))
+                .setComputeAsync(cc -> StringValue.createUni("no"))
                 .build());
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
