@@ -15,9 +15,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagProvider;
-import io.quarkiverse.flags.spi.ImmutableFlag;
 import io.quarkus.test.QuarkusUnitTest;
 
 public class FlagProviderDecoratorTest {
@@ -51,7 +49,7 @@ public class FlagProviderDecoratorTest {
         @Override
         public Iterable<Flag> getFlags() {
             return StreamSupport.stream(delegate.getFlags().spliterator(), false).<Flag> map(f -> {
-                return new ImmutableFlag(f.feature(), f.metadata(), BooleanValue.FALSE);
+                return Flag.builder(f.feature()).setMetadata(f.metadata()).setEnabled(false).build();
             }).toList();
         }
 

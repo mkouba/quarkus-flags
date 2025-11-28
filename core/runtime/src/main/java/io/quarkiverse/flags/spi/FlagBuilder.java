@@ -15,6 +15,8 @@ public class FlagBuilder implements Flag.Builder {
 
     private final String feature;
 
+    private String origin;
+
     private Map<String, String> metadata = Map.of();
 
     private Function<ComputationContext, Uni<Value>> fun;
@@ -56,6 +58,12 @@ public class FlagBuilder implements Flag.Builder {
     }
 
     @Override
+    public Builder setOrigin(String origin) {
+        this.origin = origin;
+        return this;
+    }
+
+    @Override
     public Flag build() {
         String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
         if (evaluatorId != null) {
@@ -67,13 +75,13 @@ public class FlagBuilder implements Flag.Builder {
             FlagManager manager = container.instance(FlagManager.class).get();
             FlagEvaluator evaluator = manager.getEvaluator(evaluatorId)
                     .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));
-            return value != null ? new InitializedEvaluatedFlag(feature, metadata, value, evaluator)
-                    : new ComputedEvaluatedFlag(feature, metadata, evaluator, fun);
+            return value != null ? new InitializedEvaluatedFlag(feature, origin, metadata, value, evaluator)
+                    : new ComputedEvaluatedFlag(feature, origin, metadata, evaluator, fun);
         }
         if (value != null) {
-            return new ImmutableFlag(feature, metadata, value);
+            return new ImmutableFlag(feature, origin, metadata, value);
         }
-        return new ComputedFlag(feature, metadata, fun);
+        return new ComputedFlag(feature, origin, metadata, fun);
     }
 
 }

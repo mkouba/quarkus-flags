@@ -9,9 +9,9 @@ public class ComputedEvaluatedFlag extends AbstractEvaluatedFlag {
 
     private final Function<ComputationContext, Uni<Value>> fun;
 
-    public ComputedEvaluatedFlag(String feature, Map<String, String> metadata, FlagEvaluator evaluator,
+    public ComputedEvaluatedFlag(String feature, String origin, Map<String, String> metadata, FlagEvaluator evaluator,
             Function<ComputationContext, Uni<Value>> fun) {
-        super(feature, metadata, evaluator);
+        super(feature, origin, metadata, evaluator);
         this.fun = fun;
     }
 

@@ -10,11 +10,11 @@ public final class ImmutableFlag extends AbstractFlag {
     private final Flag.Value value;
 
     public ImmutableFlag(String feature, Flag.Value value) {
-        this(feature, Map.of(), value);
+        this(feature, null, Map.of(), value);
     }
 
-    public ImmutableFlag(String feature, Map<String, String> metadata, Value value) {
-        super(feature, metadata);
+    public ImmutableFlag(String feature, String origin, Map<String, String> metadata, Value value) {
+        super(feature, origin, metadata);
         this.value = value;
     }
 

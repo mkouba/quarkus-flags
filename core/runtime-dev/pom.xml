@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>quarkus-flags-core-parent</artifactId>
+        <groupId>io.quarkiverse.flags</groupId>
+        <version>999-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>quarkus-flags-dev</artifactId>
+    <name>Quarkus Feature Flags - Runtime Dev</name>
+    <dependencies>
+        <dependency>
+            <groupId>io.quarkiverse.flags</groupId>
+            <artifactId>quarkus-flags</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <!-- Intentionally do not depend on the extension -->
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+        </dependency>
+    </dependencies>
+</project>

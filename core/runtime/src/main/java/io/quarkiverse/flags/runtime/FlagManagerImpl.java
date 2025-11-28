@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toMap;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -84,8 +85,9 @@ public class FlagManagerImpl implements FlagManager {
     Set<Flag> getFlags() {
         Set<Flag> ret = new HashSet<>();
         for (FlagProvider provider : providers) {
+            String providerClassName = provider.getClass().getName();
             for (Flag flag : provider.getFlags()) {
-                if (!ret.add(new DelegatingFlag(flag))) {
+                if (!ret.add(new DelegatingFlag(flag, providerClassName))) {
                     LOG.debugf(
                             "Flag with feature %s from provider %s is ignored: a flag with the same feature is declared by a provider with higher priority",
                             flag.feature(), provider.getClass().getName());
@@ -117,6 +119,14 @@ public class FlagManagerImpl implements FlagManager {
         return new InjectedFlag(feature.value());
     }
 
+    public List<FlagProvider> getProviders() {
+        return providers;
+    }
+
+    public Collection<FlagEvaluator> getEvaluators() {
+        return evaluators.values();
+    }
+
     class InjectedFlag implements Flag {
 
         private final String feature;
@@ -128,6 +138,11 @@ public class FlagManagerImpl implements FlagManager {
         @Override
         public String feature() {
             return feature;
+        }
+
+        @Override
+        public String origin() {
+            return find(feature).orElseThrow().origin();
         }
 
         @Override
@@ -146,13 +161,22 @@ public class FlagManagerImpl implements FlagManager {
 
         private final Flag delegate;
 
-        DelegatingFlag(Flag delegate) {
+        private final String providerClassName;
+
+        DelegatingFlag(Flag delegate, String providerClassName) {
             this.delegate = delegate;
+            this.providerClassName = providerClassName;
         }
 
         @Override
         public String feature() {
             return delegate.feature();
+        }
+
+        @Override
+        public String origin() {
+            String origin = delegate.origin();
+            return origin != null ? origin : providerClassName;
         }
 
         @Override
