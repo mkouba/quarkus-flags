@@ -1,8 +1,14 @@
 package io.quarkiverse.flags.spi;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flag.Value;
+import io.smallrye.mutiny.Uni;
 
 public class ImmutableBooleanValue implements Flag.Value {
+
+    public static final Uni<Value> createUni(boolean value) {
+        return Uni.createFrom().item(value ? TRUE : FALSE);
+    }
 
     public static final ImmutableBooleanValue from(boolean value) {
         return value ? TRUE : FALSE;

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -48,11 +47,8 @@ public class ConfigFlagsTest {
     @Feature("alpha")
     Flag alpha;
 
-    @Feature("foo")
-    Optional<Flag> foo;
-
     @Feature("delta")
-    Optional<Flag> delta;
+    Flag delta;
 
     @Feature("bravo")
     Instance<Flag> bravo;
@@ -67,15 +63,13 @@ public class ConfigFlagsTest {
         assertTrue(flags.isEnabled("charlie"));
         assertFalse(flags.isEnabled("delta"));
         assertTrue(alpha.isEnabled());
-        assertTrue(foo.isEmpty());
 
         assertFalse(bravo.get().computeAndAwait().asBoolean());
         assertEquals("0", bravo.get().getString());
 
-        Flag deltaFlag = delta.orElseThrow();
-        assertEquals("deltaEval", deltaFlag.metadata().get(FlagEvaluator.META_KEY));
-        assertTrue(deltaFlag.computeAndAwait(Flag.ComputationContext.of("username", "foo")).asBoolean());
-        assertFalse(deltaFlag.computeAndAwait(Flag.ComputationContext.of("username", "qux")).asBoolean());
+        assertEquals("deltaEval", delta.metadata().get(FlagEvaluator.META_KEY));
+        assertTrue(delta.computeAndAwait(Flag.ComputationContext.of("username", "foo")).asBoolean());
+        assertFalse(delta.computeAndAwait(Flag.ComputationContext.of("username", "qux")).asBoolean());
     }
 
     @Singleton
@@ -93,7 +87,7 @@ public class ConfigFlagsTest {
             }
             String username = computationContext.get("username");
             if (username == null) {
-                return Uni.createFrom().item(ImmutableBooleanValue.from(!initialValue.asBoolean()));
+                return ImmutableBooleanValue.createUni(!initialValue.asBoolean());
             }
             String[] usernames = flag.metadata().get("usernames").split(",");
             String match = Arrays.stream(usernames).filter(u -> username.equals(u)).findFirst().orElse(null);

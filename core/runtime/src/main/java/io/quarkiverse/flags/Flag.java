@@ -14,6 +14,10 @@ import io.smallrye.mutiny.Uni;
  */
 public interface Flag {
 
+    /**
+     * @param feature
+     * @return a new flag builder
+     */
     static Builder builder(String feature) {
         return new FlagBuilder(feature);
     }
@@ -175,11 +179,11 @@ public interface Flag {
 
         Builder setInt(int value);
 
-        default Builder setCompute(Function<ComputationContext, Flag.Value> fun) {
+        default Builder setCompute(Function<ComputationContext, Value> fun) {
             return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
         }
 
-        Builder setComputeAsync(Function<ComputationContext, Uni<Flag.Value>> fun);
+        Builder setComputeAsync(Function<ComputationContext, Uni<Value>> fun);
 
         Builder setMetadata(Map<String, String> metadata);
 
