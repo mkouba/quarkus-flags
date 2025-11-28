@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-security-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0.Beta2</version>
     </parent>
     <artifactId>quarkus-flags-security</artifactId>
     <name>Quarkus Feature Flags - Security - Runtime</name>
