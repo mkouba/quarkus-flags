@@ -1,5 +1,6 @@
 package io.quarkiverse.flags.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,8 +39,11 @@ public class TimeSpanFlagEvaluatorTest {
     @Test
     public void testFlag() {
         assertTrue(flags.isEnabled("alpha"));
+        assertEquals("true", flags.find("alpha").orElseThrow().getString());
         assertFalse(flags.isEnabled("bravo"));
+        assertEquals(0, flags.find("bravo").orElseThrow().getInt());
         assertTrue(flags.isEnabled("charlie"));
+        assertEquals(1, flags.find("charlie").orElseThrow().getInt());
     }
 
 }
