@@ -41,6 +41,7 @@ public class InjectedFlagTest {
         assertTrue(alpha.isEnabled());
         assertNull(alpha.metadata().get("foo"));
         inMemoryFlagProvider.removeFlag("alpha");
+        assertThrows(NoSuchElementException.class, () -> alpha.origin());
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false).setMetadata(Map.of("foo", "bar")).build());
         assertFalse(alpha.isEnabled());
         assertEquals("bar", alpha.metadata().get("foo"));

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -45,13 +46,14 @@ public class InMemoryFlagsTest {
         assertEquals(0, flags.findAll().size());
         assertEquals(0, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
+        AtomicBoolean charlieValue = new AtomicBoolean(true);
 
         inMemoryFlagProvider.addFlag(Flag.builder("alpha")
                 .setEnabled(true).build());
         inMemoryFlagProvider.addFlag(Flag.builder("bravo")
                 .setEnabled(false).build());
         inMemoryFlagProvider.addFlag(Flag.builder("charlie")
-                .setCompute(cc -> BooleanValue.TRUE)
+                .setCompute(cc -> BooleanValue.from(charlieValue.get()))
                 .build());
         inMemoryFlagProvider.addFlag(Flag.builder("delta")
                 .setComputeAsync(cc -> StringValue.createUni("no"))
@@ -65,7 +67,9 @@ public class InMemoryFlagsTest {
         assertEquals(1, alphaValue.asInt());
 
         assertFalse(flags.find("bravo").orElseThrow().computeAndAwait().asBoolean());
-        assertTrue(flags.find("charlie").orElseThrow().computeAndAwait().asBoolean());
+        assertTrue(flags.isEnabled("charlie"));
+        charlieValue.set(false);
+        assertFalse(flags.isEnabled("charlie"));
 
         Flag.Value deltaValue = flags.find("delta").orElseThrow().computeAndAwait();
         assertFalse(deltaValue.asBoolean());
