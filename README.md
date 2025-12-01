@@ -1,6 +1,8 @@
 # Quarkus Feature Flags
 
-This projects aims to provide a lightweight and extensible feature flag Quarkus extension.
+[![Version](https://img.shields.io/maven-central/v/io.quarkiverse.flags/quarkus-flags-parent?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.flags/quarkus-flags-parent)
+
+This project aims to provide a lightweight and extensible feature flag Quarkus extension.
 More specifically, it provides:
 
 * An API to access feature flags.
