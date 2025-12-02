@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.jpa.deployment;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -117,9 +118,10 @@ public class FlagJpaProcessor {
                     });
                 });
 
-                cc.method("getFlags", mc -> {
-                    mc.returning(Iterable.class);
+                cc.method("doGetFlags", mc -> {
+                    mc.returning(Collection.class);
                     mc.addAnnotation(Transactional.class);
+
                     mc.body(bc -> {
                         // List<MyFlag> flags = em.createQuery("from MyFlag").getResultList();
                         Expr query = bc.invokeInterface(

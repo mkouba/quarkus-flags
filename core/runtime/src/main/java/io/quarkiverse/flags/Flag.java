@@ -28,6 +28,8 @@ public interface Flag {
     String feature();
 
     /**
+     * The origin should identify the provider of the flag.
+     *
      * @return the description of the source
      */
     String origin();

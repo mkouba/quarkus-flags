@@ -13,8 +13,10 @@ import jakarta.inject.Qualifier;
 /**
  * Qualifies an injection point of a feature {@link Flag}.
  * <p>
- * Note that the injected {@link Flag} is never {@code null} but subsequent invocations can throw {@link NoSuchElementException}
- * if no such feature flag exists.
+ * Note that the injected {@link Flag} is never {@code null} but subsequent computations can throw
+ * {@link NoSuchElementException} if no such feature flag exists.
+ * <p>
+ * Furthermore, {@link Flag#origin()} and {@link Flag#metadata()} will block the caller thread.
  *
  * @see Flag
  */

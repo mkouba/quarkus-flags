@@ -1,10 +1,14 @@
 package io.quarkiverse.flags.spi;
 
+import java.util.Collection;
+
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
+import io.smallrye.common.annotation.CheckReturnValue;
+import io.smallrye.mutiny.Uni;
 
 /**
- * Represents a provider of feature flags.
+ * A provider of feature flags.
  * <p>
  * Implementation classes must be CDI beans. Qualifiers are ignored. {@link jakarta.enterprise.context.Dependent} beans are
  * reused.
@@ -14,6 +18,9 @@ public interface FlagProvider {
     int DEFAULT_PRIORITY = 1;
 
     /**
+     * Must not block the caller thread. If an implementation needs to perform a blocking operation then it has to offload the
+     * execution on a worker thread.
+     * <p>
      * The result must not contain flags with duplicate feature names.
      * <p>
      * A flag from a provider with higher priority takes precedence and overrides flags with the same {@link Flag#feature()}
@@ -24,7 +31,8 @@ public interface FlagProvider {
      * @see Flags#findAll()
      * @see Flag#builder(String)
      */
-    Iterable<Flag> getFlags();
+    @CheckReturnValue
+    Uni<Collection<Flag>> getFlags();
 
     /**
      * The priority is reflected when the system collects all flags from all providers.

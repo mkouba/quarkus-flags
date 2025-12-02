@@ -33,7 +33,7 @@ public class FlagEntityTest {
     @TestTransaction
     @Test
     public void testFlagDefinition() {
-        assertEquals(0, flags.findAll().size());
+        assertEquals(0, flags.findAllAndAwait().size());
 
         MyFlag alpha = new MyFlag();
         alpha.feature = "alpha";
@@ -41,7 +41,7 @@ public class FlagEntityTest {
         alpha.metadata = Map.of("foo", "bar", FlagEvaluator.META_KEY, "inverting");
         alpha.persistAndFlush();
 
-        Flag alphaFlag = flags.find("alpha").orElseThrow();
+        Flag alphaFlag = flags.findAndAwait("alpha").orElseThrow();
         assertEquals("bar", alphaFlag.metadata().get("foo"));
         assertEquals("inverting", alphaFlag.metadata().get(FlagEvaluator.META_KEY));
         Flag.Value alphaState = alphaFlag.computeAndAwait();

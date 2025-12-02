@@ -1,5 +1,6 @@
 package io.quarkiverse.flags.runtime;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -10,6 +11,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.smallrye.mutiny.Uni;
 
 @Singleton
 public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements InMemoryFlagProvider {
@@ -27,8 +29,8 @@ public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements In
     }
 
     @Override
-    public Iterable<Flag> getFlags() {
-        return flags.values();
+    public Uni<Collection<Flag>> getFlags() {
+        return Uni.createFrom().item(flags.values());
     }
 
     @Override

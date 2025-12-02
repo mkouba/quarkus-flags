@@ -39,11 +39,11 @@ public class TimeSpanFlagEvaluatorTest {
     @Test
     public void testFlag() {
         assertTrue(flags.isEnabled("alpha"));
-        assertEquals("true", flags.find("alpha").orElseThrow().getString());
+        assertEquals("true", flags.findAndAwait("alpha").orElseThrow().getString());
         assertFalse(flags.isEnabled("bravo"));
-        assertEquals(0, flags.find("bravo").orElseThrow().getInt());
+        assertEquals(0, flags.findAndAwait("bravo").orElseThrow().getInt());
         assertTrue(flags.isEnabled("charlie"));
-        assertEquals(1, flags.find("charlie").orElseThrow().getInt());
+        assertEquals(1, flags.getInt("charlie"));
     }
 
 }

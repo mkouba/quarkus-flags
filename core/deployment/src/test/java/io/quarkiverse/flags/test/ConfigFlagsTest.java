@@ -55,11 +55,11 @@ public class ConfigFlagsTest {
 
     @Test
     public void testFlags() {
-        List<Flag> all = flags.findAll();
+        List<Flag> all = flags.findAllAndAwait();
         assertEquals(4, all.size(), all.toString());
-        assertTrue(flags.find("alpha").orElseThrow().isEnabled());
-        assertFalse(flags.find("bravo").orElseThrow().computeAndAwait().asBoolean());
-        assertEquals(0, flags.find("bravo").orElseThrow().getInt());
+        assertTrue(flags.findAndAwait("alpha").orElseThrow().isEnabled());
+        assertFalse(flags.findAndAwait("bravo").orElseThrow().computeAndAwait().asBoolean());
+        assertEquals(0, flags.findAndAwait("bravo").orElseThrow().getInt());
         assertTrue(flags.isEnabled("charlie"));
         assertFalse(flags.isEnabled("delta"));
         assertTrue(alpha.isEnabled());
