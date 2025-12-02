@@ -58,8 +58,8 @@ public class MyService {
 }
 ----
 <1> You can inject `Flags` in any CDI bean.
-<2> You can also inject a `Flag` for the given feature. The injected flag is never `null` but subsequent invocations can throw `NoSuchElementException` if no such feature flag exists.
-<3> `Flags#isEnabled(String)` is a shortcut for `find(feature).orElseThrow().isEnabled()`.
+<2> You can also inject a `Flag` for the given feature. The injected flag is never `null` but subsequent computations can throw `NoSuchElementException` if no such feature flag exists.
+<3> `Flags#isEnabled(String)` is a shortcut for `findAndAwait(feature).orElseThrow().isEnabled()`.
 <4> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
 
 TIP: If the `quarkus-flags-qute` module is present, you can access feature flags directly in templates, e.g. `{#if flag:enabled('my-feature-alpha')}...{/if}`

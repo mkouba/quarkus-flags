@@ -2,6 +2,7 @@ package io.quarkiverse.flags.test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.util.Collection;
 import java.util.stream.StreamSupport;
 
 import jakarta.annotation.Priority;
@@ -17,6 +18,7 @@ import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.mutiny.Uni;
 
 public class FlagProviderDecoratorTest {
 
@@ -35,7 +37,7 @@ public class FlagProviderDecoratorTest {
         inMemoryFlagProvider.addFlag(Flag.builder("alpha")
                 .setEnabled(true)
                 .build());
-        assertFalse(flags.find("alpha").orElseThrow().isEnabled());
+        assertFalse(flags.findAndAwait("alpha").orElseThrow().isEnabled());
     }
 
     @Priority(5)
@@ -47,10 +49,12 @@ public class FlagProviderDecoratorTest {
         FlagProvider delegate;
 
         @Override
-        public Iterable<Flag> getFlags() {
-            return StreamSupport.stream(delegate.getFlags().spliterator(), false).<Flag> map(f -> {
-                return Flag.builder(f.feature()).setMetadata(f.metadata()).setEnabled(false).build();
-            }).toList();
+        public Uni<Collection<Flag>> getFlags() {
+            return delegate.getFlags().map(f -> {
+                return StreamSupport.stream(f.spliterator(), false).<Flag> map(flag -> {
+                    return Flag.builder(flag.feature()).setMetadata(flag.metadata()).setEnabled(false).build();
+                }).toList();
+            });
         }
 
         @Override

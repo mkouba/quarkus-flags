@@ -6,12 +6,14 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -71,30 +73,45 @@ public class FlagManagerImpl implements FlagManager {
     }
 
     @Override
-    public List<Flag> findAll() {
-        return List.copyOf(getFlags());
+    public Uni<List<Flag>> findAll() {
+        if (providers.isEmpty()) {
+            return Uni.createFrom().item(List.of());
+        }
+        ConcurrentMap<String, Flag> ret = new ConcurrentHashMap<>();
+        Iterator<FlagProvider> it = providers.iterator();
+        FlagProvider first = it.next();
+        AtomicReference<String> providerClassName = new AtomicReference<String>(first.getClass().getName());
+        Uni<Collection<Flag>> uni = first.getFlags();
+        while (it.hasNext()) {
+            FlagProvider next = it.next();
+            uni = uni.chain(c -> {
+                addFlags(providerClassName.get(), c, ret);
+                providerClassName.set(next.getClass().getName());
+                return next.getFlags();
+            });
+        }
+        return uni.map(c -> {
+            addFlags(providerClassName.get(), c, ret);
+            return List.copyOf(ret.values());
+        });
+
+    }
+
+    private void addFlags(String providerClassName, Collection<Flag> flags, ConcurrentMap<String, Flag> result) {
+        for (Flag flag : flags) {
+            if (result.putIfAbsent(flag.feature(), new DelegatingFlag(flag, providerClassName)) != null) {
+                LOG.debugf(
+                        "Flag with feature %s from provider %s is ignored: a flag with the same feature is declared by a provider with higher priority",
+                        flag.feature(), providerClassName);
+            }
+        }
     }
 
     @Override
-    public Optional<Flag> find(String feature) {
-        return getFlags().stream()
+    public Uni<Optional<Flag>> find(String feature) {
+        return findAll().map(flags -> flags.stream()
                 .filter(f -> f.feature().equals(feature))
-                .findFirst();
-    }
-
-    Set<Flag> getFlags() {
-        Set<Flag> ret = new HashSet<>();
-        for (FlagProvider provider : providers) {
-            String providerClassName = provider.getClass().getName();
-            for (Flag flag : provider.getFlags()) {
-                if (!ret.add(new DelegatingFlag(flag, providerClassName))) {
-                    LOG.debugf(
-                            "Flag with feature %s from provider %s is ignored: a flag with the same feature is declared by a provider with higher priority",
-                            flag.feature(), provider.getClass().getName());
-                }
-            }
-        }
-        return ret;
+                .findFirst());
     }
 
     @Override
@@ -142,17 +159,17 @@ public class FlagManagerImpl implements FlagManager {
 
         @Override
         public String origin() {
-            return find(feature).orElseThrow().origin();
+            return findAndAwait(feature).orElseThrow().origin();
         }
 
         @Override
         public Uni<Value> compute(ComputationContext context) {
-            return find(feature).orElseThrow().compute(context);
+            return find(feature).chain(f -> f.orElseThrow().compute(context));
         }
 
         @Override
         public Map<String, String> metadata() {
-            return find(feature).orElseThrow().metadata();
+            return findAndAwait(feature).orElseThrow().metadata();
         }
 
     }
@@ -191,22 +208,17 @@ public class FlagManagerImpl implements FlagManager {
 
         @Override
         public int hashCode() {
-            return delegate.feature().hashCode();
+            return delegate.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (!(obj instanceof Flag))
-                return false;
-            Flag other = (Flag) obj;
-            return Objects.equals(delegate.feature(), other.feature());
+            return delegate.equals(obj);
         }
 
         @Override
         public String toString() {
-            return "DelegatingFlag [delegate=" + delegate + "]";
+            return delegate.toString();
         }
 
     }

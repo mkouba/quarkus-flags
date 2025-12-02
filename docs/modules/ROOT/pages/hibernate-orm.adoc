@@ -1,0 +1,64 @@
+== Quarkus Feature Flags - Hibernate ORM
+
+include::./includes/attributes.adoc[]
+
+The extension provides integration with Hibernate ORM.
+It attempts to discover all entities annotated with `@io.quarkiverse.flags.hibernate.orm.FlagDefinition` and generates a `FlagProvider` automatically.
+
+If you want to use the Hibernate ORM integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-hibernate-orm` extension to your build file first.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags-hibernate-orm</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+
+TIP: We recommend to use the `quarkus-hibernate-orm-panache` extension as well to simplify your entities.
+
+Then you can map an entity that represents a feature flag.
+
+[source,java]
+----
+import java.util.Map;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+
+import io.quarkiverse.flags.hibernate.orm.FlagDefinition;
+import io.quarkiverse.flags.hibernate.orm.FlagFeature;
+import io.quarkiverse.flags.hibernate.orm.FlagMetadata;
+import io.quarkiverse.flags.hibernate.orm.FlagValue;
+import io.quarkus.hibernate.orm.panache.PanacheEntity; 
+
+@FlagDefinition <1>
+@Entity
+public class MyFlag extends PanacheEntity {
+
+    @FlagFeature <2>
+    public String feature;
+
+    @FlagValue <3>
+    public String value;
+
+    @FlagMetadata <4>
+    @ElementCollection
+    @CollectionTable
+    public Map<String, String> metadata;
+
+}
+----
+<1> Marks a flag definition entity.
+<2> Defines the feature name of a feature flag.
+<3> Defines the value of a feature flag.
+<4> Defines the metadata of a feature flag.
+
+A `FlagProvider` is generated automatically.
+
+[[extension-configuration-reference]]
+== Extension configuration reference
+
+include::includes/quarkus-flags-hibernate-orm.adoc[leveloffset=+1, opts=optional]

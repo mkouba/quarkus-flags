@@ -1,13 +1,11 @@
 package io.quarkiverse.flags.qute;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkus.qute.CompletedStage;
 import io.quarkus.qute.EngineConfiguration;
@@ -33,7 +31,7 @@ public class FlagNamespaceResolver implements NamespaceResolver {
         String name = ctx.getName();
         if ("flags".equals(name)) {
             // flag:flags
-            return CompletedStage.of(flags.findAll());
+            return cast(flags.findAll().subscribeAsCompletionStage());
         }
         // flag:bool('delta-feature')
         // flag:enabled('delta-feature')
@@ -45,21 +43,24 @@ public class FlagNamespaceResolver implements NamespaceResolver {
         if (params.isEmpty()) {
             return Results.notFound(ctx);
         }
-        return ctx.evaluate(params.get(0)).thenCompose(f -> {
-            Optional<Flag> flag = flags.find(f.toString());
-            if (flag.isEmpty()) {
-                return Results.notFound(ctx);
-            }
-            return switch (ctx.getName()) {
-                case "bool", "enabled" -> cast(flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
-                case "disabled" -> cast(flag.get().compute().map(v -> !v.asBoolean()).subscribeAsCompletionStage());
-                case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
-                case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
-                case "meta" -> CompletedStage.of(flag.get().metadata());
-                case "find" -> CompletedStage.of(flag.get());
-                default -> throw new IllegalArgumentException("Unexpected value: " + ctx.getName());
-            };
-        });
+        return ctx.evaluate(params.get(0))
+                .thenCompose(f -> flags.find(f.toString())
+                        .subscribeAsCompletionStage().thenCompose(flag -> {
+                            if (flag.isEmpty()) {
+                                return Results.notFound(ctx);
+                            }
+                            return switch (ctx.getName()) {
+                                case "bool", "enabled" -> cast(
+                                        flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
+                                case "disabled" -> cast(
+                                        flag.get().compute().map(v -> !v.asBoolean()).subscribeAsCompletionStage());
+                                case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
+                                case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
+                                case "meta" -> CompletedStage.of(flag.get().metadata());
+                                case "find" -> CompletedStage.of(flag.get());
+                                default -> throw new IllegalArgumentException("Unexpected value: " + ctx.getName());
+                            };
+                        }));
     }
 
     @Override

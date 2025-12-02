@@ -77,7 +77,7 @@ public class UsernameRolloutFlagEvaluatorTest {
     }
 
     private Set<String> assertDeltaFlag(Set<String> usernames) {
-        Flag flag = flags.find(FEATURE).orElseThrow();
+        Flag flag = flags.findAndAwait(FEATURE).orElseThrow();
         Log.infof("Test with rollout-percentage: %s", flag.metadata().get(RolloutFlagEvaluator.ROLLOUT_PERCENTAGE));
         Set<String> enabledUsernames = new HashSet<>();
 

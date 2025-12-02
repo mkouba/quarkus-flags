@@ -1,11 +1,10 @@
-package io.quarkiverse.flags.test;
+package io.quarkiverse.flags.jpa.test;
 
 import java.util.Map;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 import io.quarkiverse.flags.hibernate.orm.FlagDefinition;
 import io.quarkiverse.flags.hibernate.orm.FlagFeature;
@@ -15,8 +14,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @FlagDefinition
 @Entity
-@Table(name = "db_flag")
-public class DbFlag extends PanacheEntity {
+public class MyFlag extends PanacheEntity {
 
     @FlagFeature
     public String feature;
@@ -26,7 +24,7 @@ public class DbFlag extends PanacheEntity {
 
     @FlagMetadata
     @ElementCollection
-    @CollectionTable(name = "db_flag_meta")
+    @CollectionTable
     public Map<String, String> metadata;
 
 }

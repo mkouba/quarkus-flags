@@ -3,33 +3,44 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
-        <artifactId>quarkus-flags-core-parent</artifactId>
+        <artifactId>quarkus-flags-hibernate-orm-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-flags-deployment</artifactId>
-    <name>Quarkus Feature Flags - Core - Deployment</name>
+    <artifactId>quarkus-flags-hibernate-orm-deployment</artifactId>
+    <name>Quarkus Feature Flags - Hibernate ORM - Deployment</name>
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc-deployment</artifactId>
+            <artifactId>quarkus-hibernate-orm-deployment</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.flags</groupId>
+            <artifactId>quarkus-flags-deployment</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.flags</groupId>
+            <artifactId>quarkus-flags-hibernate-orm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Panache SPI-like module to collect entity classes -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-vertx-deployment</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.flags</groupId>
-            <artifactId>quarkus-flags</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.flags</groupId>
-            <artifactId>quarkus-flags-dev</artifactId>
-            <version>${project.version}</version>
+            <artifactId>quarkus-panache-common-deployment</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5-internal</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-orm-panache-deployment</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

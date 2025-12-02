@@ -24,6 +24,9 @@ public class FlagBuilder implements Flag.Builder {
     private Flag.Value value;
 
     public FlagBuilder(String feature) {
+        if (feature == null || feature.isBlank()) {
+            throw new IllegalArgumentException("Feature must not be null");
+        }
         this.feature = feature;
     }
 

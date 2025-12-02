@@ -3,19 +3,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
-        <artifactId>quarkus-flags-core-parent</artifactId>
+        <artifactId>quarkus-flags-hibernate-orm-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-flags</artifactId>
-    <name>Quarkus Feature Flags - Core - Runtime</name>
+    <artifactId>quarkus-flags-hibernate-orm</artifactId>
+    <name>Quarkus Feature Flags - Hibernate ORM - Runtime</name>
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc</artifactId>
+            <artifactId>quarkus-hibernate-orm</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-vertx</artifactId>
+            <groupId>io.quarkiverse.flags</groupId>
+            <artifactId>quarkus-flags</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -32,11 +33,7 @@
                         </goals>
                         <configuration>
                             <deployment>
-                                ${project.groupId}:${project.artifactId}-deployment:${project.version}
-                            </deployment>
-                            <conditionalDevDependencies>
-                                <artifact>${project.groupId}:${project.artifactId}-dev:${project.version}</artifact>
-                            </conditionalDevDependencies>
+                                ${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
                         </configuration>
                     </execution>
                 </executions>

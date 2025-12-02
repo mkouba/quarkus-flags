@@ -43,7 +43,7 @@ public class InMemoryFlagsTest {
 
     @Test
     public void testFlags() {
-        assertEquals(0, flags.findAll().size());
+        assertEquals(0, flags.findAllAndAwait().size());
         assertEquals(0, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
         AtomicBoolean charlieValue = new AtomicBoolean(true);
@@ -61,23 +61,23 @@ public class InMemoryFlagsTest {
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 
-        Flag.Value alphaValue = flags.find("alpha").orElseThrow().computeAndAwait();
+        Flag.Value alphaValue = flags.findAndAwait("alpha").orElseThrow().computeAndAwait();
         assertTrue(alphaValue.asBoolean());
         assertEquals("true", alphaValue.asString());
         assertEquals(1, alphaValue.asInt());
 
-        assertFalse(flags.find("bravo").orElseThrow().computeAndAwait().asBoolean());
+        assertFalse(flags.findAndAwait("bravo").orElseThrow().computeAndAwait().asBoolean());
         assertTrue(flags.isEnabled("charlie"));
         charlieValue.set(false);
         assertFalse(flags.isEnabled("charlie"));
 
-        Flag.Value deltaValue = flags.find("delta").orElseThrow().computeAndAwait();
+        Flag.Value deltaValue = flags.findAndAwait("delta").orElseThrow().computeAndAwait();
         assertFalse(deltaValue.asBoolean());
         assertEquals("no", deltaValue.asString());
         assertThrows(NoSuchElementException.class, () -> deltaValue.asInt());
 
-        flags.findAll().forEach(f -> inMemoryFlagProvider.removeFlag(f.feature()));
-        assertEquals(0, flags.findAll().size());
+        flags.findAllAndAwait().forEach(f -> inMemoryFlagProvider.removeFlag(f.feature()));
+        assertEquals(0, flags.findAllAndAwait().size());
         assertEquals(4, flagObservers.added.size());
         assertEquals(4, flagObservers.removed.size());
     }

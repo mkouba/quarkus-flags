@@ -38,7 +38,7 @@ public class FlagsJsonRPCService {
     @JsonRpcDescription("Get information about feature flags used in the application")
     public JsonArray getFlagsData() {
         JsonArray data = new JsonArray();
-        for (Flag flag : flags.findAll()) {
+        for (Flag flag : flags.findAllAndAwait()) {
             JsonObject flagJson = new JsonObject();
             flagJson.put("feature", flag.feature());
             flagJson.put("origin", flag.origin());
@@ -51,7 +51,7 @@ public class FlagsJsonRPCService {
 
     @JsonRpcDescription("Compute the value of a flag for the specific feature")
     public Uni<String> computeValue(String feature) {
-        return flags.find(feature).orElseThrow().compute().map(Value::asString);
+        return flags.findAndAwait(feature).orElseThrow().compute().map(Value::asString);
     }
 
     @JsonRpcDescription("Get information about flag providers")
@@ -68,16 +68,18 @@ public class FlagsJsonRPCService {
     }
 
     @JsonRpcDescription("Get feature flags for a specific flag provider")
-    public JsonArray getProviderFlags(String id) {
+    public Uni<JsonArray> getProviderFlags(String id) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Invalid provider id");
         }
         FlagProvider provider = providers.stream().filter(e -> e.getKey().equals(id)).findAny().orElseThrow().getValue();
-        JsonArray flags = new JsonArray();
-        for (Flag flag : provider.getFlags()) {
-            flags.add(flag.feature());
-        }
-        return flags;
+        return provider.getFlags().map(flags -> {
+            JsonArray array = new JsonArray();
+            for (Flag flag : flags) {
+                array.add(flag.feature());
+            }
+            return array;
+        });
     }
 
     @JsonRpcDescription("Get information about flag evaluators")

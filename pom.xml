@@ -13,7 +13,7 @@
     <name>Quarkus Feature Flags - Parent</name>
     <modules>
         <module>core</module>
-        <module>jpa</module>
+        <module>hibernate-orm</module>
         <module>security</module>
         <module>qute</module>
     </modules>
