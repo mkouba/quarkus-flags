@@ -10,7 +10,7 @@ More specifically, it provides:
 * Several built-in flag providers 
 ** Leverage Quarkus config to define feature flags,
 ** In-memory repository (useful for testing and dynamic registration).
-* *JPA module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
+* *Hibernate ORM module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
 * *Security module*, so that it's possible to evaluate flags based on the current `SecurityIdentity`.
 * *Qute module* so that it's possible to use the flags directly in templates.
 
