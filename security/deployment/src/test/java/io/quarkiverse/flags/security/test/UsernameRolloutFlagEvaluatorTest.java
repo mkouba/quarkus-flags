@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.jpa.test;
+package io.quarkiverse.flags.security.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

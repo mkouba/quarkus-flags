@@ -16,6 +16,7 @@
         <module>hibernate-orm</module>
         <module>security</module>
         <module>qute</module>
+        <module>cron</module>
     </modules>
     <properties>
         <quarkus.version>3.27.1</quarkus.version>
