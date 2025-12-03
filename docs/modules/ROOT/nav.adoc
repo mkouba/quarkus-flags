@@ -1,5 +1,5 @@
 * xref:index.adoc[Reference Guide]
-* xref:jpa.adoc[JPA]
+* xref:hibernate-orm.adoc[Hibernate ORM]
 * xref:security.adoc[Security]
 * xref:qute.adoc[Qute]
 
