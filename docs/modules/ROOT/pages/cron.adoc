@@ -1,0 +1,27 @@
+== Quarkus Feature Flags - Cron
+
+include::./includes/attributes.adoc[]
+
+If you want to use a flag evaluator to match a specific CRON expression in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-cron` extension to your build file first.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags-cron</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+The extension provides the `CronFlagEvaluator` that can be used to compute the current value of a feature flag based on the current date-time obtained from the system clock in the default time-zone and the configured CRON expression. 
+A typical feature flag configuration may look like:
+
+```properties
+quarkus.flags.runtime.delta.value=true <1>
+quarkus.flags.runtime.delta.meta.evaluator=quarkus.cron <2>
+quarkus.flags.runtime.delta.meta.cron-expr=* * * * mon <3>
+``` 
+<1> Flag `delta` is enabled by default.
+<2> The `CronFlagEvaluator` is used to compute the current value of the feature flag.
+<3> The current date-time must match the given CRON expression. In this particular case, the flag will be enabled every Monday.
+
+NOTE: By default, the Unix/crontab syntax is used. However, it is also possible to use the syntax from Cron4j, Quartz and Spring. For example, `quarkus.flags.runtime.delta.meta.cron-type=QUARTZ`.
