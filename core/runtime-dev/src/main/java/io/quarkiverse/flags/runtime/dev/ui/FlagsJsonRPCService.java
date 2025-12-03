@@ -51,7 +51,7 @@ public class FlagsJsonRPCService {
 
     @JsonRpcDescription("Compute the value of a flag for the specific feature")
     public Uni<String> computeValue(String feature) {
-        return flags.findAndAwait(feature).orElseThrow().compute().map(Value::asString);
+        return flags.find(feature).chain(f -> f.orElseThrow().compute().map(Value::asString));
     }
 
     @JsonRpcDescription("Get information about flag providers")
