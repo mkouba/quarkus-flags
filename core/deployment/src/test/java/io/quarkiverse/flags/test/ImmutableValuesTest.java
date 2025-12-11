@@ -9,10 +9,10 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag.Value;
-import io.quarkiverse.flags.spi.BooleanValue;
-import io.quarkiverse.flags.spi.IntValue;
-import io.quarkiverse.flags.spi.StringValue;
+import io.quarkiverse.flags.IntValue;
+import io.quarkiverse.flags.StringValue;
 
 public class ImmutableValuesTest {
 

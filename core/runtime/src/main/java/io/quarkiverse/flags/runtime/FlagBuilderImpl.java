@@ -1,17 +1,22 @@
-package io.quarkiverse.flags.spi;
+package io.quarkiverse.flags.runtime;
 
 import java.util.Map;
 import java.util.function.Function;
 
+import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.Builder;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
+import io.quarkiverse.flags.IntValue;
+import io.quarkiverse.flags.StringValue;
+import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.ArcContainer;
 import io.smallrye.mutiny.Uni;
 
-public class FlagBuilder implements Flag.Builder {
+public class FlagBuilderImpl implements Flag.Builder {
 
     private final String feature;
 
@@ -23,7 +28,7 @@ public class FlagBuilder implements Flag.Builder {
 
     private Flag.Value value;
 
-    public FlagBuilder(String feature) {
+    public FlagBuilderImpl(String feature) {
         if (feature == null || feature.isBlank()) {
             throw new IllegalArgumentException("Feature must not be null");
         }

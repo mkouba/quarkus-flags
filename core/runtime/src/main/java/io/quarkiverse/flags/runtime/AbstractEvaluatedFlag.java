@@ -1,7 +1,8 @@
-package io.quarkiverse.flags.spi;
+package io.quarkiverse.flags.runtime;
 
 import java.util.Map;
 
+import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.smallrye.mutiny.Uni;
 
 public abstract class AbstractEvaluatedFlag extends AbstractFlag {

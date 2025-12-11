@@ -17,13 +17,13 @@ import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.InMemoryFlagProvider.FlagAdded;
 import io.quarkiverse.flags.InMemoryFlagProvider.FlagRemoved;
-import io.quarkiverse.flags.spi.BooleanValue;
-import io.quarkiverse.flags.spi.StringValue;
+import io.quarkiverse.flags.StringValue;
 import io.quarkus.test.QuarkusUnitTest;
 
 public class InMemoryFlagsTest {

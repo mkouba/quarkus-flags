@@ -14,10 +14,10 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
 
+import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
-import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.smallrye.mutiny.Uni;
 

@@ -12,12 +12,12 @@ import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.CompositeFlagEvaluator;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
-import io.quarkiverse.flags.spi.BooleanValue;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
 import io.smallrye.mutiny.Uni;

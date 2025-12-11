@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.spi;
+package io.quarkiverse.flags.runtime;
 
 import java.util.Map;
 

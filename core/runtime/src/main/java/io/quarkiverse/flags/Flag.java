@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-import io.quarkiverse.flags.spi.ComputationContextImpl;
-import io.quarkiverse.flags.spi.FlagBuilder;
+import io.quarkiverse.flags.runtime.ComputationContextImpl;
+import io.quarkiverse.flags.runtime.FlagBuilderImpl;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -19,7 +19,7 @@ public interface Flag {
      * @return a new flag builder
      */
     static Builder builder(String feature) {
-        return new FlagBuilder(feature);
+        return new FlagBuilderImpl(feature);
     }
 
     /**
