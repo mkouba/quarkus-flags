@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.hibernate.orm;
+package io.quarkiverse.flags.hibernate.common;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

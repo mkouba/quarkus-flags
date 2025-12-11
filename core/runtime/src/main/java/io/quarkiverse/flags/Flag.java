@@ -23,6 +23,8 @@ public interface Flag {
     }
 
     /**
+     * There can be only one flag for a given feature at a given time.
+     *
      * @return the name of the feature (not {@code null})
      */
     String feature();

@@ -1,0 +1,8 @@
+name: Feature Flags - Hibernate Common
+metadata:
+  keywords:
+    - flags
+    - toggles
+  categories:
+    - "miscellaneous"
+  status: "preview"

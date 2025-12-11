@@ -2,32 +2,26 @@ package io.quarkiverse.flags.hibernate.orm.deployment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 
-import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.DotName;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Flag;
-import io.quarkiverse.flags.hibernate.orm.FlagDefinition;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
-import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateFlagProvider;
+import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateOrmFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
 import io.quarkus.arc.deployment.GeneratedBeanGizmo2Adaptor;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.builditem.ApplicationIndexBuildItem;
 import io.quarkus.gizmo2.ClassOutput;
 import io.quarkus.gizmo2.Const;
 import io.quarkus.gizmo2.Expr;
@@ -41,29 +35,13 @@ import io.quarkus.gizmo2.desc.MethodDesc;
 import io.quarkus.hibernate.orm.PersistenceUnit;
 import io.quarkus.hibernate.orm.deployment.PersistenceUnitDescriptorBuildItem;
 import io.quarkus.hibernate.orm.runtime.PersistenceUnitUtil;
-import io.quarkus.panache.common.deployment.PanacheEntityClassesBuildItem;
 
-public class FlagHibernateProcessor {
+public class FlagHibernateOrmProcessor {
 
-    private static final Logger LOG = Logger.getLogger(FlagHibernateProcessor.class);
-
-    @BuildStep
-    void collectFlagDefinitions(ApplicationIndexBuildItem index, List<PanacheEntityClassesBuildItem> panacheEntityClasses,
-            BuildProducer<FlagDefinitionBuildItem> flagDefinition) {
-        List<AnnotationInstance> flagDefinitions = index.getIndex().getAnnotations(DotName.createSimple(FlagDefinition.class));
-        for (AnnotationInstance flagDefinitionAnnotation : flagDefinitions) {
-            Set<String> panacheEntities = new HashSet<>();
-            for (PanacheEntityClassesBuildItem entityClasses : panacheEntityClasses) {
-                panacheEntities.addAll(entityClasses.getEntityClasses());
-            }
-            ClassInfo entityClass = flagDefinitionAnnotation.target().asClass();
-            flagDefinition.produce(
-                    new FlagDefinitionBuildItem(entityClass, panacheEntities.contains(entityClass.name().toString())));
-        }
-    }
+    private static final Logger LOG = Logger.getLogger(FlagHibernateOrmProcessor.class);
 
     @BuildStep
-    void generateFlagProvider(FlagHibernateBuildTimeConfig config, List<PersistenceUnitDescriptorBuildItem> descriptors,
+    void generateFlagProvider(FlagHibernateOrmBuildTimeConfig config, List<PersistenceUnitDescriptorBuildItem> descriptors,
             List<FlagDefinitionBuildItem> flagDefinitions, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
         if (flagDefinitions.isEmpty()) {
             LOG.debugf("No @FlagDefinition found - no JPA FlagProvider will be generated");
@@ -78,10 +56,10 @@ public class FlagHibernateProcessor {
         for (FlagDefinitionBuildItem flagDefinition : flagDefinitions) {
             ClassInfo entityClass = flagDefinition.getEntityClass();
 
-            gizmo.class_(entityClass.name() + "_JpaFlagProvider", cc -> {
+            gizmo.class_(entityClass.name() + "_HibernateOrmFlagProvider", cc -> {
                 This this_ = cc.this_();
                 cc.addAnnotation(Singleton.class);
-                cc.extends_(AbstractHibernateFlagProvider.class);
+                cc.extends_(AbstractHibernateOrmFlagProvider.class);
 
                 // private final EntityManager em;
                 FieldDesc emField = cc.field("em", fc -> {
@@ -91,7 +69,7 @@ public class FlagHibernateProcessor {
                 });
 
                 cc.constructor(constructor -> {
-                    // MyFlag_JpaFlagProvider(EntityManager em, FlagManager fm) {
+                    // MyFlag_HibernateOrmFlagProvider(EntityManager em, FlagManager fm) {
                     //    super(fm);
                     //    this.em = em;
                     // }
@@ -105,7 +83,7 @@ public class FlagHibernateProcessor {
                     });
                     ParamVar manager = constructor.parameter("fm", FlagManager.class);
                     constructor.body(bc -> {
-                        bc.invokeSpecial(ConstructorDesc.of(AbstractHibernateFlagProvider.class, FlagManager.class), this_,
+                        bc.invokeSpecial(ConstructorDesc.of(AbstractHibernateOrmFlagProvider.class, FlagManager.class), this_,
                                 manager);
                         bc.set(this_.field(emField), em);
                         bc.return_();
@@ -149,7 +127,7 @@ public class FlagHibernateProcessor {
                             }
                             ibc.withList(ret)
                                     .add(ibc.invokeVirtual(
-                                            MethodDesc.of(AbstractHibernateFlagProvider.class, "createFlag", Flag.class,
+                                            MethodDesc.of(AbstractHibernateOrmFlagProvider.class, "createFlag", Flag.class,
                                                     String.class,
                                                     String.class,
                                                     Map.class),
