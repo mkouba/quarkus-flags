@@ -7,8 +7,8 @@ import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 
 @ConfigRoot
-@ConfigMapping(prefix = "quarkus.flags.hibernate-orm")
-public interface FlagHibernateBuildTimeConfig {
+@ConfigMapping(prefix = "quarkus.flags.hibernate.orm")
+public interface FlagHibernateOrmBuildTimeConfig {
 
     /**
      * Selects the persistence unit.

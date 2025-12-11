@@ -16,10 +16,10 @@ import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
 
-import io.quarkiverse.flags.hibernate.orm.FlagDefinition;
-import io.quarkiverse.flags.hibernate.orm.FlagFeature;
-import io.quarkiverse.flags.hibernate.orm.FlagMetadata;
-import io.quarkiverse.flags.hibernate.orm.FlagValue;
+import io.quarkiverse.flags.hibernate.common.FlagDefinition;
+import io.quarkiverse.flags.hibernate.common.FlagFeature;
+import io.quarkiverse.flags.hibernate.common.FlagMetadata;
+import io.quarkiverse.flags.hibernate.common.FlagValue;
 import io.quarkus.builder.item.MultiBuildItem;
 import io.quarkus.deployment.bean.JavaBeanUtil;
 import io.quarkus.gizmo2.Expr;

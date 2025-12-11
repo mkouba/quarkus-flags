@@ -7,10 +7,10 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import io.quarkiverse.flags.hibernate.orm.FlagDefinition;
-import io.quarkiverse.flags.hibernate.orm.FlagFeature;
-import io.quarkiverse.flags.hibernate.orm.FlagMetadata;
-import io.quarkiverse.flags.hibernate.orm.FlagValue;
+import io.quarkiverse.flags.hibernate.common.FlagDefinition;
+import io.quarkiverse.flags.hibernate.common.FlagFeature;
+import io.quarkiverse.flags.hibernate.common.FlagMetadata;
+import io.quarkiverse.flags.hibernate.common.FlagValue;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @FlagDefinition

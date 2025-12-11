@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
+import io.quarkus.runtime.BlockingOperationControl;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -18,13 +19,16 @@ public interface FlagProvider {
     int DEFAULT_PRIORITY = 1;
 
     /**
-     * Must not block the caller thread. If an implementation needs to perform a blocking operation then it has to offload the
+     * Must not block the caller thread unless blocking is allowed.
+     * <p>
+     * An implementation can use {@link BlockingOperationControl#isBlockingAllowed()} to detect if blocking is allowed on the
+     * current thread.
+     * <p>
+     * If blocking is not allowed but an implementation still needs to perform a blocking operation then it has to offload the
      * execution on a worker thread.
      * <p>
-     * The result must not contain flags with duplicate feature names.
-     * <p>
-     * A flag from a provider with higher priority takes precedence and overrides flags with the same {@link Flag#feature()}
-     * from providers with lower priority.
+     * The result must not contain flags with duplicate feature names. A flag from a provider with higher priority takes
+     * precedence and overrides flags with the same {@link Flag#feature()} from providers with lower priority.
      *
      * @return the flags
      * @see Flags#find(String)
@@ -36,6 +40,8 @@ public interface FlagProvider {
 
     /**
      * The priority is reflected when the system collects all flags from all providers.
+     * <p>
+     * If multiple providers with the same priority are detected then the application fails to start.
      *
      * @return the priority
      */

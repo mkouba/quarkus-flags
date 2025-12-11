@@ -11,9 +11,9 @@ import io.quarkus.runtime.BlockingOperationControl;
 import io.quarkus.vertx.VertxContextSupport;
 import io.smallrye.mutiny.Uni;
 
-public abstract class AbstractHibernateFlagProvider extends AbstractFlagProvider {
+public abstract class AbstractHibernateOrmFlagProvider extends AbstractFlagProvider {
 
-    public AbstractHibernateFlagProvider(FlagManager manager) {
+    public AbstractHibernateOrmFlagProvider(FlagManager manager) {
         super(manager);
     }
 
