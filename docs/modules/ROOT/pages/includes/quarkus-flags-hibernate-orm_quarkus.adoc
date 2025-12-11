@@ -15,6 +15,8 @@ endif::add-copy-button-to-config-props[]
 
 [.description]
 --
+Selects the persistence unit.
+
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_PERSISTENCE_UNIT_NAME+++[]

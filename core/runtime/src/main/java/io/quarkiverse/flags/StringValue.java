@@ -1,15 +1,14 @@
-package io.quarkiverse.flags.spi;
+package io.quarkiverse.flags;
 
 import java.util.NoSuchElementException;
 
-import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
 
 /**
  * Immutable string flag value.
  */
-public class StringValue implements Flag.Value {
+public final class StringValue implements Flag.Value {
 
     public static final Uni<Value> createUni(String value) {
         return Uni.createFrom().item(new StringValue(value));
