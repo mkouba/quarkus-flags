@@ -1,6 +1,7 @@
 package io.quarkiverse.flags;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
@@ -17,7 +18,7 @@ public final class StringValue implements Flag.Value {
     private final String value;
 
     public StringValue(String value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value);
     }
 
     @Override

@@ -48,8 +48,7 @@ public class InMemoryFlagsTest {
         assertEquals(0, flagObservers.removed.size());
         AtomicBoolean charlieValue = new AtomicBoolean(true);
 
-        inMemoryFlagProvider.addFlag(Flag.builder("alpha")
-                .setEnabled(true).build());
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha").build());
         inMemoryFlagProvider.addFlag(Flag.builder("bravo")
                 .setEnabled(false).build());
         inMemoryFlagProvider.addFlag(Flag.builder("charlie")

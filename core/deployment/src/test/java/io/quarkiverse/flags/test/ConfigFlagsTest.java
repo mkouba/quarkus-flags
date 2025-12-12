@@ -37,7 +37,6 @@ public class ConfigFlagsTest {
                                 """), "application.properties");
             })
             .overrideRuntimeConfigKey("quarkus.flags.runtime.charlie.value", "true")
-            .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.evaluator", "deltaEval")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.usernames", "foo,bar,baz");
 

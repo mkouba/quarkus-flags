@@ -15,7 +15,7 @@ import io.smallrye.mutiny.Uni;
 public interface Flag {
 
     /**
-     * @param feature
+     * @param feature (not {@code null})
      * @return a new flag builder
      */
     static Builder builder(String feature) {
@@ -180,24 +180,67 @@ public interface Flag {
 
     }
 
+    /**
+     * A convenient flag builder.
+     */
     interface Builder {
 
+        /**
+         * @param value
+         * @return self
+         * @see Flag#compute()
+         */
         Builder setEnabled(boolean value);
 
+        /**
+         * @param value
+         * @return self
+         * @see Flag#compute()
+         */
         Builder setString(String value);
 
+        /**
+         * @param value
+         * @return self
+         * @see Flag#compute()
+         */
         Builder setInt(int value);
 
+        /**
+         * @param fun
+         * @return self
+         * @see Flag#compute()
+         */
         default Builder setCompute(Function<ComputationContext, Value> fun) {
             return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
         }
 
+        /**
+         * @param fun
+         * @return self
+         * @see Flag#compute()
+         */
         Builder setComputeAsync(Function<ComputationContext, Uni<Value>> fun);
 
+        /**
+         * @param metadata
+         * @return self
+         * @see Flag#metadata()
+         */
         Builder setMetadata(Map<String, String> metadata);
 
+        /**
+         * @param origin
+         * @return self
+         * @see Flag#origin()
+         */
         Builder setOrigin(String origin);
 
+        /**
+         * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.
+         *
+         * @return a new flag
+         */
         Flag build();
 
     }
