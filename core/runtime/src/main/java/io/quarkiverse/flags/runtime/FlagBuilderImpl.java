@@ -61,6 +61,9 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     @Override
     public Builder setMetadata(Map<String, String> metadata) {
+        if (metadata == null) {
+            throw new IllegalArgumentException("Metadata must not be null");
+        }
         this.metadata = metadata;
         return this;
     }
@@ -73,6 +76,9 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     @Override
     public Flag build() {
+        if (value == null && fun == null) {
+            value = BooleanValue.TRUE;
+        }
         String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
         if (evaluatorId != null) {
             ArcContainer container = Arc.container();
