@@ -12,7 +12,7 @@ import io.smallrye.mutiny.Uni;
 public class CustomFlagEvaluator implements FlagEvaluator {
 
     @Override
-    public String id() {
+    public String getId() {
         return "custom";
     }
 

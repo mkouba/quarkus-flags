@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toMap;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ import io.quarkus.runtime.Startup;
 import io.smallrye.mutiny.Uni;
 
 @Startup
-@ApplicationScoped
+@ApplicationScoped // Must be normal scoped so that providers/evaluators can inject it
 public class FlagManagerImpl implements FlagManager {
 
     private static final Logger LOG = Logger.getLogger(FlagManagerImpl.class);
@@ -44,14 +43,15 @@ public class FlagManagerImpl implements FlagManager {
 
     private FlagManagerImpl(@All List<FlagProvider> providers,
             @All List<FlagEvaluator> evaluators) {
+        Set<String> providerIds = providers.stream().map(FlagProvider::getId).collect(Collectors.toSet());
+        if (providerIds.size() != providers.size()) {
+            throw new IllegalStateException("Multiple flag providers with the same id detected:\n"
+                    + providers.stream().map(e -> "\t-" + e.getId() + ": " + e.getClass().getName())
+                            .collect(Collectors.joining("\n")));
+        }
         List<FlagProvider> sortedProviders = new ArrayList<>();
         int lastPriority = Integer.MAX_VALUE;
-        for (FlagProvider provider : providers.stream().sorted(new Comparator<FlagProvider>() {
-            @Override
-            public int compare(FlagProvider o1, FlagProvider o2) {
-                return Integer.compare(o2.getPriority(), o1.getPriority());
-            }
-        }).toList()) {
+        for (FlagProvider provider : providers.stream().sorted(this::compareProviders).toList()) {
             if (provider.getPriority() < lastPriority) {
                 sortedProviders.add(provider);
             } else {
@@ -63,13 +63,13 @@ public class FlagManagerImpl implements FlagManager {
             lastPriority = provider.getPriority();
         }
         this.providers = List.copyOf(sortedProviders);
-        Set<String> evaluatorIds = evaluators.stream().map(FlagEvaluator::id).collect(Collectors.toSet());
+        Set<String> evaluatorIds = evaluators.stream().map(FlagEvaluator::getId).collect(Collectors.toSet());
         if (evaluatorIds.size() != evaluators.size()) {
             throw new IllegalStateException("Multiple flag evaluators with the same id detected:\n"
-                    + evaluators.stream().map(e -> "\t-" + e.id() + ": " + e.getClass().getName())
+                    + evaluators.stream().map(e -> "\t-" + e.getId() + ": " + e.getClass().getName())
                             .collect(Collectors.joining("\n")));
         }
-        this.evaluators = evaluators.stream().collect(toMap(FlagEvaluator::id, Function.identity()));
+        this.evaluators = evaluators.stream().collect(toMap(FlagEvaluator::getId, Function.identity()));
     }
 
     @Override
@@ -80,29 +80,29 @@ public class FlagManagerImpl implements FlagManager {
         ConcurrentMap<String, Flag> ret = new ConcurrentHashMap<>();
         Iterator<FlagProvider> it = providers.iterator();
         FlagProvider first = it.next();
-        AtomicReference<String> providerClassName = new AtomicReference<String>(first.getClass().getName());
+        AtomicReference<String> providerId = new AtomicReference<String>(first.getId());
         Uni<Collection<Flag>> uni = first.getFlags();
         while (it.hasNext()) {
             FlagProvider next = it.next();
             uni = uni.chain(c -> {
-                addFlags(providerClassName.get(), c, ret);
-                providerClassName.set(next.getClass().getName());
+                addFlags(providerId.get(), c, ret);
+                providerId.set(next.getId());
                 return next.getFlags();
             });
         }
         return uni.map(c -> {
-            addFlags(providerClassName.get(), c, ret);
+            addFlags(providerId.get(), c, ret);
             return List.copyOf(ret.values());
         });
 
     }
 
-    private void addFlags(String providerClassName, Collection<Flag> flags, ConcurrentMap<String, Flag> result) {
+    private void addFlags(String providerId, Collection<Flag> flags, ConcurrentMap<String, Flag> result) {
         for (Flag flag : flags) {
-            if (result.putIfAbsent(flag.feature(), new DelegatingFlag(flag, providerClassName)) != null) {
+            if (result.putIfAbsent(flag.feature(), new DelegatingFlag(flag, providerId)) != null) {
                 LOG.debugf(
                         "Flag with feature %s from provider %s is ignored: a flag with the same feature is declared by a provider with higher priority",
-                        flag.feature(), providerClassName);
+                        flag.feature(), providerId);
             }
         }
     }
@@ -144,6 +144,10 @@ public class FlagManagerImpl implements FlagManager {
         return evaluators.values();
     }
 
+    private int compareProviders(FlagProvider p1, FlagProvider p2) {
+        return Integer.compare(p2.getPriority(), p1.getPriority());
+    }
+
     class InjectedFlag implements Flag {
 
         private final String feature;
@@ -178,11 +182,11 @@ public class FlagManagerImpl implements FlagManager {
 
         private final Flag delegate;
 
-        private final String providerClassName;
+        private final String providerId;
 
-        DelegatingFlag(Flag delegate, String providerClassName) {
+        DelegatingFlag(Flag delegate, String providerId) {
             this.delegate = delegate;
-            this.providerClassName = providerClassName;
+            this.providerId = providerId;
         }
 
         @Override
@@ -193,7 +197,7 @@ public class FlagManagerImpl implements FlagManager {
         @Override
         public String origin() {
             String origin = delegate.origin();
-            return origin != null ? origin : providerClassName;
+            return origin != null ? origin : providerId;
         }
 
         @Override

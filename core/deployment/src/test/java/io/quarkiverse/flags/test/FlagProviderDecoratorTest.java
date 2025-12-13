@@ -62,5 +62,10 @@ public class FlagProviderDecoratorTest {
             return delegate.getPriority();
         }
 
+        @Override
+        public String getId() {
+            return delegate.getId();
+        }
+
     }
 }

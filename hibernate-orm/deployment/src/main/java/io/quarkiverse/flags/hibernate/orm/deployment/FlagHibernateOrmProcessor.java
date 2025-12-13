@@ -17,7 +17,6 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
 import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateOrmFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
-import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
 import io.quarkus.arc.deployment.GeneratedBeanGizmo2Adaptor;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -93,7 +92,8 @@ public class FlagHibernateOrmProcessor {
                 cc.method("getPriority", mc -> {
                     mc.returning(int.class);
                     mc.body(bc -> {
-                        bc.return_(FlagProvider.DEFAULT_PRIORITY + 3);
+                        // Config provider has 200, in-memory provider has 600
+                        bc.return_(400);
                     });
                 });
 

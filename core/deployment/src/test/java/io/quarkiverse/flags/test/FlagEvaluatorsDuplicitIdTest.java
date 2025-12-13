@@ -30,7 +30,7 @@ public class FlagEvaluatorsDuplicitIdTest {
     public static class FooEvaluator implements FlagEvaluator {
 
         @Override
-        public String id() {
+        public String getId() {
             return "foo";
         }
 
@@ -45,7 +45,7 @@ public class FlagEvaluatorsDuplicitIdTest {
     public static class BarEvaluator implements FlagEvaluator {
 
         @Override
-        public String id() {
+        public String getId() {
             return "foo";
         }
 
