@@ -8,8 +8,14 @@ import io.quarkiverse.flags.runtime.InMemoryFlagProviderImpl;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 public class FlagsProcessor {
+
+    @BuildStep
+    FeatureBuildItem feature() {
+        return new FeatureBuildItem("feature-flags");
+    }
 
     @BuildStep
     void beans(BuildProducer<AdditionalBeanBuildItem> beans) {
