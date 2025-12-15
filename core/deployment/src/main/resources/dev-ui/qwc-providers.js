@@ -58,8 +58,8 @@ export class QwcFlagProviders extends LitElement {
                 <vaadin-grid-sort-column
                     path="className"
                     auto-width
-                    header="Class name"
-                    ${columnBodyRenderer(this._renderClassName, [])}
+                    header="Id"
+                    ${columnBodyRenderer(this._renderId, [])}
                     resizable>
                 </vaadin-grid-sort-column>
                 <vaadin-grid-sort-column
@@ -115,9 +115,9 @@ export class QwcFlagProviders extends LitElement {
                   </vaadin-button>`;
     }
     
-    _renderClassName(provider) {
+    _renderId(provider) {
             return html`
-                ${provider.className}
+                ${provider.id}
             `;
    }
    

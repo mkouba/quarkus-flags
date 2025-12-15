@@ -33,7 +33,7 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
     SecurityIdentity identity;
 
     @Override
-    public String id() {
+    public String getId() {
         return ID;
     }
 

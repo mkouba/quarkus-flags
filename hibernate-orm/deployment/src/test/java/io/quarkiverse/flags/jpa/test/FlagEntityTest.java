@@ -53,7 +53,7 @@ public class FlagEntityTest {
     public static class InvertingFlagEvaluator implements FlagEvaluator {
 
         @Override
-        public String id() {
+        public String getId() {
             return "inverting";
         }
 

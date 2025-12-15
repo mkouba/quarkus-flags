@@ -48,13 +48,13 @@ public class CompositeFlagEvaluatorTest {
     public static class FooEvaluator implements FlagEvaluator {
 
         @Override
-        public String id() {
+        public String getId() {
             return "foo";
         }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            EVALS.add(id());
+            EVALS.add(getId());
             if ("1".equals(flag.metadata().get("baz"))) {
                 return BooleanValue.createUni(!initialValue.asBoolean());
             }
@@ -67,13 +67,13 @@ public class CompositeFlagEvaluatorTest {
     public static class BarEvaluator implements FlagEvaluator {
 
         @Override
-        public String id() {
+        public String getId() {
             return "bar";
         }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            EVALS.add(id());
+            EVALS.add(getId());
             return BooleanValue.createUni(!initialValue.asBoolean());
         }
 

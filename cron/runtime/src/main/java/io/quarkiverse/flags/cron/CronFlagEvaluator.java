@@ -57,7 +57,7 @@ public class CronFlagEvaluator implements FlagEvaluator {
     }
 
     @Override
-    public String id() {
+    public String getId() {
         return ID;
     }
 

@@ -16,8 +16,6 @@ import io.smallrye.mutiny.Uni;
  */
 public interface FlagProvider {
 
-    int DEFAULT_PRIORITY = 1;
-
     /**
      * Must not block the caller thread unless blocking is allowed.
      * <p>
@@ -45,8 +43,16 @@ public interface FlagProvider {
      *
      * @return the priority
      */
-    default int getPriority() {
-        return DEFAULT_PRIORITY;
-    }
+    int getPriority();
+
+    /**
+     * The identifier must be unique.
+     * <p>
+     * If multiple flag providers with the same identifier exist then the application fails to start.
+     *
+     *
+     * @return the identifier
+     */
+    String getId();
 
 }

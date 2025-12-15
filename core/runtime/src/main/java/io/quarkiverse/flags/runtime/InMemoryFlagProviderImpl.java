@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.runtime;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -30,7 +31,7 @@ public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements In
 
     @Override
     public Uni<Collection<Flag>> getFlags() {
-        return Uni.createFrom().item(flags.values());
+        return Uni.createFrom().item(List.copyOf(flags.values()));
     }
 
     @Override

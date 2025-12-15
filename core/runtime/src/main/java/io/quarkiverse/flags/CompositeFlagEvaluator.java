@@ -31,7 +31,7 @@ public class CompositeFlagEvaluator implements FlagEvaluator {
     FlagManager flagManager;
 
     @Override
-    public String id() {
+    public String getId() {
         return ID;
     }
 

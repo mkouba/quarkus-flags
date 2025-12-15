@@ -28,7 +28,7 @@ public class TimeSpanFlagEvaluator implements FlagEvaluator {
     public static final String END_TIME = "end-time";
 
     @Override
-    public String id() {
+    public String getId() {
         return ID;
     }
 

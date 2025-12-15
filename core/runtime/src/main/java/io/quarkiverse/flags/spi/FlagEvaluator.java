@@ -22,12 +22,13 @@ public interface FlagEvaluator {
     static String META_KEY = "evaluator";
 
     /**
-     * The identifier must be unique. If multiple flag evaluators with the same identifier exist then the application fails to
-     * start.
+     * The identifier must be unique.
+     * <p>
+     * If multiple flag evaluators with the same identifier exist then the application fails to start.
      *
      * @return the identifier
      */
-    String id();
+    String getId();
 
     /**
      * The initial flag value does not have to be used during evaluation.

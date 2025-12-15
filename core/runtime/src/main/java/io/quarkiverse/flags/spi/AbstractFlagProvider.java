@@ -8,4 +8,9 @@ public abstract class AbstractFlagProvider implements FlagProvider {
         this.manager = manager;
     }
 
+    @Override
+    public String getId() {
+        return getClass().getName();
+    }
+
 }

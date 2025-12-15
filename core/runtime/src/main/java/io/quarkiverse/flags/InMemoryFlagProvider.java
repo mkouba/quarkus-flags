@@ -9,7 +9,7 @@ import io.quarkiverse.flags.spi.FlagProvider;
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
-    static int PRIORITY = FlagProvider.DEFAULT_PRIORITY + 5;
+    static int PRIORITY = 600;
 
     @Override
     default int getPriority() {

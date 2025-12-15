@@ -11,13 +11,12 @@ import jakarta.inject.Singleton;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
-import io.quarkiverse.flags.spi.FlagProvider;
 import io.smallrye.mutiny.Uni;
 
 @Singleton
 public class ConfigFlagProvider extends AbstractFlagProvider {
 
-    public static final int PRIORITY = FlagProvider.DEFAULT_PRIORITY + 1;
+    public static final int PRIORITY = 200;
 
     private final FlagsBuildTimeConfig buildConfig;
 
