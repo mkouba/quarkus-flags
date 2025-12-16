@@ -13,9 +13,10 @@ More specifically, it provides:
 * Built-in flag evaluators:
    * Time span evaluator - based on the current date-time obtained from the system clock in the default time-zone.
    * Composite evaluator - evaluates a flag with the specified sub-evaluators.
-* *Hibernate ORM module*, where feature flags are mapped from an annotated entity and are automatically loaded from the database.
-* *Security module*, so that it's possible to evaluate flags based on the current `SecurityIdentity`.
-* *Qute module* so that it's possible to use the flags directly in templates.
+* [Hibernate ORM module](https://docs.quarkiverse.io/quarkus-flags/dev/hibernate-orm.html), where feature flags are mapped from an annotated entity and are automatically loaded from the database.
+* [Security module](https://docs.quarkiverse.io/quarkus-flags/dev/security.html), so that it's possible to evaluate flags based on the current `SecurityIdentity`.
+* [Qute module](https://docs.quarkiverse.io/quarkus-flags/dev/qute.html), so that it's possible to use the flags directly in templates.
+* [Cron module](https://docs.quarkiverse.io/quarkus-flags/dev/cron.html) with a flag evaluator that matches a specific CRON expression.
 
 ## Documentation
 
