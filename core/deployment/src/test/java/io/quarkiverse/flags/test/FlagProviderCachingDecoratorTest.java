@@ -104,7 +104,9 @@ public class FlagProviderCachingDecoratorTest {
 
         @Override
         public Uni<Collection<Flag>> getFlags() {
-            return cache.getAsync(delegate.getId(), k -> delegate.getFlags());
+            return cache.getAsync(delegate.getId(), k -> {
+                return delegate.getFlags().memoize().indefinitely();
+            });
         }
 
         @Override

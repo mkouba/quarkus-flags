@@ -161,6 +161,51 @@ quarkus.flags.runtime."my-feature-alpha".meta.roles-allowed=admin <4>
 <3> The current date-time must be after the specified start-time.
 <4> The current user must have the role `admin`.
 
+
+== Caching
+
+Some flag providers may involve long running operations.
+In that case, caching of flags might be useful.
+Let's use the `quarkus-cache` extension and CDI to implement a simple caching.
+First, you need to add the `io.quarkus:quarkus-cache` extension to your project.
+Then create a simple CDI decorator like this: 
+
+[source,java]
+----
+@Priority(1)
+@Decorator
+public class CachingDecorator implements FlagProvider {
+
+    @Inject
+    @Any
+    @Delegate
+    FlagProvider delegate;
+
+    @CacheName("quarkus-flags-cache") <1>
+    Cache cache;
+
+    @Override
+    public Uni<Collection<Flag>> getFlags() {
+        return cache.getAsync(delegate.getId(), k -> { <2>
+            return delegate.getFlags().memoize().indefinitely(); <3>  
+        });
+    }
+
+    @Override
+    public int getPriority() {
+        return delegate.getPriority();
+    }
+
+    @Override
+    public String getId() {
+        return delegate.getId();
+    }
+}
+----
+<1> Inject the cache named `quarkus-flags-cache`. You can configure the cache based on the cache implementation used. For example, `quarkus.cache.caffeine."quarkus-flags-cache".expire-after-write=10m`. See https://quarkus.io/guides/cache for more information.
+<2> The cached value is computed if absent.
+<3> The returned `Uni` is memoized so that subsequent subscriptions do not trigger computation again. 
+
 [[extension-configuration-reference]]
 == Extension configuration reference
 
