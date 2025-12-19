@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import io.quarkiverse.flags.runtime.ComputationContextImpl;
 import io.quarkiverse.flags.runtime.FlagBuilderImpl;
+import io.quarkiverse.flags.spi.FlagManager;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -235,6 +236,19 @@ public interface Flag {
          * @see Flag#origin()
          */
         Builder setOrigin(String origin);
+
+        /**
+         * By default, a flag can reference one evaluator in its metadata with a key
+         * {@link io.quarkiverse.flags.spi.FlagEvaluator#META_KEY}. This evaluator is automatically used to compute the current
+         * value for the flag produced by {@link #build()}.
+         * <p>
+         * {@link FlagManager#getEvaluator(String)} is used to obtain the evaluator instance. You can specify the manager
+         * instance explicitly, otherwise the CDI lookup is performed.
+         *
+         * @param manager
+         * @return self
+         */
+        Builder setFeatureManager(FlagManager manager);
 
         /**
          * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.

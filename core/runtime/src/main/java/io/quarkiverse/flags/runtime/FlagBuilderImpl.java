@@ -28,6 +28,8 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     private Flag.Value value;
 
+    private FlagManager manager;
+
     public FlagBuilderImpl(String feature) {
         if (feature == null || feature.isBlank()) {
             throw new IllegalArgumentException("Feature must not be null");
@@ -75,19 +77,30 @@ public class FlagBuilderImpl implements Flag.Builder {
     }
 
     @Override
+    public Builder setFeatureManager(FlagManager manager) {
+        this.manager = manager;
+        return this;
+    }
+
+    @Override
     public Flag build() {
         if (value == null && fun == null) {
             value = BooleanValue.TRUE;
         }
         String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
         if (evaluatorId != null) {
-            ArcContainer container = Arc.container();
-            if (container == null) {
-                throw new IllegalStateException(
-                        "Unable to find the ArC container - flag builder must not be used outside a Quarkus app");
+            FlagManager flagManager;
+            if (manager != null) {
+                flagManager = manager;
+            } else {
+                ArcContainer container = Arc.container();
+                if (container == null) {
+                    throw new IllegalStateException(
+                            "Unable to find the ArC container - flag builder must not be used outside a Quarkus app");
+                }
+                flagManager = container.instance(FlagManager.class).get();
             }
-            FlagManager manager = container.instance(FlagManager.class).get();
-            FlagEvaluator evaluator = manager.getEvaluator(evaluatorId)
+            FlagEvaluator evaluator = flagManager.getEvaluator(evaluatorId)
                     .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));
             return value != null ? new InitializedEvaluatedFlag(feature, origin, metadata, value, evaluator)
                     : new ComputedEvaluatedFlag(feature, origin, metadata, evaluator, fun);
