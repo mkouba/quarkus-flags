@@ -33,7 +33,11 @@ public abstract class AbstractHibernateOrmFlagProvider extends AbstractFlagProvi
     protected abstract Collection<Flag> doGetFlags();
 
     protected Flag createFlag(String feature, String value, Map<String, String> metadata) {
-        return Flag.builder(feature).setMetadata(metadata).setString(value).build();
+        return Flag.builder(feature)
+                .setMetadata(metadata)
+                .setString(value)
+                .setFeatureManager(manager)
+                .build();
     }
 
 }

@@ -18,13 +18,16 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
 
     public static final int PRIORITY = 200;
 
-    private final FlagsBuildTimeConfig buildConfig;
+    private final List<Flag> buildConfigFlags;
 
     private final FlagsRuntimeConfig runtimeConfig;
 
     public ConfigFlagProvider(FlagManager manager, FlagsBuildTimeConfig buildConfig, FlagsRuntimeConfig runtimeConfig) {
         super(manager);
-        this.buildConfig = buildConfig;
+        // Build config flags are immutable
+        List<Flag> buildConfigFlags = new ArrayList<>();
+        addFlags(buildConfigFlags, buildConfig.flags());
+        this.buildConfigFlags = buildConfigFlags;
         this.runtimeConfig = runtimeConfig;
     }
 
@@ -36,18 +39,19 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
     @Override
     public Uni<Collection<Flag>> getFlags() {
         List<Flag> ret = new ArrayList<>();
-        addFlags(ret, buildConfig.flags());
+        ret.addAll(buildConfigFlags);
         addFlags(ret, runtimeConfig.flags());
         return Uni.createFrom().item(List.copyOf(ret));
     }
 
-    private void addFlags(List<Flag> ret, Map<String, FlagConfig> flags) {
-        for (Entry<String, FlagConfig> entry : flags.entrySet()) {
+    private void addFlags(List<Flag> flags, Map<String, FlagConfig> config) {
+        for (Entry<String, FlagConfig> entry : config.entrySet()) {
             String feature = entry.getKey();
             Map<String, String> metadata = entry.getValue().meta();
-            ret.add(Flag.builder(feature)
+            flags.add(Flag.builder(feature)
                     .setMetadata(metadata)
                     .setString(entry.getValue().value())
+                    .setFeatureManager(manager)
                     .build());
         }
     }
