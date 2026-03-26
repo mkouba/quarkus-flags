@@ -136,6 +136,53 @@ public class FlagHibernateOrmProcessor {
                         bc.return_(ret);
                     });
                 });
+
+                cc.method("doGetFlag", mc -> {
+                    mc.returning(Flag.class);
+                    mc.addAnnotation(Transactional.class);
+
+                    ParamVar featureParam = mc.parameter("feature", String.class);
+
+                    mc.body(bc -> {
+                        // Query query = em.createQuery("from MyFlag where feature = :feature");
+                        LocalVar query = bc.localVar("query", bc.invokeInterface(
+                                MethodDesc.of(EntityManager.class, "createQuery", Query.class, String.class),
+                                this_.field(emField),
+                                Const.of("from " + flagDefinition.getEntityName() + " where "
+                                        + flagDefinition.getFeature().name() + " = :feature")));
+                        // query.setParameter("feature", "foo");
+                        bc.invokeInterface(MethodDesc.of(Query.class, "setParameter", Query.class, String.class, Object.class),
+                                query, Const.of(flagDefinition.getFeature().name()), featureParam);
+                        // List<MyFlag> resultList = query.getResultList();
+                        LocalVar resultList = bc.localVar("resultList",
+                                bc.invokeInterface(MethodDesc.of(Query.class, "getResultList", List.class),
+                                        query));
+                        LocalVar entity = bc.localVar("entity", bc.invokeVirtual(
+                                MethodDesc.of(AbstractHibernateOrmFlagProvider.class, "ensureSingle", Object.class,
+                                        List.class, String.class),
+                                this_, resultList, featureParam));
+                        LocalVar ret = bc.localVar("ret", Const.ofNull(Flag.class));
+                        bc.if_(bc.isNotNull(entity), entityNotNull -> {
+                            Expr feature = flagDefinition.getFeature().read(entity, entityNotNull);
+                            Expr value = flagDefinition.getValue().read(entity, entityNotNull);
+                            Expr metadata;
+                            Property metadataProperty = flagDefinition.getMetadata();
+                            if (metadataProperty != null) {
+                                metadata = metadataProperty.read(entity, entityNotNull);
+                            } else {
+                                metadata = entityNotNull.mapOf();
+                            }
+                            entityNotNull.set(ret, entityNotNull.invokeVirtual(
+                                    MethodDesc.of(AbstractHibernateOrmFlagProvider.class, "createFlag", Flag.class,
+                                            String.class,
+                                            String.class,
+                                            Map.class),
+                                    this_, feature, value, metadata));
+                            ;
+                        });
+                        bc.return_(ret);
+                    });
+                });
             });
         }
     }

@@ -93,6 +93,8 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
 
     interface Property {
 
+        String name();
+
         AnnotationTarget target();
 
         Expr read(Var item, BlockCreator bc);
@@ -112,6 +114,11 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
         @Override
         public AnnotationTarget target() {
             return field;
+        }
+
+        @Override
+        public String name() {
+            return field.name();
         }
 
         @Override
@@ -138,6 +145,11 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
         }
 
         @Override
+        public String name() {
+            return JavaBeanUtil.getPropertyNameFromGetter(getter.name());
+        }
+
+        @Override
         public Expr read(Var item, BlockCreator bc) {
             return bc.invokeVirtual(methodDescOf(getter), item);
         }
@@ -145,7 +157,7 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
     }
 
     private static MethodInfo findGetter(FieldInfo field, boolean isPanache) {
-        String getterName = "get" + JavaBeanUtil.capitalize(field.name());
+        String getterName = JavaBeanUtil.getGetterName(field.name(), field.type().name());
         if (isPanache) {
             // Panache adds getters directly to the bytecode
             return MethodInfo.create(field.declaringClass(), getterName, new Type[0], field.type(), (short) Modifier.PUBLIC);
