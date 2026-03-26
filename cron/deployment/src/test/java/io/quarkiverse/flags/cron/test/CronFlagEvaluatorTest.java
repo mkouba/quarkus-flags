@@ -41,9 +41,10 @@ public class CronFlagEvaluatorTest {
         inMemoryFlagProvider.removeFlag("cron");
 
         int dayOfMonth = now.getDayOfMonth();
+        int nonMatchingDay = dayOfMonth == 1 ? 2 : dayOfMonth - 1;
         inMemoryFlagProvider.addFlag(Flag.builder("cron")
                 .setEnabled(true)
-                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* * %s * *".formatted(dayOfMonth + 1)))
+                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* * %s * *".formatted(nonMatchingDay)))
                 .build());
         assertFalse(flags.isEnabled("cron"));
         inMemoryFlagProvider.removeFlag("cron");

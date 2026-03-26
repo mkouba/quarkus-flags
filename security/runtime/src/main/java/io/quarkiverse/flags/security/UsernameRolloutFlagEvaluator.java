@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.spi.RolloutFlagEvaluator;
 import io.quarkus.security.identity.SecurityIdentity;
 
@@ -30,7 +31,7 @@ public class UsernameRolloutFlagEvaluator extends RolloutFlagEvaluator {
     }
 
     @Override
-    protected OptionalInt getHash(Flag flag) {
+    protected OptionalInt getHash(Flag flag, ComputationContext computationContext) {
         if (!identity.isAnonymous()) {
             Principal principal = identity.getPrincipal();
             if (principal != null) {

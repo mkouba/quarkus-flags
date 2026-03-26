@@ -35,6 +35,11 @@ public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements In
     }
 
     @Override
+    public Uni<Flag> getFlag(String feature) {
+        return Uni.createFrom().item(flags.get(feature));
+    }
+
+    @Override
     public boolean addFlag(Flag flag) {
         Flag existing = flags.putIfAbsent(flag.feature(), flag);
         if (existing == null) {

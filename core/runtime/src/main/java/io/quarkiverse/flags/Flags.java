@@ -10,7 +10,7 @@ import io.smallrye.mutiny.Uni;
 /**
  * A central point to access feature flags.
  * <p>
- * The container provides a CDI bean that implements this inteface.
+ * The container provides a CDI bean that implements this interface.
  *
  * @see Flag
  */

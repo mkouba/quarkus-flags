@@ -5,7 +5,7 @@ import io.quarkiverse.flags.spi.FlagProvider;
 /**
  * An in-memory feature flag provider.
  * <p>
- * The container provides a CDI bean that implements this inteface.
+ * The container provides a CDI bean that implements this interface.
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
@@ -17,7 +17,7 @@ public interface InMemoryFlagProvider extends FlagProvider {
     }
 
     /**
-     * @return {@code true} if the flag was added sucessfully, {@code false} otherwise
+     * @return {@code true} if the flag was added successfully, {@code false} otherwise
      * @see FlagAdded
      * @see Flag#builder(String)
      */

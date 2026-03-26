@@ -44,6 +44,21 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         return Uni.createFrom().item(List.copyOf(ret));
     }
 
+    @Override
+    public Uni<Flag> getFlag(String feature) {
+        Flag found = null;
+        for (Flag flag : buildConfigFlags) {
+            if (flag.feature().equals(feature)) {
+                found = flag;
+                break;
+            }
+        }
+        if (found == null) {
+            found = findFlag(feature, runtimeConfig.flags());
+        }
+        return Uni.createFrom().item(found);
+    }
+
     private void addFlags(List<Flag> flags, Map<String, FlagConfig> config) {
         for (Entry<String, FlagConfig> entry : config.entrySet()) {
             String feature = entry.getKey();
@@ -54,6 +69,19 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
                     .setFeatureManager(manager)
                     .build());
         }
+    }
+
+    private Flag findFlag(String feature, Map<String, FlagConfig> config) {
+        for (Entry<String, FlagConfig> entry : config.entrySet()) {
+            if (feature.equals(entry.getKey())) {
+                return Flag.builder(feature)
+                        .setMetadata(entry.getValue().meta())
+                        .setString(entry.getValue().value())
+                        .setFeatureManager(manager)
+                        .build();
+            }
+        }
+        return null;
     }
 
 }

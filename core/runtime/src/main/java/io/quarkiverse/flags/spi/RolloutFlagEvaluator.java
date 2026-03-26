@@ -34,11 +34,11 @@ public abstract class RolloutFlagEvaluator implements FlagEvaluator {
                 } catch (NumberFormatException e) {
                     throw new IllegalStateException("Invalid rollout percentage value: " + rolloutPercentage);
                 }
-                OptionalInt userHash = getHash(flag);
+                OptionalInt userHash = getHash(flag, computationContext);
                 if (userHash.isEmpty()) {
                     return BooleanValue.createUni(false);
                 }
-                int bucket = Math.abs(userHash.getAsInt() % 100);
+                int bucket = Math.floorMod(userHash.getAsInt(), 100);
                 return BooleanValue.createUni(bucket < percentage);
             }
         }
@@ -51,6 +51,6 @@ public abstract class RolloutFlagEvaluator implements FlagEvaluator {
      * @param flag
      * @return the numerical representation of the current user
      */
-    protected abstract OptionalInt getHash(Flag flag);
+    protected abstract OptionalInt getHash(Flag flag, ComputationContext computationContext);
 
 }

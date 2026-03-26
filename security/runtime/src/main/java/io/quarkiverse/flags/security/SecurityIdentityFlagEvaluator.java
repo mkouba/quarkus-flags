@@ -17,8 +17,8 @@ import io.smallrye.mutiny.Uni;
  * Evaluates a flag based on the current security identity.
  * <p>
  * If the initial value is {@code true} and the security identity is not anonymous (in case of {@value #AUTHENTICATED} metadata
- * is present) and the identity has an allowed role (in case of {@value #ROLES_ALLOWED} metadata is present). Otherwise, it
- * evaluates to {@code false}.
+ * is present) and the identity has an allowed role (in case of {@value #ROLES_ALLOWED} metadata is present) then the flag
+ * evaluates to {@code true}. Otherwise, it evaluates to {@code false}.
  */
 @Singleton
 public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
@@ -49,7 +49,7 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
             }
             String rolesAllowed = flag.metadata().get(ROLES_ALLOWED);
             if (rolesAllowed != null) {
-                String[] roles = rolesAllowed.toString().split(",");
+                String[] roles = rolesAllowed.split(",");
                 for (String role : roles) {
                     if (identity.hasRole(role)) {
                         return Uni.createFrom().item(BooleanValue.TRUE);
