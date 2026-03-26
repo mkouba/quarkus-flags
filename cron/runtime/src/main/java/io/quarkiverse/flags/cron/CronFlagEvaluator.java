@@ -29,7 +29,6 @@ import io.smallrye.mutiny.Uni;
  * <p>
  * The evaluator is configured through the {@link Flag#metadata()}. The {@value #CRON_EXPR} is used to specify the CRON
  * expression and {@value #CRON_TYPE} defines the CRON syntax used to parse the expression.
- * no bound.
  */
 @Singleton
 public class CronFlagEvaluator implements FlagEvaluator {

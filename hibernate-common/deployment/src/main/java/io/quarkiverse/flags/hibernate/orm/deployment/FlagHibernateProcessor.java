@@ -20,11 +20,11 @@ public class FlagHibernateProcessor {
     void collectFlagDefinitions(ApplicationIndexBuildItem index, List<PanacheEntityClassesBuildItem> panacheEntityClasses,
             BuildProducer<FlagDefinitionBuildItem> flagDefinition) {
         List<AnnotationInstance> flagDefinitions = index.getIndex().getAnnotations(DotName.createSimple(FlagDefinition.class));
+        Set<String> panacheEntities = new HashSet<>();
+        for (PanacheEntityClassesBuildItem entityClasses : panacheEntityClasses) {
+            panacheEntities.addAll(entityClasses.getEntityClasses());
+        }
         for (AnnotationInstance flagDefinitionAnnotation : flagDefinitions) {
-            Set<String> panacheEntities = new HashSet<>();
-            for (PanacheEntityClassesBuildItem entityClasses : panacheEntityClasses) {
-                panacheEntities.addAll(entityClasses.getEntityClasses());
-            }
             ClassInfo entityClass = flagDefinitionAnnotation.target().asClass();
             flagDefinition.produce(
                     new FlagDefinitionBuildItem(entityClass, panacheEntities.contains(entityClass.name().toString())));

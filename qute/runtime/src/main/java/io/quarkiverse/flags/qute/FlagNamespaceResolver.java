@@ -14,9 +14,6 @@ import io.quarkus.qute.Expression;
 import io.quarkus.qute.NamespaceResolver;
 import io.quarkus.qute.Results;
 
-/**
- *
- */
 @Singleton
 @EngineConfiguration
 public class FlagNamespaceResolver implements NamespaceResolver {

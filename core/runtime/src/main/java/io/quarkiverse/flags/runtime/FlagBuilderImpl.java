@@ -32,7 +32,7 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     public FlagBuilderImpl(String feature) {
         if (feature == null || feature.isBlank()) {
-            throw new IllegalArgumentException("Feature must not be null");
+            throw new IllegalArgumentException("Feature must not be null or blank");
         }
         this.feature = feature;
     }

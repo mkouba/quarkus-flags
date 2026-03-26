@@ -37,6 +37,24 @@ public interface FlagProvider {
     Uni<Collection<Flag>> getFlags();
 
     /**
+     * Must not block the caller thread unless blocking is allowed.
+     * <p>
+     * By default, this method filters the result of {@link #getFlags()}. Implementations backed by a database or remote service
+     * should override this method with an optimized lookup.
+     *
+     * @param feature
+     * @return the flag or {@code null}
+     * @see Flags#find(String)
+     */
+    @CheckReturnValue
+    default Uni<Flag> getFlag(String feature) {
+        return getFlags().map(flags -> flags.stream()
+                .filter(f -> f.feature().equals(feature))
+                .findFirst()
+                .orElse(null));
+    }
+
+    /**
      * The priority is reflected when the system collects all flags from all providers.
      * <p>
      * If multiple providers with the same priority are detected then the application fails to start.

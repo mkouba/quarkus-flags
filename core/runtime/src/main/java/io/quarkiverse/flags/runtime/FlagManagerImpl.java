@@ -50,7 +50,7 @@ public class FlagManagerImpl implements FlagManager {
                             .collect(Collectors.joining("\n")));
         }
         List<FlagProvider> sortedProviders = new ArrayList<>();
-        int lastPriority = Integer.MAX_VALUE;
+        long lastPriority = (long) Integer.MAX_VALUE + 1;
         for (FlagProvider provider : providers.stream().sorted(this::compareProviders).toList()) {
             if (provider.getPriority() < lastPriority) {
                 sortedProviders.add(provider);
@@ -109,9 +109,23 @@ public class FlagManagerImpl implements FlagManager {
 
     @Override
     public Uni<Optional<Flag>> find(String feature) {
-        return findAll().map(flags -> flags.stream()
-                .filter(f -> f.feature().equals(feature))
-                .findFirst());
+        if (providers.isEmpty()) {
+            return Uni.createFrom().item(Optional.empty());
+        }
+        return findInProviders(feature, providers.iterator());
+    }
+
+    private Uni<Optional<Flag>> findInProviders(String feature, Iterator<FlagProvider> it) {
+        FlagProvider provider = it.next();
+        return provider.getFlag(feature).chain(f -> {
+            if (f != null) {
+                return Uni.createFrom().item(Optional.of((Flag) new DelegatingFlag(f, provider.getId())));
+            }
+            if (it.hasNext()) {
+                return findInProviders(feature, it);
+            }
+            return Uni.createFrom().item(Optional.empty());
+        });
     }
 
     @Override

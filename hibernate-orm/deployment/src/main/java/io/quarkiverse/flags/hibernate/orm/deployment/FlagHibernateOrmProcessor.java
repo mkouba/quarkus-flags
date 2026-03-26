@@ -123,7 +123,7 @@ public class FlagHibernateOrmProcessor {
                             if (metadataProperty != null) {
                                 metadata = metadataProperty.read(item, ibc);
                             } else {
-                                metadata = Const.ofNull(Map.class);
+                                metadata = ibc.mapOf();
                             }
                             ibc.withList(ret)
                                     .add(ibc.invokeVirtual(
