@@ -11,12 +11,14 @@ import jakarta.inject.Singleton;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
+@Identifier(ConfigFlagProvider.ID)
 @Singleton
 public class ConfigFlagProvider extends AbstractFlagProvider {
 
-    public static final int PRIORITY = 200;
+    public static final String ID = "config";
 
     private final List<Flag> buildConfigFlags;
 
@@ -29,11 +31,6 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         addFlags(buildConfigFlags, buildConfig.flags());
         this.buildConfigFlags = buildConfigFlags;
         this.runtimeConfig = runtimeConfig;
-    }
-
-    @Override
-    public int getPriority() {
-        return PRIORITY;
     }
 
     @Override
@@ -64,6 +61,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
             String feature = entry.getKey();
             Map<String, String> metadata = entry.getValue().meta();
             flags.add(Flag.builder(feature)
+                    .setOrigin(ID)
                     .setMetadata(metadata)
                     .setString(entry.getValue().value())
                     .setFeatureManager(manager)
@@ -75,6 +73,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
         for (Entry<String, FlagConfig> entry : config.entrySet()) {
             if (feature.equals(entry.getKey())) {
                 return Flag.builder(feature)
+                        .setOrigin(ID)
                         .setMetadata(entry.getValue().meta())
                         .setString(entry.getValue().value())
                         .setFeatureManager(manager)

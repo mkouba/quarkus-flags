@@ -11,6 +11,7 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -20,6 +21,7 @@ import io.smallrye.mutiny.Uni;
  * is present) and the identity has an allowed role (in case of {@value #ROLES_ALLOWED} metadata is present) then the flag
  * evaluates to {@code true}. Otherwise, it evaluates to {@code false}.
  */
+@Identifier(SecurityIdentityFlagEvaluator.ID)
 @Singleton
 public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
 
@@ -31,11 +33,6 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
 
     @Inject
     SecurityIdentity identity;
-
-    @Override
-    public String getId() {
-        return ID;
-    }
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

@@ -68,9 +68,20 @@ TIP: If the `quarkus-flags-qute` module is present, you can access feature flags
 == Flags provider SPI
 
 The feature flags are collected at runtime.
-More specifically, the extension injects all CDI beans that implement `io.quarkiverse.flags.spi.FlagProvider` and calls the `FlagProvider#getFlags()` method.
-The result must not contain flags with duplicate feature names.
-A flag from a provider with higher priority takes precedence and overrides flags with the same `Flag#feature()` from providers with lower priority.
+More specifically, the extension injects all CDI beans that implement `io.quarkiverse.flags.spi.FlagProvider` and calls the `FlagProvider#getFlags()` method to collect all flags and `FlagProvider#getFlag(String)` to find a flag for a specific feature.
+The result of `getFlags()` must not contain flags with duplicate feature names.
+
+Each `FlagProvider` bean must be annotated with `@io.smallrye.common.annotation.Identifier` to define a unique identifier.
+If multiple flag providers with the same identifier exist then the application fails to start.
+
+The ordering of providers is defined with the `@io.quarkiverse.flags.spi.ComponentOrder` annotation.
+A provider listed in `before` has lower priority, i.e., flags from the annotated provider take precedence.
+A provider listed in `after` has higher priority.
+Both `before` and `after` reference provider identifiers.
+The ordering is validated at build time; cycles in the ordering result in a deployment error.
+
+By default, `getFlag(String)` filters the result of `getFlags()`.
+Implementations backed by a database or remote service should override this method with an optimized lookup.
 
 The core extension provides two built-in flag providers.
 The first one is built on top of Quarkus config service.
@@ -104,7 +115,7 @@ public class MyService {
     
     void addFlag() {
         provider.addFlag(Flag.builder("my-feature-alpha")
-                .setEnabled(true).build()); <2>
+                .setEnabled(true)); <2>
     }
     
     void removeFlag() {
@@ -121,8 +132,7 @@ public class MyService {
 
 The `io.quarkiverse.flags.spi.FlagEvaluator` SPI makes it possible to externalize the computation of the current value of a feature flag.
 This allows for more dynamic evaluation logic based on some external state, such as the current `SecurityIdentity`.
-Flag evaluators must be CDI beans.
-Qualifiers are ignored. 
+Flag evaluators must be CDI beans annotated with `@io.smallrye.common.annotation.Identifier` to define a unique identifier.
 `@Dependent` beans are reused.
 
 By default, a `Flag` can reference one `FlagEvaluator` in its metadata with a key `evaluator`.
@@ -181,30 +191,30 @@ public class CachingDecorator implements FlagProvider {
     @Delegate
     FlagProvider delegate;
 
-    @CacheName("quarkus-flags-cache") <1>
+    @Inject
+    @Decorated
+    Bean<FlagProvider> decoratedBean; <1>
+
+    @CacheName("quarkus-flags-cache") <2>
     Cache cache;
 
     @Override
     public Uni<Collection<Flag>> getFlags() {
-        return cache.getAsync(delegate.getId(), k -> { <2>
-            return delegate.getFlags().memoize().indefinitely(); <3>  
+        String cacheKey = decoratedBean.getQualifiers().stream()
+                .filter(q -> q instanceof Identifier)
+                .map(q -> ((Identifier) q).value())
+                .findFirst()
+                .orElse(decoratedBean.getBeanClass().getName()); <3>
+        return cache.getAsync(cacheKey, k -> {
+            return delegate.getFlags().memoize().indefinitely(); <4>
         });
-    }
-
-    @Override
-    public int getPriority() {
-        return delegate.getPriority();
-    }
-
-    @Override
-    public String getId() {
-        return delegate.getId();
     }
 }
 ----
-<1> Inject the cache named `quarkus-flags-cache`. You can configure the cache based on the cache implementation used. For example, `quarkus.cache.caffeine."quarkus-flags-cache".expire-after-write=10m`. See https://quarkus.io/guides/cache for more information.
-<2> The cached value is computed if absent.
-<3> The returned `Uni` is memoized so that subsequent subscriptions do not trigger computation again. 
+<1> The `@Decorated` injection point gives access to the metadata of the decorated bean, including its qualifiers.
+<2> Inject the cache named `quarkus-flags-cache`. You can configure the cache based on the cache implementation used. For example, `quarkus.cache.caffeine."quarkus-flags-cache".expire-after-write=10m`. See https://quarkus.io/guides/cache for more information.
+<3> The `@Identifier` value of the decorated provider is used as the cache key.
+<4> The returned `Uni` is memoized so that subsequent subscriptions do not trigger computation again.
 
 [[extension-configuration-reference]]
 == Extension configuration reference

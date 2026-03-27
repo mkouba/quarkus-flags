@@ -35,8 +35,7 @@ public class CronFlagEvaluatorTest {
         int hour = now.getHour();
         inMemoryFlagProvider.addFlag(Flag.builder("cron")
                 .setEnabled(true)
-                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* %s * * *".formatted(hour)))
-                .build());
+                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* %s * * *".formatted(hour))));
         assertTrue(flags.isEnabled("cron"));
         inMemoryFlagProvider.removeFlag("cron");
 
@@ -44,8 +43,7 @@ public class CronFlagEvaluatorTest {
         int nonMatchingDay = dayOfMonth == 1 ? 2 : dayOfMonth - 1;
         inMemoryFlagProvider.addFlag(Flag.builder("cron")
                 .setEnabled(true)
-                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* * %s * *".formatted(nonMatchingDay)))
-                .build());
+                .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID, "cron-expr", "* * %s * *".formatted(nonMatchingDay))));
         assertFalse(flags.isEnabled("cron"));
         inMemoryFlagProvider.removeFlag("cron");
     }
@@ -58,8 +56,7 @@ public class CronFlagEvaluatorTest {
                 .setEnabled(true)
                 .setMetadata(Map.of("evaluator", CronFlagEvaluator.ID,
                         "cron-expr", "* * * 1-%s * ?".formatted(dayOfMonth),
-                        "cron-type", "QUARTZ"))
-                .build());
+                        "cron-type", "QUARTZ")));
         assertTrue(flags.isEnabled("cron"));
         inMemoryFlagProvider.removeFlag("cron");
     }

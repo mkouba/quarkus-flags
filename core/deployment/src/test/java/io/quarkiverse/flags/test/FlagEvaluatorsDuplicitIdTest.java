@@ -12,6 +12,7 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 public class FlagEvaluatorsDuplicitIdTest {
@@ -26,13 +27,9 @@ public class FlagEvaluatorsDuplicitIdTest {
         fail();
     }
 
+    @Identifier("foo")
     @Singleton
     public static class FooEvaluator implements FlagEvaluator {
-
-        @Override
-        public String getId() {
-            return "foo";
-        }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
@@ -41,13 +38,9 @@ public class FlagEvaluatorsDuplicitIdTest {
 
     }
 
+    @Identifier("foo")
     @Singleton
     public static class BarEvaluator implements FlagEvaluator {
-
-        @Override
-        public String getId() {
-            return "foo";
-        }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

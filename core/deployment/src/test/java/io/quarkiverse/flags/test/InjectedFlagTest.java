@@ -37,12 +37,12 @@ public class InjectedFlagTest {
     public void testFlags() {
         assertNotNull(alpha);
         assertThrows(NoSuchElementException.class, () -> alpha.isEnabled());
-        inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(true).build());
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(true));
         assertTrue(alpha.isEnabled());
         assertNull(alpha.metadata().get("foo"));
         inMemoryFlagProvider.removeFlag("alpha");
         assertThrows(NoSuchElementException.class, () -> alpha.origin());
-        inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false).setMetadata(Map.of("foo", "bar")).build());
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false).setMetadata(Map.of("foo", "bar")));
         assertFalse(alpha.isEnabled());
         assertEquals("bar", alpha.metadata().get("foo"));
     }

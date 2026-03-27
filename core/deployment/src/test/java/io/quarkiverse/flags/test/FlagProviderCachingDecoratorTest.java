@@ -12,6 +12,8 @@ import jakarta.annotation.Priority;
 import jakarta.decorator.Decorator;
 import jakarta.decorator.Delegate;
 import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Decorated;
+import jakarta.enterprise.inject.spi.Bean;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -25,6 +27,7 @@ import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheName;
 import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 public class FlagProviderCachingDecoratorTest {
@@ -50,7 +53,7 @@ public class FlagProviderCachingDecoratorTest {
         assertThrows(NoSuchElementException.class, () -> flags.getInt("other-flag"));
 
         cache.invalidateAll().await().indefinitely();
-        inMemory.addFlag(Flag.builder("other-flag").setInt(1).build());
+        inMemory.addFlag(Flag.builder("other-flag").setInt(1));
 
         // Cache was invalidated
         // Trigger invocation of FlagProvider#getFlags() for all providers
@@ -68,6 +71,7 @@ public class FlagProviderCachingDecoratorTest {
         assertThrows(NoSuchElementException.class, () -> flags.getInt("other-flag"));
     }
 
+    @Identifier("my-flag-provider")
     @Singleton
     public static class MyFlagProvider implements FlagProvider {
 
@@ -75,17 +79,8 @@ public class FlagProviderCachingDecoratorTest {
 
         @Override
         public Uni<Collection<Flag>> getFlags() {
-            return Uni.createFrom().item(List.of(Flag.builder("my-flag").setInt(counter.incrementAndGet()).build()));
-        }
-
-        @Override
-        public int getPriority() {
-            return 1;
-        }
-
-        @Override
-        public String getId() {
-            return MyFlagProvider.class.getName();
+            return Uni.createFrom().item(
+                    List.of(Flag.builder("my-flag").setOrigin("my-flag-provider").setInt(counter.incrementAndGet()).build()));
         }
 
     }
@@ -99,24 +94,23 @@ public class FlagProviderCachingDecoratorTest {
         @Delegate
         FlagProvider delegate;
 
+        @Inject
+        @Decorated
+        Bean<FlagProvider> decoratedBean;
+
         @CacheName("quarkus.flags")
         Cache cache;
 
         @Override
         public Uni<Collection<Flag>> getFlags() {
-            return cache.getAsync(delegate.getId(), k -> {
+            String cacheKey = decoratedBean.getQualifiers().stream()
+                    .filter(q -> q instanceof Identifier)
+                    .map(q -> ((Identifier) q).value())
+                    .findFirst()
+                    .orElse(decoratedBean.getBeanClass().getName());
+            return cache.getAsync(cacheKey, k -> {
                 return delegate.getFlags().memoize().indefinitely();
             });
-        }
-
-        @Override
-        public int getPriority() {
-            return delegate.getPriority();
-        }
-
-        @Override
-        public String getId() {
-            return delegate.getId();
         }
 
     }

@@ -10,6 +10,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.spi.RolloutFlagEvaluator;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.common.annotation.Identifier;
 
 /**
  * {@link RolloutFlagEvaluator} implementation where the numerical representation of the current user is based on the current
@@ -17,6 +18,7 @@ import io.quarkus.security.identity.SecurityIdentity;
  * <p>
  * It can be used to implement gradual rollout by increasing the {@value RolloutFlagEvaluator#ROLLOUT_PERCENTAGE} value.
  */
+@Identifier(UsernameRolloutFlagEvaluator.ID)
 @Singleton
 public class UsernameRolloutFlagEvaluator extends RolloutFlagEvaluator {
 
@@ -24,11 +26,6 @@ public class UsernameRolloutFlagEvaluator extends RolloutFlagEvaluator {
 
     @Inject
     SecurityIdentity identity;
-
-    @Override
-    public String getId() {
-        return ID;
-    }
 
     @Override
     protected OptionalInt getHash(Flag flag, ComputationContext computationContext) {
