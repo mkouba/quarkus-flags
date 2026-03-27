@@ -17,11 +17,16 @@ public class FlagBuilderTest {
         assertThrows(IllegalArgumentException.class, () -> Flag.builder(null));
         assertThrows(IllegalArgumentException.class, () -> Flag.builder(""));
         assertThrows(IllegalArgumentException.class, () -> Flag.builder("foo").setMetadata(null));
+        assertThrows(IllegalStateException.class,
+                () -> Flag.builder("foo").setEnabled(true).build(),
+                "Origin must be set");
+
         IllegalStateException containerNotFound = assertThrows(IllegalStateException.class,
-                () -> Flag.builder("foo").setMetadata(Map.of(FlagEvaluator.META_KEY, "bar")).setEnabled(true).build());
+                () -> Flag.builder("foo").setOrigin("test").setMetadata(Map.of(FlagEvaluator.META_KEY, "bar")).setEnabled(true)
+                        .build());
         assertTrue(containerNotFound.getMessage().startsWith("Unable to find the ArC container"));
 
-        Flag trueByDefault = Flag.builder("foo").build();
+        Flag trueByDefault = Flag.builder("foo").setOrigin("test").build();
         assertTrue(trueByDefault.isEnabled());
     }
 

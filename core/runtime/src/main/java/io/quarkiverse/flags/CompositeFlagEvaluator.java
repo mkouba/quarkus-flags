@@ -10,6 +10,7 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -18,6 +19,7 @@ import io.smallrye.mutiny.Uni;
  * The evaluator is configured through the {@link Flag#metadata()}. The value of {@value #SUB_EVALUATORS} represents a
  * comma-separated list of sub-evaluator identifiers.
  */
+@Identifier(CompositeFlagEvaluator.ID)
 public class CompositeFlagEvaluator implements FlagEvaluator {
 
     public static final String ID = "quarkus.composite";
@@ -29,11 +31,6 @@ public class CompositeFlagEvaluator implements FlagEvaluator {
 
     @Inject
     FlagManager flagManager;
-
-    @Override
-    public String getId() {
-        return ID;
-    }
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

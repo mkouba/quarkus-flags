@@ -48,15 +48,13 @@ public class InMemoryFlagsTest {
         assertEquals(0, flagObservers.removed.size());
         AtomicBoolean charlieValue = new AtomicBoolean(true);
 
-        inMemoryFlagProvider.addFlag(Flag.builder("alpha").build());
+        inMemoryFlagProvider.addFlag(Flag.builder("alpha"));
         inMemoryFlagProvider.addFlag(Flag.builder("bravo")
-                .setEnabled(false).build());
+                .setEnabled(false));
         inMemoryFlagProvider.addFlag(Flag.builder("charlie")
-                .setCompute(cc -> BooleanValue.from(charlieValue.get()))
-                .build());
+                .setCompute(cc -> BooleanValue.from(charlieValue.get())));
         inMemoryFlagProvider.addFlag(Flag.builder("delta")
-                .setComputeAsync(cc -> StringValue.createUni("no"))
-                .build());
+                .setComputeAsync(cc -> StringValue.createUni("no")));
         assertEquals(4, flagObservers.added.size());
         assertEquals(0, flagObservers.removed.size());
 

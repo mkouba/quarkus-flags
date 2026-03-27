@@ -6,16 +6,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import jakarta.enterprise.event.Event;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Typed;
 import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
+import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
+@Identifier(InMemoryFlagProviderImpl.ID)
+@ComponentOrder(before = ConfigFlagProvider.ID)
 @Singleton
 public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements InMemoryFlagProvider {
+
+    public static final String ID = "in-memory";
 
     private final ConcurrentMap<String, Flag> flags = new ConcurrentHashMap<>();
 
@@ -29,6 +37,13 @@ public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements In
         this.flagRemoved = flagRemoved;
     }
 
+    // For @Inject InMemoryFlagProvider
+    @Typed(InMemoryFlagProvider.class)
+    @Produces
+    public InMemoryFlagProvider withDefaultQualifier() {
+        return this;
+    }
+
     @Override
     public Uni<Collection<Flag>> getFlags() {
         return Uni.createFrom().item(List.copyOf(flags.values()));
@@ -40,7 +55,8 @@ public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements In
     }
 
     @Override
-    public boolean addFlag(Flag flag) {
+    public boolean addFlag(Flag.Builder builder) {
+        Flag flag = builder.setOrigin(ID).build();
         Flag existing = flags.putIfAbsent(flag.feature(), flag);
         if (existing == null) {
             flagAdded.fire(new FlagAdded(flag));

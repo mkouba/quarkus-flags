@@ -11,8 +11,13 @@ import io.smallrye.mutiny.Uni;
 /**
  * A provider of feature flags.
  * <p>
- * Implementation classes must be CDI beans. Qualifiers are ignored. {@link jakarta.enterprise.context.Dependent} beans are
- * reused.
+ * Implementation classes must be CDI beans. {@link jakarta.enterprise.context.Dependent} beans are reused.
+ * <p>
+ * Each provider must be annotated with {@link io.smallrye.common.annotation.Identifier} to define a unique identifier. If
+ * multiple flag providers with the same identifier exist then the application fails to start.
+ * <p>
+ * The ordering of providers can be defined with {@link ComponentOrder}. A flag from a provider with higher priority takes
+ * precedence and overrides flags with the same {@link Flag#feature()} from providers with lower priority.
  */
 public interface FlagProvider {
 
@@ -23,8 +28,7 @@ public interface FlagProvider {
      * current thread. If blocking is not allowed but an implementation still needs to perform a blocking operation then it has
      * to offload the execution on a worker thread.
      * <p>
-     * The result must not contain flags with duplicate feature names. A flag from a provider with higher priority takes
-     * precedence and overrides flags with the same {@link Flag#feature()} from providers with lower priority.
+     * The result must not contain flags with duplicate feature names.
      *
      * @return the flags
      * @see Flags#find(String)
@@ -55,24 +59,5 @@ public interface FlagProvider {
                 .findFirst()
                 .orElse(null));
     }
-
-    /**
-     * The priority is reflected when the system collects all flags from all providers.
-     * <p>
-     * If multiple providers with the same priority are detected then the application fails to start.
-     *
-     * @return the priority
-     */
-    int getPriority();
-
-    /**
-     * The identifier must be unique.
-     * <p>
-     * If multiple flag providers with the same identifier exist then the application fails to start.
-     *
-     *
-     * @return the identifier
-     */
-    String getId();
 
 }

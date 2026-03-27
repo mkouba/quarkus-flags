@@ -20,6 +20,7 @@ import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 public class CompositeFlagEvaluatorTest {
@@ -44,17 +45,13 @@ public class CompositeFlagEvaluatorTest {
         assertEquals("foo", EVALS.get(0));
     }
 
+    @Identifier("foo")
     @Singleton
     public static class FooEvaluator implements FlagEvaluator {
 
         @Override
-        public String getId() {
-            return "foo";
-        }
-
-        @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            EVALS.add(getId());
+            EVALS.add("foo");
             if ("1".equals(flag.metadata().get("baz"))) {
                 return BooleanValue.createUni(!initialValue.asBoolean());
             }
@@ -63,17 +60,13 @@ public class CompositeFlagEvaluatorTest {
 
     }
 
+    @Identifier("bar")
     @Singleton
     public static class BarEvaluator implements FlagEvaluator {
 
         @Override
-        public String getId() {
-            return "bar";
-        }
-
-        @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-            EVALS.add(getId());
+            EVALS.add("bar");
             return BooleanValue.createUni(!initialValue.asBoolean());
         }
 

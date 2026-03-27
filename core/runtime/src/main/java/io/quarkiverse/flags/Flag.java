@@ -33,7 +33,7 @@ public interface Flag {
     /**
      * The origin should identify the provider of the flag.
      *
-     * @return the description of the source
+     * @return the description of the source (not {@code null})
      */
     String origin();
 

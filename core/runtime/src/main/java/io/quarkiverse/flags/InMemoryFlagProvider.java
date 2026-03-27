@@ -9,19 +9,15 @@ import io.quarkiverse.flags.spi.FlagProvider;
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
-    static int PRIORITY = 600;
-
-    @Override
-    default int getPriority() {
-        return PRIORITY;
-    }
-
     /**
+     * Builds the flag and adds it to the provider. The {@link Flag#origin()} is set automatically.
+     *
+     * @param builder
      * @return {@code true} if the flag was added successfully, {@code false} otherwise
      * @see FlagAdded
      * @see Flag#builder(String)
      */
-    boolean addFlag(Flag flag);
+    boolean addFlag(Flag.Builder builder);
 
     /**
      * @param feature

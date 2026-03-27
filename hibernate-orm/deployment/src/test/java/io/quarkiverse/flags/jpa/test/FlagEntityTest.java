@@ -19,6 +19,7 @@ import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
 import io.quarkus.test.TestTransaction;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 public class FlagEntityTest {
@@ -49,13 +50,9 @@ public class FlagEntityTest {
         assertEquals("true", alphaState.asString());
     }
 
+    @Identifier("inverting")
     @Singleton
     public static class InvertingFlagEvaluator implements FlagEvaluator {
-
-        @Override
-        public String getId() {
-            return "inverting";
-        }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

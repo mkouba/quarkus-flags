@@ -14,8 +14,11 @@ import io.smallrye.mutiny.Uni;
 
 public abstract class AbstractHibernateOrmFlagProvider extends AbstractFlagProvider {
 
-    public AbstractHibernateOrmFlagProvider(FlagManager manager) {
+    protected final String origin;
+
+    public AbstractHibernateOrmFlagProvider(FlagManager manager, String origin) {
         super(manager);
+        this.origin = origin;
     }
 
     @Override
@@ -50,6 +53,7 @@ public abstract class AbstractHibernateOrmFlagProvider extends AbstractFlagProvi
 
     protected Flag createFlag(String feature, String value, Map<String, String> metadata) {
         return Flag.builder(feature)
+                .setOrigin(origin)
                 .setMetadata(metadata)
                 .setString(value)
                 .setFeatureManager(manager)

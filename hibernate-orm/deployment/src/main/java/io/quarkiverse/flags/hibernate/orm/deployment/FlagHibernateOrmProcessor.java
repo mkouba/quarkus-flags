@@ -16,6 +16,9 @@ import org.jboss.logging.Logger;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
 import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateOrmFlagProvider;
+import io.quarkiverse.flags.runtime.ConfigFlagProvider;
+import io.quarkiverse.flags.runtime.InMemoryFlagProviderImpl;
+import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
 import io.quarkus.arc.deployment.GeneratedBeanGizmo2Adaptor;
@@ -34,6 +37,7 @@ import io.quarkus.gizmo2.desc.MethodDesc;
 import io.quarkus.hibernate.orm.PersistenceUnit;
 import io.quarkus.hibernate.orm.deployment.PersistenceUnitDescriptorBuildItem;
 import io.quarkus.hibernate.orm.runtime.PersistenceUnitUtil;
+import io.smallrye.common.annotation.Identifier;
 
 public class FlagHibernateOrmProcessor {
 
@@ -54,10 +58,15 @@ public class FlagHibernateOrmProcessor {
 
         for (FlagDefinitionBuildItem flagDefinition : flagDefinitions) {
             ClassInfo entityClass = flagDefinition.getEntityClass();
-
-            gizmo.class_(entityClass.name() + "_HibernateOrmFlagProvider", cc -> {
+            String className = entityClass.name() + "_HibernateOrmFlagProvider";
+            gizmo.class_(className, cc -> {
                 This this_ = cc.this_();
                 cc.addAnnotation(Singleton.class);
+                cc.addAnnotation(Identifier.Literal.of(flagDefinition.getEntityName()));
+                cc.addAnnotation(ComponentOrder.class, ac -> {
+                    ac.addArray("before", new String[] { ConfigFlagProvider.ID });
+                    ac.addArray("after", new String[] { InMemoryFlagProviderImpl.ID });
+                });
                 cc.extends_(AbstractHibernateOrmFlagProvider.class);
 
                 // private final EntityManager em;
@@ -69,7 +78,7 @@ public class FlagHibernateOrmProcessor {
 
                 cc.constructor(constructor -> {
                     // MyFlag_HibernateOrmFlagProvider(EntityManager em, FlagManager fm) {
-                    //    super(fm);
+                    //    super(fm, "MyFlag");
                     //    this.em = em;
                     // }
                     constructor.public_();
@@ -82,18 +91,12 @@ public class FlagHibernateOrmProcessor {
                     });
                     ParamVar manager = constructor.parameter("fm", FlagManager.class);
                     constructor.body(bc -> {
-                        bc.invokeSpecial(ConstructorDesc.of(AbstractHibernateOrmFlagProvider.class, FlagManager.class), this_,
-                                manager);
+                        bc.invokeSpecial(
+                                ConstructorDesc.of(AbstractHibernateOrmFlagProvider.class, FlagManager.class, String.class),
+                                this_,
+                                manager, Const.of(className));
                         bc.set(this_.field(emField), em);
                         bc.return_();
-                    });
-                });
-
-                cc.method("getPriority", mc -> {
-                    mc.returning(int.class);
-                    mc.body(bc -> {
-                        // Config provider has 200, in-memory provider has 600
-                        bc.return_(400);
                     });
                 });
 

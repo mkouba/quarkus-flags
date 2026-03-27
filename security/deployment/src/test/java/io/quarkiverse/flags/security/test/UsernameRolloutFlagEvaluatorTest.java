@@ -50,24 +50,20 @@ public class UsernameRolloutFlagEvaluatorTest {
         for (int i = 0; i < total; i++) {
             usernames.add(generateUsername());
         }
-        Flag delta = Flag.builder(FEATURE)
+        inMemoryFlagProvider.addFlag(Flag.builder(FEATURE)
                 .setEnabled(true)
                 .setMetadata(
                         Map.of("evaluator", UsernameRolloutFlagEvaluator.ID,
-                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "10"))
-                .build();
-        inMemoryFlagProvider.addFlag(delta);
+                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "10")));
         Set<String> enabledUsernames10 = assertDeltaFlag(usernames);
         // We cannot assert an exact number but it should be a value < 25 percent
         assertTrue(enabledUsernames10.size() < (total / 4));
         inMemoryFlagProvider.removeFlag(FEATURE);
-        delta = Flag.builder(FEATURE)
+        inMemoryFlagProvider.addFlag(Flag.builder(FEATURE)
                 .setEnabled(true)
                 .setMetadata(
                         Map.of("evaluator", UsernameRolloutFlagEvaluator.ID,
-                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "30"))
-                .build();
-        inMemoryFlagProvider.addFlag(delta);
+                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "30")));
         Set<String> enabledUsernames30 = assertDeltaFlag(usernames);
         // We cannot assert an exact number but it should be a value < 50 percent
         assertTrue(enabledUsernames30.size() < (total / 2));

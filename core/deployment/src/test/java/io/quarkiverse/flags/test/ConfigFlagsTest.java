@@ -23,6 +23,7 @@ import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 public class ConfigFlagsTest {
@@ -71,13 +72,9 @@ public class ConfigFlagsTest {
         assertFalse(delta.computeAndAwait(Flag.ComputationContext.of("username", "qux")).asBoolean());
     }
 
+    @Identifier("deltaEval")
     @Singleton
     public static class DeltaEvaluator implements FlagEvaluator {
-
-        @Override
-        public String getId() {
-            return "deltaEval";
-        }
 
         @Override
         public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

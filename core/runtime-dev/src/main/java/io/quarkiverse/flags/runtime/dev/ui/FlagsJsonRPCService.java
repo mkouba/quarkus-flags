@@ -1,7 +1,6 @@
 package io.quarkiverse.flags.runtime.dev.ui;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map.Entry;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -10,6 +9,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.runtime.FlagManagerImpl;
+import io.quarkiverse.flags.runtime.FlagManagerImpl.FlagProviderWithId;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.runtime.annotations.JsonRpcDescription;
@@ -23,13 +23,10 @@ public class FlagsJsonRPCService {
     @Inject
     Flags flags;
 
-    List<FlagProvider> providers;
-
-    Collection<FlagEvaluator> evaluators;
+    final FlagManagerImpl flagManager;
 
     public FlagsJsonRPCService(FlagManagerImpl flagManager) {
-        this.providers = flagManager.getProviders();
-        this.evaluators = flagManager.getEvaluators();
+        this.flagManager = flagManager;
     }
 
     @JsonRpcDescription("Get information about feature flags used in the application")
@@ -54,10 +51,9 @@ public class FlagsJsonRPCService {
     @JsonRpcDescription("Get information about flag providers")
     public JsonArray getFlagProvidersData() {
         JsonArray data = new JsonArray();
-        for (FlagProvider p : providers) {
+        for (FlagProviderWithId p : flagManager.getProviders()) {
             JsonObject providerJson = new JsonObject();
-            providerJson.put("id", p.getId());
-            providerJson.put("priority", p.getPriority());
+            providerJson.put("id", p.id());
             data.add(providerJson);
         }
         return data;
@@ -68,10 +64,11 @@ public class FlagsJsonRPCService {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Invalid provider id: " + id);
         }
-        FlagProvider provider = providers.stream().filter(e -> e.getId().equals(id)).findAny().orElseThrow();
-        if (provider == null) {
-            throw new IllegalArgumentException("Provider with given id does not exist: " + id);
-        }
+        FlagProvider provider = flagManager.getProviders().stream()
+                .filter(p -> p.id().equals(id))
+                .findAny()
+                .orElseThrow()
+                .provider();
         return provider.getFlags().map(flags -> {
             JsonArray array = new JsonArray();
             for (Flag flag : flags) {
@@ -84,10 +81,10 @@ public class FlagsJsonRPCService {
     @JsonRpcDescription("Get information about flag evaluators")
     public JsonArray getFlagEvaluatorsData() {
         JsonArray data = new JsonArray();
-        for (FlagEvaluator e : evaluators) {
+        for (Entry<String, FlagEvaluator> e : flagManager.getEvaluators().entrySet()) {
             JsonObject evaluatorJson = new JsonObject();
-            evaluatorJson.put("id", e.getId());
-            evaluatorJson.put("className", e.getClass().getName());
+            evaluatorJson.put("id", e.getKey());
+            evaluatorJson.put("className", e.getValue().getClass().getName());
             data.add(evaluatorJson);
         }
         return data;

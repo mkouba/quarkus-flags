@@ -19,6 +19,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -30,11 +31,11 @@ import io.smallrye.mutiny.Uni;
  * The evaluator is configured through the {@link Flag#metadata()}. The {@value #CRON_EXPR} is used to specify the CRON
  * expression and {@value #CRON_TYPE} defines the CRON syntax used to parse the expression.
  */
+@Identifier(CronFlagEvaluator.ID)
 @Singleton
 public class CronFlagEvaluator implements FlagEvaluator {
 
     public static final String ID = "quarkus.cron";
-
     public static final String CRON_EXPR = "cron-expr";
 
     /**
@@ -53,11 +54,6 @@ public class CronFlagEvaluator implements FlagEvaluator {
         for (CronType cronType : CronType.values()) {
             parsers.put(cronType, new CronParser(CronDefinitionBuilder.instanceDefinitionFor(cronType)));
         }
-    }
-
-    @Override
-    public String getId() {
-        return ID;
     }
 
     @Override

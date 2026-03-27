@@ -9,8 +9,10 @@ import io.smallrye.mutiny.Uni;
  * An evaluator can be used to compute a value of a feature flag. It receives the initial flag value but it does not have to use
  * it during evaluation.
  * <p>
- * Implementation classes must be CDI beans. Qualifiers are ignored. {@link jakarta.enterprise.context.Dependent} beans are
- * reused.
+ * Implementation classes must be CDI beans. {@link jakarta.enterprise.context.Dependent} beans are reused.
+ * <p>
+ * Each evaluator must be annotated with {@link io.smallrye.common.annotation.Identifier} to define a unique identifier. If
+ * multiple flag evaluators with the same identifier exist then the application fails to start.
  */
 public interface FlagEvaluator {
 
@@ -20,15 +22,6 @@ public interface FlagEvaluator {
      * @see Flag#metadata()
      */
     static String META_KEY = "evaluator";
-
-    /**
-     * The identifier must be unique.
-     * <p>
-     * If multiple flag evaluators with the same identifier exist then the application fails to start.
-     *
-     * @return the identifier
-     */
-    String getId();
 
     /**
      * The initial flag value does not have to be used during evaluation.

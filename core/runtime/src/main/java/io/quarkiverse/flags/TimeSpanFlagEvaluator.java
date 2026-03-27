@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.spi.FlagEvaluator;
+import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -20,17 +21,13 @@ import io.smallrye.mutiny.Uni;
  * parse values of the {@value #START_TIME} and {@value #END_TIME} metadata. Both values are optional - an absent value implies
  * no bound.
  */
+@Identifier(TimeSpanFlagEvaluator.ID)
 @Singleton
 public class TimeSpanFlagEvaluator implements FlagEvaluator {
 
     public static final String ID = "quarkus.time-span";
     public static final String START_TIME = "start-time";
     public static final String END_TIME = "end-time";
-
-    @Override
-    public String getId() {
-        return ID;
-    }
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {

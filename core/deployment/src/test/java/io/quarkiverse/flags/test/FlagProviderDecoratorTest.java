@@ -8,6 +8,7 @@ import java.util.stream.StreamSupport;
 import jakarta.annotation.Priority;
 import jakarta.decorator.Decorator;
 import jakarta.decorator.Delegate;
+import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
@@ -35,9 +36,8 @@ public class FlagProviderDecoratorTest {
     @Test
     public void testFlags() {
         inMemoryFlagProvider.addFlag(Flag.builder("alpha")
-                .setEnabled(true)
-                .build());
-        assertFalse(flags.findAndAwait("alpha").orElseThrow().isEnabled());
+                .setEnabled(true));
+        assertFalse(flags.isEnabled("alpha"));
     }
 
     @Priority(5)
@@ -45,6 +45,7 @@ public class FlagProviderDecoratorTest {
     public static class FlagProviderDecorator implements FlagProvider {
 
         @Inject
+        @Any
         @Delegate
         FlagProvider delegate;
 
@@ -52,19 +53,10 @@ public class FlagProviderDecoratorTest {
         public Uni<Collection<Flag>> getFlags() {
             return delegate.getFlags().map(f -> {
                 return StreamSupport.stream(f.spliterator(), false).<Flag> map(flag -> {
-                    return Flag.builder(flag.feature()).setMetadata(flag.metadata()).setEnabled(false).build();
+                    return Flag.builder(flag.feature()).setOrigin(flag.origin()).setMetadata(flag.metadata()).setEnabled(false)
+                            .build();
                 }).toList();
             });
-        }
-
-        @Override
-        public int getPriority() {
-            return delegate.getPriority();
-        }
-
-        @Override
-        public String getId() {
-            return delegate.getId();
         }
 
     }

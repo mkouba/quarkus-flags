@@ -84,6 +84,9 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     @Override
     public Flag build() {
+        if (origin == null || origin.isBlank()) {
+            throw new IllegalStateException("Origin must be set");
+        }
         if (value == null && fun == null) {
             value = BooleanValue.TRUE;
         }
