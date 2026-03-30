@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.jpa.test;
+package io.quarkiverse.flags.hibernate.reactive.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,6 +8,7 @@ import java.util.Map;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -18,31 +19,33 @@ import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
-import io.quarkus.test.TestTransaction;
+import io.quarkus.vertx.VertxContextSupport;
 import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
-public class FlagEntityTest {
+public class ReactiveFlagEntityTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .withApplicationRoot(root -> root.addClasses(MyFlag.class, InvertingFlagEvaluator.class))
+            .withApplicationRoot(root -> root.addClasses(MyReactiveFlag.class, InvertingFlagEvaluator.class))
     //.overrideConfigKey("quarkus.hibernate-orm.log.sql", "true")
     ;
 
     @Inject
+    Mutiny.SessionFactory sf;
+
+    @Inject
     Flags flags;
 
-    @TestTransaction
     @Test
-    public void testFlagDefinition() {
+    public void testFlagDefinition() throws Throwable {
         assertEquals(0, flags.findAllAndAwait().size());
 
-        MyFlag alpha = new MyFlag();
+        MyReactiveFlag alpha = new MyReactiveFlag();
         alpha.feature = "alpha";
         alpha.value = "false";
         alpha.metadata = Map.of("foo", "bar", FlagEvaluator.META_KEY, "inverting");
-        alpha.persistAndFlush();
+        VertxContextSupport.subscribeAndAwait(() -> sf.withTransaction(s -> s.persist(alpha)));
 
         Flag alphaFlag = flags.findAndAwait("alpha").orElseThrow();
         assertEquals("bar", alphaFlag.metadata().get("foo"));

@@ -30,7 +30,7 @@ import io.quarkus.gizmo2.creator.BlockCreator;
  *
  * @see FlagDefinition
  */
-final class FlagDefinitionBuildItem extends MultiBuildItem {
+public final class FlagDefinitionBuildItem extends MultiBuildItem {
 
     private final ClassInfo entityClass;
 
@@ -91,7 +91,7 @@ final class FlagDefinitionBuildItem extends MultiBuildItem {
         return metadata;
     }
 
-    interface Property {
+    public interface Property {
 
         String name();
 

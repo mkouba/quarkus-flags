@@ -78,7 +78,7 @@ public class FlagHibernateOrmProcessor {
 
                 cc.constructor(constructor -> {
                     // MyFlag_HibernateOrmFlagProvider(EntityManager em, FlagManager fm) {
-                    //    super(fm, "MyFlag");
+                    //    super(fm, "com.acme.MyFlag_HibernateOrmFlagProvider");
                     //    this.em = em;
                     // }
                     constructor.public_();
