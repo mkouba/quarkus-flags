@@ -1,9 +1,10 @@
-name: Feature Flags - Hibernate ORM
+name: Feature Flags - Hibernate Reactive
 metadata:
   keywords:
     - flags
     - toggles
-  #guide: 
+    - reactive
+  #guide:
   categories:
     - "miscellaneous"
   status: "preview"

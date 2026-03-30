@@ -15,6 +15,7 @@
         <module>core</module>
         <module>hibernate-common</module>
         <module>hibernate-orm</module>
+        <module>hibernate-reactive</module>
         <module>security</module>
         <module>qute</module>
         <module>cron</module>

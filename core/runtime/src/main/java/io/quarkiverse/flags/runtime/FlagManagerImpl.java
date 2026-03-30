@@ -42,7 +42,7 @@ public class FlagManagerImpl implements FlagManager {
 
     FlagManagerImpl(@All List<InstanceHandle<FlagProvider>> providerHandles,
             @All List<InstanceHandle<FlagEvaluator>> evaluatorHandles,
-            FlagContext config) {
+            FlagContext context) {
         // Build provider ID map from @Identifier qualifiers
         Map<String, FlagProvider> providerById = new LinkedHashMap<>();
         for (InstanceHandle<FlagProvider> handle : providerHandles) {
@@ -52,7 +52,7 @@ public class FlagManagerImpl implements FlagManager {
         }
         // Sort providers according to the build-time validated order
         List<FlagProviderWithId> sortedProviders = new ArrayList<>(providerById.size());
-        for (String id : config.getOrderedProviderIds()) {
+        for (String id : context.getOrderedProviderIds()) {
             FlagProvider provider = providerById.get(id);
             if (provider != null) {
                 sortedProviders.add(new FlagProviderWithId(provider, id));
