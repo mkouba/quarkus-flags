@@ -16,5 +16,5 @@ jobs:
     uses: quarkiverse/.github/.github/workflows/quarkus-ecosystem-ci.yml@main
     secrets: inherit
     with:
-      ecosystem_ci_repo_path: quarkiverse-mcp-server
+      ecosystem_ci_repo_path: quarkiverse-flags
       java_version: 17
