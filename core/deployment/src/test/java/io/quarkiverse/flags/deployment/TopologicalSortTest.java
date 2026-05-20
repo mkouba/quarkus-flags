@@ -86,24 +86,22 @@ public class TopologicalSortTest {
 
     @Test
     public void testBeforeNonExistentProvider() {
-        IllegalStateException e = assertThrows(IllegalStateException.class, () -> {
-            FlagsProcessor.topologicalSort(
-                    Set.of("a"),
-                    Map.of("a", List.of("nonexistent")),
-                    Map.of());
-        });
-        assertTrue(e.getMessage().contains("nonexistent"));
+        // Non-existent IDs are silently ignored
+        List<String> result = FlagsProcessor.topologicalSort(
+                Set.of("a"),
+                Map.of("a", List.of("nonexistent")),
+                Map.of());
+        assertEquals(List.of("a"), result);
     }
 
     @Test
     public void testAfterNonExistentProvider() {
-        IllegalStateException e = assertThrows(IllegalStateException.class, () -> {
-            FlagsProcessor.topologicalSort(
-                    Set.of("a"),
-                    Map.of(),
-                    Map.of("a", List.of("nonexistent")));
-        });
-        assertTrue(e.getMessage().contains("nonexistent"));
+        // Non-existent IDs are silently ignored
+        List<String> result = FlagsProcessor.topologicalSort(
+                Set.of("a"),
+                Map.of(),
+                Map.of("a", List.of("nonexistent")));
+        assertEquals(List.of("a"), result);
     }
 
     @Test

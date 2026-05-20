@@ -42,18 +42,18 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
                     && Boolean.parseBoolean(authenticated)
                     && identity.isAnonymous()) {
                 LOG.debugf("User not authenticated");
-                return Uni.createFrom().item(BooleanValue.FALSE);
+                return BooleanValue.createUni(false);
             }
             String rolesAllowed = flag.metadata().get(ROLES_ALLOWED);
             if (rolesAllowed != null) {
                 String[] roles = rolesAllowed.split(",");
                 for (String role : roles) {
                     if (identity.hasRole(role)) {
-                        return Uni.createFrom().item(BooleanValue.TRUE);
+                        return BooleanValue.createUni(true);
                     }
                 }
                 LOG.debugf("User [%s] has none of the allowed roles: %s", identity.getPrincipal().getName(), rolesAllowed);
-                return Uni.createFrom().item(BooleanValue.FALSE);
+                return BooleanValue.createUni(false);
             }
         }
         return Uni.createFrom().item(initialValue);

@@ -17,11 +17,11 @@ import org.jboss.jandex.DotName;
 
 import io.quarkiverse.flags.CompositeFlagEvaluator;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
-import io.quarkiverse.flags.runtime.ConfigFlagProvider;
-import io.quarkiverse.flags.runtime.FlagContext;
-import io.quarkiverse.flags.runtime.FlagManagerImpl;
-import io.quarkiverse.flags.runtime.FlagsRecorder;
-import io.quarkiverse.flags.runtime.InMemoryFlagProviderImpl;
+import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
+import io.quarkiverse.flags.runtime.impl.FlagContext;
+import io.quarkiverse.flags.runtime.impl.FlagManagerImpl;
+import io.quarkiverse.flags.runtime.impl.FlagsRecorder;
+import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagProvider;
@@ -157,9 +157,7 @@ public class FlagsProcessor {
             String from = entry.getKey();
             for (String to : entry.getValue()) {
                 if (!allIds.contains(to)) {
-                    throw new IllegalStateException(
-                            "FlagProvider '" + from + "' declares @ComponentOrder(before = \"" + to
-                                    + "\") but no provider with @Identifier(\"" + to + "\") exists");
+                    continue;
                 }
                 if (graph.get(from).add(to)) {
                     inDegree.merge(to, 1, Integer::sum);
@@ -172,9 +170,7 @@ public class FlagsProcessor {
             String to = entry.getKey();
             for (String from : entry.getValue()) {
                 if (!allIds.contains(from)) {
-                    throw new IllegalStateException(
-                            "FlagProvider '" + to + "' declares @ComponentOrder(after = \"" + from
-                                    + "\") but no provider with @Identifier(\"" + from + "\") exists");
+                    continue;
                 }
                 if (graph.get(from).add(to)) {
                     inDegree.merge(to, 1, Integer::sum);

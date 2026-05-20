@@ -6,46 +6,16 @@
         <artifactId>quarkus-flags-core-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-flags</artifactId>
-    <name>Quarkus Feature Flags - Core - Runtime</name>
+    <artifactId>quarkus-flags-api</artifactId>
+    <name>Quarkus Feature Flags - Core - Runtime API</name>
     <dependencies>
-        <dependency>
-            <groupId>io.quarkiverse.flags</groupId>
-            <artifactId>quarkus-flags-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-vertx</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-extension-maven-plugin</artifactId>
-                <version>${quarkus.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>extension-descriptor</goal>
-                        </goals>
-                        <configuration>
-                            <deployment>
-                                ${project.groupId}:${project.artifactId}-deployment:${project.version}
-                            </deployment>
-                            <conditionalDevDependencies>
-                                <artifact>${project.groupId}:${project.artifactId}-dev:${project.version}</artifact>
-                            </conditionalDevDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>

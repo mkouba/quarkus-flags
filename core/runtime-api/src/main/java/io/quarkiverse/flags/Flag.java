@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-import io.quarkiverse.flags.runtime.ComputationContextImpl;
-import io.quarkiverse.flags.runtime.FlagBuilderImpl;
+import io.quarkiverse.flags.spi.ComputationContextImpl;
+import io.quarkiverse.flags.spi.FlagBuilderImpl;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
@@ -124,7 +124,7 @@ public interface Flag {
     }
 
     /**
-     * Represents the value of a feature flag.
+     * Represents the computed value of a feature flag.
      */
     interface Value {
 
