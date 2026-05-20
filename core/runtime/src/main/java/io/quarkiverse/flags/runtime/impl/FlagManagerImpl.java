@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.runtime;
+package io.quarkiverse.flags.runtime.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

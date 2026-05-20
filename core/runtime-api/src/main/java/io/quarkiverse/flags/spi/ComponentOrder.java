@@ -9,8 +9,6 @@ import java.lang.annotation.Target;
  * Defines the ordering of a component relative to other components of the same type.
  * <p>
  * Components are referenced by their {@link io.smallrye.common.annotation.Identifier} value.
- * A component listed in {@link #before()} has lower priority than this component, i.e., this component is processed first.
- * A component listed in {@link #after()} has higher priority than this component.
  * <p>
  * Cycles in the ordering are detected at build time and result in a deployment error.
  */
@@ -19,14 +17,14 @@ import java.lang.annotation.Target;
 public @interface ComponentOrder {
 
     /**
-     * Identifiers of components that this component takes precedence over (i.e., this component has higher priority).
+     * Identifiers of components that this component takes precedence over, i.e., are processed after this component.
      *
      * @return the component identifiers
      */
     String[] before() default {};
 
     /**
-     * Identifiers of components that take precedence over this component (i.e., this component has lower priority).
+     * Identifiers of components that take precedence over this component, i.e., are processed before this component.
      *
      * @return the component identifiers
      */

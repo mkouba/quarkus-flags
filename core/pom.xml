@@ -14,6 +14,7 @@
   <name>Quarkus Feature Flags - Core - Parent</name>
 
   <modules>
+    <module>runtime-api</module>
     <module>runtime</module>
     <module>deployment</module>
     <module>runtime-dev</module>

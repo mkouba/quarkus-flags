@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.runtime;
+package io.quarkiverse.flags.spi;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -10,8 +10,6 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.IntValue;
 import io.quarkiverse.flags.StringValue;
-import io.quarkiverse.flags.spi.FlagEvaluator;
-import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.ArcContainer;
 import io.smallrye.mutiny.Uni;

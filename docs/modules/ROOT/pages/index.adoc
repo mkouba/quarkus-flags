@@ -75,10 +75,10 @@ Each `FlagProvider` bean must be annotated with `@io.smallrye.common.annotation.
 If multiple flag providers with the same identifier exist then the application fails to start.
 
 The ordering of providers is defined with the `@io.quarkiverse.flags.spi.ComponentOrder` annotation.
-A provider listed in `before` has lower priority, i.e., flags from the annotated provider take precedence.
-A provider listed in `after` has higher priority.
+A provider listed in `before` is processed after this provider, i.e., this provider takes precedence.
+A provider listed in `after` is processed before this provider, i.e., it takes precedence over this provider.
 Both `before` and `after` reference provider identifiers.
-The ordering is validated at build time; cycles in the ordering result in a deployment error.
+Cycles in the ordering are detected at build time and result in a deployment error.
 
 By default, `getFlag(String)` filters the result of `getFlags()`.
 Implementations backed by a database or remote service should override this method with an optimized lookup.
