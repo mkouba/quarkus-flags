@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-core-parent</artifactId>
-        <version>1.0.0.Beta7</version>
+        <version>999-SNAPSHOT</version>
     </parent>
     <artifactId>quarkus-flags</artifactId>
     <name>Quarkus Feature Flags - Core - Runtime</name>
@@ -65,8 +65,4 @@
             </plugin>
         </plugins>
     </build>
-
-  <scm>
-    <tag>1.0.0.Beta7</tag>
-  </scm>
 </project>
