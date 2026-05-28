@@ -3,7 +3,7 @@
     <parent>
         <artifactId>quarkus-flags-core-parent</artifactId>
         <groupId>io.quarkiverse.flags</groupId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0.Beta7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,4 +21,8 @@
             <artifactId>vertx-core</artifactId>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>1.0.0.Beta7</tag>
+  </scm>
 </project>
