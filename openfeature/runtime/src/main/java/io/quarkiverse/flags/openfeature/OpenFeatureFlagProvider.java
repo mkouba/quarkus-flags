@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,11 +28,12 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.IntValue;
 import io.quarkiverse.flags.StringValue;
-import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.quarkus.runtime.BlockingOperationControl;
+import io.quarkus.vertx.VertxContextSupport;
 import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
@@ -99,7 +101,17 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
     private Flag buildFlag(String feature, FlagRegistration registration) {
         return Flag.builder(feature)
                 .setOrigin(ID)
-                .setComputeAsync(ctx -> Uni.createFrom().item(() -> evaluate(feature, registration, ctx)))
+                .setComputeAsync(ctx -> {
+                    if (BlockingOperationControl.isBlockingAllowed()) {
+                        return Uni.createFrom().item(() -> evaluate(feature, registration, ctx));
+                    }
+                    return VertxContextSupport.executeBlocking(new Callable<Flag.Value>() {
+                        @Override
+                        public Flag.Value call() {
+                            return evaluate(feature, registration, ctx);
+                        }
+                    });
+                })
                 .setFeatureManager(manager)
                 .build();
     }
