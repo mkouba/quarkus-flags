@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -66,8 +67,31 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
     }
 
     @Override
-    public boolean register(String feature, FlagType type, String defaultValue) {
-        return registrations.putIfAbsent(feature, new FlagRegistration(type, defaultValue)) == null;
+    public boolean register(String feature, boolean defaultValue) {
+        Objects.requireNonNull(feature);
+        return registrations.putIfAbsent(feature,
+                new FlagRegistration(FlagType.BOOLEAN, Boolean.toString(defaultValue))) == null;
+    }
+
+    @Override
+    public boolean register(String feature, String defaultValue) {
+        Objects.requireNonNull(feature);
+        Objects.requireNonNull(defaultValue);
+        return registrations.putIfAbsent(feature, new FlagRegistration(FlagType.STRING, defaultValue)) == null;
+    }
+
+    @Override
+    public boolean register(String feature, int defaultValue) {
+        Objects.requireNonNull(feature);
+        return registrations.putIfAbsent(feature,
+                new FlagRegistration(FlagType.INT, Integer.toString(defaultValue))) == null;
+    }
+
+    @Override
+    public boolean register(String feature, double defaultValue) {
+        Objects.requireNonNull(feature);
+        return registrations.putIfAbsent(feature,
+                new FlagRegistration(FlagType.DOUBLE, Double.toString(defaultValue))) == null;
     }
 
     @Override
@@ -189,6 +213,25 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
         if (details.getErrorCode() != null) {
             LOG.warnf("OpenFeature evaluation error for flag '%s': %s [%s]",
                     feature, details.getErrorCode(), details.getErrorMessage());
+        }
+    }
+
+    enum FlagType {
+
+        BOOLEAN,
+        STRING,
+        INT,
+        DOUBLE;
+
+        static FlagType fromString(String type) {
+            return switch (type) {
+                case "boolean" -> BOOLEAN;
+                case "string" -> STRING;
+                case "int" -> INT;
+                case "double" -> DOUBLE;
+                default -> throw new IllegalArgumentException(
+                        "Unsupported flag type: " + type + "; supported values: boolean, string, int, double");
+            };
         }
     }
 

@@ -76,17 +76,22 @@ Additional flags can be registered at runtime via the `OpenFeatureFlags` CDI bea
 
 ```java
 import io.quarkiverse.flags.openfeature.OpenFeatureFlags;
-import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
 import jakarta.inject.Inject;
 
 @Inject
 OpenFeatureFlags openFeatureFlags;
 
-// Register a boolean flag (default: false)
-openFeatureFlags.register("new-feature");
+// Register a boolean flag
+openFeatureFlags.register("new-feature", false);
 
-// Register a typed flag
-openFeatureFlags.register("welcome-message", FlagType.STRING, "Hello");
+// Register a string flag
+openFeatureFlags.register("welcome-message", "Hello");
+
+// Register an integer flag
+openFeatureFlags.register("max-retries", 3);
+
+// Register a double flag
+openFeatureFlags.register("ratio", 0.5);
 
 // Unregister a flag
 openFeatureFlags.unregister("old-feature");
