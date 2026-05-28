@@ -9,7 +9,7 @@ import io.quarkiverse.flags.spi.FlagProvider;
  */
 public interface InMemoryFlagProvider extends FlagProvider {
 
-    String ID = "in-memory";
+    String ID = "quarkus.in-memory";
 
     /**
      * Builds the flag and adds it to the provider. The {@link Flag#origin()} is set automatically.

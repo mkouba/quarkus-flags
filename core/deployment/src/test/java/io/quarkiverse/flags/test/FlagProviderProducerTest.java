@@ -37,7 +37,7 @@ public class FlagProviderProducerTest {
 
     @Test
     public void testProducerProviderHasPriority() {
-        // The producer provider declares @ComponentOrder(before = "in-memory")
+        // The producer provider declares @ComponentOrder(before = "quarkus.in-memory")
         // so its flags should take precedence over in-memory flags
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false));
         // "alpha" is also provided by the producer provider with value true

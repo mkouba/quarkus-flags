@@ -40,7 +40,7 @@ import io.smallrye.mutiny.Uni;
 @Singleton
 public class OpenFeatureFlagProvider extends AbstractFlagProvider implements OpenFeatureFlags {
 
-    public static final String ID = "openfeature";
+    public static final String ID = "quarkus.openfeature";
 
     private static final Logger LOG = Logger.getLogger(OpenFeatureFlagProvider.class);
 

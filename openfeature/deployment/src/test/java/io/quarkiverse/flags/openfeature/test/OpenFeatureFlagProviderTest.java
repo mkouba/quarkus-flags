@@ -134,7 +134,7 @@ public class OpenFeatureFlagProviderTest {
     @Test
     public void testFlagOrigin() {
         io.quarkiverse.flags.Flag flag = flags.findAndAwait("bool-flag").orElseThrow();
-        assertEquals("openfeature", flag.origin());
+        assertEquals("quarkus.openfeature", flag.origin());
     }
 
     @Test
