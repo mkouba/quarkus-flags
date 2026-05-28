@@ -21,7 +21,6 @@ import dev.openfeature.sdk.providers.memory.InMemoryProvider;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.openfeature.OpenFeatureFlags;
-import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
 import io.quarkus.test.QuarkusUnitTest;
 import io.quarkus.vertx.VertxContextSupport;
 
@@ -146,12 +145,12 @@ public class OpenFeatureFlagProviderTest {
         assertTrue(flags.findAndAwait("dynamic-flag").isEmpty());
 
         // Register a boolean flag dynamically
-        assertTrue(openFeatureFlags.register("dynamic-flag"));
+        assertTrue(openFeatureFlags.register("dynamic-flag", false));
         assertTrue(openFeatureFlags.isRegistered("dynamic-flag"));
         assertTrue(flags.isEnabled("dynamic-flag"));
 
         // Duplicate registration returns false
-        assertFalse(openFeatureFlags.register("dynamic-flag"));
+        assertFalse(openFeatureFlags.register("dynamic-flag", false));
 
         // Unregister
         assertTrue(openFeatureFlags.unregister("dynamic-flag"));
@@ -162,7 +161,7 @@ public class OpenFeatureFlagProviderTest {
     @Test
     public void testDynamicRegistrationWithType() {
         // Register a typed flag dynamically
-        assertTrue(openFeatureFlags.register("dynamic-str", FlagType.STRING, "fallback"));
+        assertTrue(openFeatureFlags.register("dynamic-str", "fallback"));
         assertEquals("Alpha", flags.getString("dynamic-str"));
 
         openFeatureFlags.unregister("dynamic-str");

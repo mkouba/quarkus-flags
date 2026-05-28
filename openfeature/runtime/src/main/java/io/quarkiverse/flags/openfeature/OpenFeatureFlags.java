@@ -10,24 +10,40 @@ package io.quarkiverse.flags.openfeature;
 public interface OpenFeatureFlags {
 
     /**
-     * Registers a boolean flag with default value {@code false}.
+     * Registers a boolean flag.
      *
      * @param feature
-     * @return {@code true} if the flag was registered, {@code false} if it was already registered
-     */
-    default boolean register(String feature) {
-        return register(feature, FlagType.BOOLEAN, "false");
-    }
-
-    /**
-     * Registers a flag with the given type and default value.
-     *
-     * @param feature
-     * @param type
      * @param defaultValue the default value returned by OpenFeature if the flag cannot be resolved
      * @return {@code true} if the flag was registered, {@code false} if it was already registered
      */
-    boolean register(String feature, FlagType type, String defaultValue);
+    boolean register(String feature, boolean defaultValue);
+
+    /**
+     * Registers a string flag.
+     *
+     * @param feature
+     * @param defaultValue the default value returned by OpenFeature if the flag cannot be resolved
+     * @return {@code true} if the flag was registered, {@code false} if it was already registered
+     */
+    boolean register(String feature, String defaultValue);
+
+    /**
+     * Registers an integer flag.
+     *
+     * @param feature
+     * @param defaultValue the default value returned by OpenFeature if the flag cannot be resolved
+     * @return {@code true} if the flag was registered, {@code false} if it was already registered
+     */
+    boolean register(String feature, int defaultValue);
+
+    /**
+     * Registers a double flag.
+     *
+     * @param feature
+     * @param defaultValue the default value returned by OpenFeature if the flag cannot be resolved
+     * @return {@code true} if the flag was registered, {@code false} if it was already registered
+     */
+    boolean register(String feature, double defaultValue);
 
     /**
      * Unregisters a flag.
@@ -42,24 +58,5 @@ public interface OpenFeatureFlags {
      * @return {@code true} if the flag is registered
      */
     boolean isRegistered(String feature);
-
-    enum FlagType {
-
-        BOOLEAN,
-        STRING,
-        INT,
-        DOUBLE;
-
-        static FlagType fromString(String type) {
-            return switch (type) {
-                case "boolean" -> BOOLEAN;
-                case "string" -> STRING;
-                case "int" -> INT;
-                case "double" -> DOUBLE;
-                default -> throw new IllegalArgumentException(
-                        "Unsupported flag type: " + type + "; supported values: boolean, string, int, double");
-            };
-        }
-    }
 
 }
