@@ -63,8 +63,11 @@ quarkus.flags.openfeature.greeting.default-value=Hello
 
 quarkus.flags.openfeature.max-retries.type=int
 quarkus.flags.openfeature.max-retries.default-value=3
+
+quarkus.flags.openfeature.ratio.type=double
+quarkus.flags.openfeature.ratio.default-value=0.0
 ```
-<1> The type determines which OpenFeature evaluation method is used. Supported values: `boolean` (default), `string`, `int`.
+<1> The type determines which OpenFeature evaluation method is used. Supported values: `boolean` (default), `string`, `int`, `double`.
 <2> The default value is returned by OpenFeature if the flag cannot be resolved by the backend provider.
 
 ==== Programmatic Registration
@@ -119,6 +122,9 @@ String greeting = flags.getString("greeting");
 
 // Integer flag
 int retries = flags.getInt("max-retries");
+
+// Double flag (returned as BigDecimal)
+BigDecimal ratio = flags.getDecimal("ratio");
 ```
 
 === Provider Ordering

@@ -1,5 +1,6 @@
 package io.quarkiverse.flags.openfeature;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,18 +16,18 @@ import jakarta.inject.Singleton;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
-
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.ImmutableContext;
 import dev.openfeature.sdk.OpenFeatureAPI;
 import dev.openfeature.sdk.Value;
+import io.quarkiverse.flags.BigDecimalValue;
 import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.IntValue;
 import io.quarkiverse.flags.StringValue;
+import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.spi.AbstractFlagProvider;
 import io.quarkiverse.flags.spi.ComponentOrder;
@@ -139,6 +140,12 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
                 FlagEvaluationDetails<Integer> details = client.getIntegerDetails(feature, defaultVal, evalCtx);
                 logIfError(feature, details);
                 yield new IntValue(details.getValue());
+            }
+            case DOUBLE -> {
+                double defaultVal = Double.parseDouble(registration.defaultValue());
+                FlagEvaluationDetails<Double> details = client.getDoubleDetails(feature, defaultVal, evalCtx);
+                logIfError(feature, details);
+                yield new BigDecimalValue(BigDecimal.valueOf(details.getValue()));
             }
         };
     }

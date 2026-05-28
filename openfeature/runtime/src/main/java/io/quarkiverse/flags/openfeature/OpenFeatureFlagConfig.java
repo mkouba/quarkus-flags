@@ -10,7 +10,8 @@ public interface OpenFeatureFlagConfig {
     /**
      * The type of the flag value.
      * <p>
-     * Determines which OpenFeature evaluation method is used. Supported values: {@code boolean}, {@code string}, {@code int}.
+     * Determines which OpenFeature evaluation method is used. Supported values: {@code boolean}, {@code string}, {@code int},
+     * {@code double}.
      */
     @WithDefault("boolean")
     String type();

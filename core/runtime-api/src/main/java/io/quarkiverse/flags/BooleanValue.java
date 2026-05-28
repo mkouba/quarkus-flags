@@ -1,5 +1,7 @@
 package io.quarkiverse.flags;
 
+import java.math.BigDecimal;
+
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
 
@@ -38,6 +40,11 @@ public final class BooleanValue implements Flag.Value {
     @Override
     public int asInt() {
         return value ? 1 : 0;
+    }
+
+    @Override
+    public BigDecimal asDecimal() {
+        return value ? BigDecimal.ONE : BigDecimal.ZERO;
     }
 
 }

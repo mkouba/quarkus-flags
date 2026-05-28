@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import jakarta.inject.Inject;
@@ -49,6 +50,11 @@ public class OpenFeatureFlagProviderTest {
                     .variant("off", false)
                     .defaultVariant("on")
                     .build(),
+            "double-flag", Flag.<Double> builder()
+                    .variant("pi", 3.14)
+                    .variant("e", 2.72)
+                    .defaultVariant("pi")
+                    .build(),
             "dynamic-str", Flag.<String> builder()
                     .variant("a", "Alpha")
                     .variant("b", "Bravo")
@@ -66,6 +72,8 @@ public class OpenFeatureFlagProviderTest {
             .overrideRuntimeConfigKey("quarkus.flags.openfeature.int-flag.default-value", "0")
             .overrideRuntimeConfigKey("quarkus.flags.openfeature.disabled-flag.type", "boolean")
             .overrideRuntimeConfigKey("quarkus.flags.openfeature.disabled-flag.default-value", "true")
+            .overrideRuntimeConfigKey("quarkus.flags.openfeature.double-flag.type", "double")
+            .overrideRuntimeConfigKey("quarkus.flags.openfeature.double-flag.default-value", "0.0")
             .overrideRuntimeConfigKey("quarkus.flags.openfeature.missing-flag.type", "boolean")
             .overrideRuntimeConfigKey("quarkus.flags.openfeature.missing-flag.default-value", "true");
 
@@ -98,6 +106,11 @@ public class OpenFeatureFlagProviderTest {
     @Test
     public void testIntFlag() {
         assertEquals(100, flags.getInt("int-flag"));
+    }
+
+    @Test
+    public void testDoubleFlag() {
+        assertEquals(BigDecimal.valueOf(3.14), flags.getDecimal("double-flag"));
     }
 
     @Test

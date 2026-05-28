@@ -47,15 +47,17 @@ public interface OpenFeatureFlags {
 
         BOOLEAN,
         STRING,
-        INT;
+        INT,
+        DOUBLE;
 
         static FlagType fromString(String type) {
             return switch (type) {
                 case "boolean" -> BOOLEAN;
                 case "string" -> STRING;
                 case "int" -> INT;
+                case "double" -> DOUBLE;
                 default -> throw new IllegalArgumentException(
-                        "Unsupported flag type: " + type + "; supported values: boolean, string, int");
+                        "Unsupported flag type: " + type + "; supported values: boolean, string, int, double");
             };
         }
     }

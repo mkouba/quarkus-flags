@@ -1,8 +1,10 @@
 package io.quarkiverse.flags.spi;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.quarkiverse.flags.BigDecimalValue;
 import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.Builder;
@@ -50,6 +52,12 @@ public class FlagBuilderImpl implements Flag.Builder {
     @Override
     public Builder setInt(int value) {
         this.value = new IntValue(value);
+        return this;
+    }
+
+    @Override
+    public Builder setDecimal(BigDecimal value) {
+        this.value = new BigDecimalValue(value);
         return this;
     }
 
