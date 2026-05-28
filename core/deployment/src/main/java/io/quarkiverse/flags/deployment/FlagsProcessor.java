@@ -17,6 +17,7 @@ import org.jboss.jandex.DotName;
 
 import io.quarkiverse.flags.CompositeFlagEvaluator;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
+import io.quarkiverse.flags.VariantFlagEvaluator;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.runtime.impl.FlagContext;
 import io.quarkiverse.flags.runtime.impl.FlagManagerImpl;
@@ -50,7 +51,8 @@ public class FlagsProcessor {
     void beans(BuildProducer<AdditionalBeanBuildItem> beans) {
         beans.produce(AdditionalBeanBuildItem.builder()
                 .addBeanClasses(FlagManagerImpl.class, ConfigFlagProvider.class,
-                        InMemoryFlagProviderImpl.class, TimeSpanFlagEvaluator.class, CompositeFlagEvaluator.class)
+                        InMemoryFlagProviderImpl.class, TimeSpanFlagEvaluator.class, CompositeFlagEvaluator.class,
+                        VariantFlagEvaluator.class)
                 .build());
     }
 
