@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.test.QuarkusUnitTest;
@@ -56,7 +55,7 @@ public class FlagProviderProducerTest {
         @Produces
         @Singleton
         @Identifier("producer")
-        @ComponentOrder(before = InMemoryFlagProviderImpl.ID)
+        @ComponentOrder(before = InMemoryFlagProvider.ID)
         FlagProvider createProvider() {
             return new FlagProvider() {
                 @Override

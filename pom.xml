@@ -19,10 +19,12 @@
         <module>security</module>
         <module>qute</module>
         <module>cron</module>
+        <module>openfeature</module>
     </modules>
     <properties>
         <quarkus.version>3.33.2</quarkus.version>
         <sundrio.version>0.300.0</sundrio.version>
+        <openfeature-sdk.version>1.20.2</openfeature-sdk.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -32,6 +34,11 @@
                 <version>${quarkus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>dev.openfeature</groupId>
+                <artifactId>sdk</artifactId>
+                <version>${openfeature-sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

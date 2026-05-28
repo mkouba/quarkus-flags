@@ -1,5 +1,6 @@
 package io.quarkiverse.flags;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -170,6 +171,13 @@ public interface Flag {
          * @return the data or {@code null}
          */
         <T> T get(String key);
+
+        /**
+         * @return an unmodifiable map of all context entries
+         */
+        default Map<String, Object> asMap() {
+            return Collections.emptyMap();
+        }
 
         interface Builder {
 
