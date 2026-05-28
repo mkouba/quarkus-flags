@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 
@@ -17,10 +18,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import dev.openfeature.sdk.OpenFeatureAPI;
 import dev.openfeature.sdk.providers.memory.Flag;
 import dev.openfeature.sdk.providers.memory.InMemoryProvider;
+import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.openfeature.OpenFeatureFlags;
 import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
 import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.vertx.VertxContextSupport;
 
 public class OpenFeatureFlagProviderTest {
 
@@ -163,6 +166,18 @@ public class OpenFeatureFlagProviderTest {
         assertEquals("Alpha", flags.getString("dynamic-str"));
 
         openFeatureFlags.unregister("dynamic-str");
+    }
+
+    @Test
+    public void testEvalOffloadedFromEventLoop() throws Throwable {
+        // Verify that flag evaluation works when called from a Vert.x event loop
+        // thread,
+        // i.e. the blocking OpenFeature call is offloaded to a worker thread
+        Value value = VertxContextSupport
+                .subscribeAndAwait(() -> flags.find("bool-flag")
+                        .map(Optional::orElseThrow)
+                        .chain(f -> f.compute()));
+        assertTrue(value.asBoolean());
     }
 
     @Test
