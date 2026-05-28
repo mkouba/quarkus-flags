@@ -18,12 +18,10 @@ import io.quarkiverse.flags.spi.FlagManager;
 import io.smallrye.common.annotation.Identifier;
 import io.smallrye.mutiny.Uni;
 
-@Identifier(InMemoryFlagProviderImpl.ID)
+@Identifier(InMemoryFlagProvider.ID)
 @ComponentOrder(before = ConfigFlagProvider.ID)
 @Singleton
 public class InMemoryFlagProviderImpl extends AbstractFlagProvider implements InMemoryFlagProvider {
-
-    public static final String ID = "in-memory";
 
     private final ConcurrentMap<String, Flag> flags = new ConcurrentHashMap<>();
 

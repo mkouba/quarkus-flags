@@ -14,10 +14,10 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
 import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateOrmFlagProvider;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
-import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
@@ -65,7 +65,7 @@ public class FlagHibernateOrmProcessor {
                 cc.addAnnotation(Identifier.Literal.of(flagDefinition.getEntityName()));
                 cc.addAnnotation(ComponentOrder.class, ac -> {
                     ac.addArray("before", new String[] { ConfigFlagProvider.ID });
-                    ac.addArray("after", new String[] { InMemoryFlagProviderImpl.ID });
+                    ac.addArray("after", new String[] { InMemoryFlagProvider.ID });
                 });
                 cc.extends_(AbstractHibernateOrmFlagProvider.class);
 

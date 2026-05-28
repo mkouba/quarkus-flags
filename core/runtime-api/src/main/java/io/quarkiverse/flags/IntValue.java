@@ -1,5 +1,7 @@
 package io.quarkiverse.flags;
 
+import java.math.BigDecimal;
+
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
 
@@ -31,6 +33,11 @@ public final class IntValue implements Flag.Value {
     @Override
     public int asInt() {
         return value;
+    }
+
+    @Override
+    public BigDecimal asDecimal() {
+        return BigDecimal.valueOf(value);
     }
 
 }

@@ -1,0 +1,155 @@
+== Quarkus Feature Flags - OpenFeature
+
+include::./includes/attributes.adoc[]
+
+https://openfeature.dev[OpenFeature] is a vendor-neutral, community-driven standard for feature flagging.
+This extension integrates OpenFeature as a backend for Quarkus Feature Flags.
+Applications use the familiar quarkus-flags API (`@Feature`, `Flags`) while flag values are resolved via the OpenFeature Java SDK, which can be backed by any OpenFeature-compatible provider (LaunchDarkly, Flagsmith, CloudBees, Split, etc.).
+
+=== Dependency
+
+Add the `io.quarkiverse.flags:quarkus-flags-openfeature` extension to your build file.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags-openfeature</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+
+You also need to add a concrete OpenFeature provider dependency to your project (e.g. LaunchDarkly, Flagsmith, etc.).
+The https://github.com/open-feature/java-sdk[OpenFeature Java SDK] is already included as a transitive dependency.
+
+=== Setting up the OpenFeature Provider
+
+The concrete OpenFeature provider must be registered with the `OpenFeatureAPI` before flags can be evaluated.
+This is typically done at application startup:
+
+```java
+import dev.openfeature.sdk.OpenFeatureAPI;
+import jakarta.enterprise.event.Startup;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class OpenFeatureSetup {
+
+    @Startup
+    void onStart() {
+        // Register a concrete provider, e.g. LaunchDarkly, Flagsmith, etc.
+        OpenFeatureAPI.getInstance().setProviderAndWait(myProvider);
+    }
+}
+```
+
+=== Registering Flags
+
+OpenFeature does not provide a way to discover available flags.
+Therefore, flags must be registered with the `OpenFeatureFlags` registry before they can be evaluated.
+There are two ways to register flags.
+
+==== Configuration-based Registration
+
+Flags can be declared in `application.properties`.
+These flags are registered automatically at startup:
+
+```properties
+quarkus.flags.openfeature.dark-mode.type=boolean <1>
+quarkus.flags.openfeature.dark-mode.default-value=false <2>
+
+quarkus.flags.openfeature.greeting.type=string
+quarkus.flags.openfeature.greeting.default-value=Hello
+
+quarkus.flags.openfeature.max-retries.type=int
+quarkus.flags.openfeature.max-retries.default-value=3
+
+quarkus.flags.openfeature.ratio.type=double
+quarkus.flags.openfeature.ratio.default-value=0.0
+```
+<1> The type determines which OpenFeature evaluation method is used. Supported values: `boolean` (default), `string`, `int`, `double`.
+<2> The default value is returned by OpenFeature if the flag cannot be resolved by the backend provider.
+
+==== Programmatic Registration
+
+Additional flags can be registered at runtime via the `OpenFeatureFlags` CDI bean:
+
+```java
+import io.quarkiverse.flags.openfeature.OpenFeatureFlags;
+import io.quarkiverse.flags.openfeature.OpenFeatureFlags.FlagType;
+import jakarta.inject.Inject;
+
+@Inject
+OpenFeatureFlags openFeatureFlags;
+
+// Register a boolean flag (default: false)
+openFeatureFlags.register("new-feature");
+
+// Register a typed flag
+openFeatureFlags.register("welcome-message", FlagType.STRING, "Hello");
+
+// Unregister a flag
+openFeatureFlags.unregister("old-feature");
+
+// Check if a flag is registered
+openFeatureFlags.isRegistered("new-feature"); // true
+```
+
+=== Using Flags
+
+Once registered, flags are resolved through the standard quarkus-flags API:
+
+```java
+import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.Feature;
+import jakarta.inject.Inject;
+
+@Inject
+@Feature("dark-mode")
+Flag darkMode;
+
+@Inject
+Flags flags;
+
+// Boolean flag
+if (darkMode.isEnabled()) {
+    // ...
+}
+
+// String flag
+String greeting = flags.getString("greeting");
+
+// Integer flag
+int retries = flags.getInt("max-retries");
+
+// Double flag (returned as BigDecimal)
+BigDecimal ratio = flags.getDecimal("ratio");
+```
+
+=== Provider Ordering
+
+The OpenFeature flag provider is ordered _after_ the `in-memory` provider and _before_ the `config` provider.
+This means:
+
+1. In-memory flags (highest priority) - useful for testing overrides
+2. **OpenFeature flags**
+3. Config-based flags (lowest priority)
+
+=== Evaluation Context
+
+The quarkus-flags `ComputationContext` is forwarded to the OpenFeature `EvaluationContext`.
+The `targetingKey` entry is mapped to the OpenFeature targeting key; all other entries are mapped to context attributes:
+
+```java
+Flag.ComputationContext ctx = Flag.ComputationContext.builder()
+        .put("targetingKey", "user-123")
+        .put("email", "user@example.com")
+        .build();
+flag.compute(ctx);
+```
+
+=== Error Handling
+
+The OpenFeature SDK never throws exceptions during flag evaluation.
+If an error occurs (flag not found in the backend, provider not ready, type mismatch, etc.), the configured default value is returned and a warning is logged.

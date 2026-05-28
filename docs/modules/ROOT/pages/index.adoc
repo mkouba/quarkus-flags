@@ -172,6 +172,55 @@ quarkus.flags.runtime."my-feature-alpha".meta.roles-allowed=admin <4>
 <4> The current user must have the role `admin`.
 
 
+=== Variant flag evaluator
+
+The core extension provides `io.quarkiverse.flags.VariantFlagEvaluator` that selects a value from a set of named variants based on the `ComputationContext`.
+
+Variants are defined in the flag metadata with the `variant-` key prefix.
+The `variant-key` metadata specifies which context key is used to select a variant.
+The `default-variant` metadata specifies the fallback variant when the context key is absent or does not match any variant.
+
+.A feature flag with variants
+[source,properties]
+----
+quarkus.flags.runtime.checkout.value=Buy Now
+quarkus.flags.runtime.checkout.meta.evaluator=quarkus.variant <1>
+quarkus.flags.runtime.checkout.meta.variant-key=group <2>
+quarkus.flags.runtime.checkout.meta.default-variant=control <3>
+quarkus.flags.runtime.checkout.meta.variant-control=Buy Now <4>
+quarkus.flags.runtime.checkout.meta.variant-treatment=Add to Cart
+quarkus.flags.runtime.checkout.meta.variant-holiday=Gift This!
+----
+<1> The `VariantFlagEvaluator` is used to compute the current value of the feature flag.
+<2> The value of `variant-key` specifies the context key used to select a variant. In this case, `ctx.get("group")` is used.
+<3> The `default-variant` is used when the context key is absent or does not match any defined variant.
+<4> Each `variant-<name>` metadata entry defines a named variant with its value.
+
+[source,java]
+----
+Flag checkout = flags.findAndAwait("checkout").orElseThrow();
+
+// No context - returns the default variant "control" -> "Buy Now"
+checkout.getString();
+
+// Context selects the "treatment" variant -> "Add to Cart"
+checkout.computeAndAwait(ComputationContext.of("group", "treatment")).asString();
+----
+
+The `VariantFlagEvaluator` can be combined with other evaluators using the `CompositeFlagEvaluator`.
+For example, variants can be selected first and then further processed by another evaluator:
+
+[source,properties]
+----
+quarkus.flags.runtime.greeting.value=hello
+quarkus.flags.runtime.greeting.meta.evaluator=quarkus.composite
+quarkus.flags.runtime.greeting.meta.sub-evaluators=quarkus.variant, my-custom-evaluator
+quarkus.flags.runtime.greeting.meta.variant-key=locale
+quarkus.flags.runtime.greeting.meta.default-variant=en
+quarkus.flags.runtime.greeting.meta.variant-en=Hello
+quarkus.flags.runtime.greeting.meta.variant-es=Hola
+----
+
 == Caching
 
 Some flag providers may involve long running operations.

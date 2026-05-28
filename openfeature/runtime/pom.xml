@@ -3,24 +3,41 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
-        <artifactId>quarkus-flags-core-parent</artifactId>
+        <artifactId>quarkus-flags-openfeature-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-flags-api</artifactId>
-    <name>Quarkus Feature Flags - Core - Runtime API</name>
+    <artifactId>quarkus-flags-openfeature</artifactId>
+    <name>Quarkus Feature Flags - OpenFeature - Runtime</name>
     <dependencies>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc</artifactId>
+            <groupId>io.quarkiverse.flags</groupId>
+            <artifactId>quarkus-flags</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
+            <groupId>dev.openfeature</groupId>
+            <artifactId>sdk</artifactId>
         </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-extension-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>extension-descriptor</goal>
+                        </goals>
+                        <configuration>
+                            <deployment>
+                                ${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>

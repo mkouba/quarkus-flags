@@ -18,7 +18,7 @@ import io.smallrye.mutiny.Uni;
 @Singleton
 public class ConfigFlagProvider extends AbstractFlagProvider {
 
-    public static final String ID = "config";
+    public static final String ID = "quarkus.config";
 
     private final List<Flag> buildConfigFlags;
 

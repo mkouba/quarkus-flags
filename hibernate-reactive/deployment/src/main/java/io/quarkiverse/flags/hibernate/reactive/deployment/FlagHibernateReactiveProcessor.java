@@ -11,11 +11,11 @@ import org.jboss.jandex.gizmo2.Jandex2Gizmo;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem;
 import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
 import io.quarkiverse.flags.hibernate.reactive.runtime.AbstractHibernateReactiveFlagProvider;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
-import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
@@ -67,7 +67,7 @@ public class FlagHibernateReactiveProcessor {
                 cc.addAnnotation(Identifier.Literal.of(entityName));
                 cc.addAnnotation(ComponentOrder.class, ac -> {
                     ac.addArray("before", new String[] { ConfigFlagProvider.ID });
-                    ac.addArray("after", new String[] { InMemoryFlagProviderImpl.ID });
+                    ac.addArray("after", new String[] { InMemoryFlagProvider.ID });
                 });
                 cc.extends_(GenericType.ofClass(AbstractHibernateReactiveFlagProvider.class,
                         TypeArgument.of(Jandex2Gizmo.classDescOf(entityClass))));

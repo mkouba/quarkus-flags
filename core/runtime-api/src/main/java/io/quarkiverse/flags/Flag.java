@@ -1,5 +1,7 @@
 package io.quarkiverse.flags;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -124,6 +126,17 @@ public interface Flag {
     }
 
     /**
+     * Computes the current value and returns its decimal representation.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @return the computed decimal value
+     */
+    default BigDecimal getDecimal() {
+        return computeAndAwait().asDecimal();
+    }
+
+    /**
      * Represents the computed value of a feature flag.
      */
     interface Value {
@@ -148,6 +161,13 @@ public interface Flag {
          * @throws NoSuchElementException if the value cannot be represented as integer
          */
         int asInt();
+
+        /**
+         *
+         * @return the decimal value
+         * @throws NoSuchElementException if the value cannot be represented as decimal
+         */
+        BigDecimal asDecimal();
     }
 
     /**
@@ -170,6 +190,13 @@ public interface Flag {
          * @return the data or {@code null}
          */
         <T> T get(String key);
+
+        /**
+         * @return an unmodifiable map of all context entries
+         */
+        default Map<String, Object> asMap() {
+            return Collections.emptyMap();
+        }
 
         interface Builder {
 
@@ -206,6 +233,13 @@ public interface Flag {
          * @see Flag#compute()
          */
         Builder setInt(int value);
+
+        /**
+         * @param value
+         * @return self
+         * @see Flag#compute()
+         */
+        Builder setDecimal(BigDecimal value);
 
         /**
          * @param fun

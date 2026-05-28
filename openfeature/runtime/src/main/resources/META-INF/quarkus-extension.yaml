@@ -1,0 +1,10 @@
+name: Feature Flags - OpenFeature
+metadata:
+  keywords:
+    - flags
+    - toggles
+    - openfeature
+  #guide:
+  categories:
+    - "miscellaneous"
+  status: "preview"

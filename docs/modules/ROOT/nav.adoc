@@ -3,3 +3,4 @@
 * xref:security.adoc[Security]
 * xref:qute.adoc[Qute]
 * xref:cron.adoc[Cron]
+* xref:openfeature.adoc[OpenFeature]

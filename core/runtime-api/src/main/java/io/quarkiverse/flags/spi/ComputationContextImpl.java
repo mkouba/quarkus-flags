@@ -20,6 +20,11 @@ public class ComputationContextImpl implements Flag.ComputationContext {
         return (T) data.get(key);
     }
 
+    @Override
+    public Map<String, Object> asMap() {
+        return data;
+    }
+
     public static class BuilderImpl implements Flag.ComputationContext.Builder {
 
         private final Map<String, Object> data = new HashMap<>();

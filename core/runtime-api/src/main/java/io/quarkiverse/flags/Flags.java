@@ -1,5 +1,6 @@
 package io.quarkiverse.flags;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -83,5 +84,16 @@ public interface Flags {
      */
     default int getInt(String feature) {
         return findAndAwait(feature).orElseThrow().getInt();
+    }
+
+    /**
+     * Blocks the caller thread.
+     *
+     * @param feature
+     * @return the computed decimal value
+     * @throws NoSuchElementException If no such feature flag exists
+     */
+    default BigDecimal getDecimal(String feature) {
+        return findAndAwait(feature).orElseThrow().getDecimal();
     }
 }

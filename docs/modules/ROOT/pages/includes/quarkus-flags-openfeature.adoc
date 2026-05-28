@@ -1,0 +1,55 @@
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[.header-title]##Configuration property##
+h|Type
+h|Default
+
+a| [[quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-type]] [.property-path]##link:#quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-type[`+++quarkus.flags.openfeature."flag-name".type+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.openfeature."flag-name".type+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The type of the flag value.
+
+Determines which OpenFeature evaluation method is used. Supported values: `boolean`, `string`, `int`, `double`.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__TYPE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__TYPE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++boolean+++`
+
+a| [[quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-default-value]] [.property-path]##link:#quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-default-value[`+++quarkus.flags.openfeature."flag-name".default-value+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.openfeature."flag-name".default-value+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The default value returned by OpenFeature if the flag cannot be resolved.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__DEFAULT_VALUE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__DEFAULT_VALUE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++true+++`
+
+|===
+

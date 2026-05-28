@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagProvider;
 import io.quarkus.test.QuarkusUnitTest;
@@ -38,7 +37,7 @@ public class FlagProviderProducerTest {
 
     @Test
     public void testProducerProviderHasPriority() {
-        // The producer provider declares @ComponentOrder(before = "in-memory")
+        // The producer provider declares @ComponentOrder(before = "quarkus.in-memory")
         // so its flags should take precedence over in-memory flags
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false));
         // "alpha" is also provided by the producer provider with value true
@@ -56,7 +55,7 @@ public class FlagProviderProducerTest {
         @Produces
         @Singleton
         @Identifier("producer")
-        @ComponentOrder(before = InMemoryFlagProviderImpl.ID)
+        @ComponentOrder(before = InMemoryFlagProvider.ID)
         FlagProvider createProvider() {
             return new FlagProvider() {
                 @Override

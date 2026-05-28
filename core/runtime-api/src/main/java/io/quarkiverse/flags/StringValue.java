@@ -1,5 +1,6 @@
 package io.quarkiverse.flags;
 
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -35,6 +36,15 @@ public final class StringValue implements Flag.Value {
     public int asInt() {
         try {
             return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    @Override
+    public BigDecimal asDecimal() {
+        try {
+            return new BigDecimal(value);
         } catch (NumberFormatException e) {
             throw new NoSuchElementException();
         }
