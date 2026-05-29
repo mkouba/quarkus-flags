@@ -14,6 +14,7 @@ More specifically, it provides:
 * xref:security.adoc[*Security module*], so that it's possible to evaluate flags based on the current `SecurityIdentity`.
 * xref:qute.adoc[*Qute module*], so that it's possible to use the flags directly in templates.
 * xref:cron.adoc[*Cron module*] with a flag evaluator that matches a specific CRON expression.
+* xref:openfeature.adoc[*OpenFeature module*], an integration with the https://openfeature.dev[OpenFeature] standard.
 
 == What is a feature flag?
 
@@ -21,7 +22,7 @@ A feature flag makes it possible to turn on/off or configure a specific function
 It's also referred to as toggles or switches.
 In this extension, a feature flag is represented by the `io.quarkiverse.flags.Flag` interface.
 It refers to a specific feature with `Flag#feature()` and provides several convenient methods to compute the _current value_.
-The value of a feature flag can be represented as boolean, string or integer.
+The value of a feature flag can be represented as boolean, string, integer or decimal.
 A flag can also define metadata with `Flag#metadata()`.
 Metadata enable further configuration which can be leveraged in <<spi,SPI>>.
 
@@ -47,13 +48,13 @@ public class MyService {
     
     void serviceCall1() {
         if (flags.isEnabled("my-feature-alpha")) { <3>
-            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true 
+            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true
         }
     }
-    
+
     void serviceCall2() {
         if (alpha.isEnabled()) { <4>
-            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true 
+            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true
         }
     }
 }
@@ -62,6 +63,45 @@ public class MyService {
 <2> You can also inject a `Flag` for the given feature. The injected flag is never `null` but subsequent computations can throw `NoSuchElementException` if no such feature flag exists.
 <3> `Flags#isEnabled(String)` is a shortcut for `findAndAwait(feature).orElseThrow().isEnabled()`.
 <4> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
+
+=== Other value types
+
+The value of a feature flag can also be retrieved as a string, integer or decimal.
+
+[source,java]
+----
+String name = flags.getString("my-feature-alpha"); <1>
+int count = flags.getInt("my-feature-alpha"); <2>
+BigDecimal ratio = flags.getDecimal("my-feature-alpha"); <3>
+----
+<1> `Flags#getString(String)` is a shortcut for `findAndAwait(feature).orElseThrow().getString()`.
+<2> `Flags#getInt(String)` is a shortcut for `findAndAwait(feature).orElseThrow().getInt()`.
+<3> `Flags#getDecimal(String)` is a shortcut for `findAndAwait(feature).orElseThrow().getDecimal()`.
+
+The equivalent methods are also available on the `Flag` interface:
+
+[source,java]
+----
+String name = alpha.getString();
+int count = alpha.getInt();
+BigDecimal ratio = alpha.getDecimal();
+----
+
+=== Non-blocking computation
+
+The convenience methods shown above block the caller thread.
+If you need to compute the value without blocking, use `Flag#compute()` which returns a `Uni<Flag.Value>`.
+
+[source,java]
+----
+alpha.compute()
+    .subscribe().with(value -> {
+        boolean enabled = value.asBoolean();
+        String str = value.asString();
+        int num = value.asInt();
+        BigDecimal dec = value.asDecimal();
+    });
+----
 
 TIP: If the `quarkus-flags-qute` module is present, you can access feature flags directly in templates, e.g. `{#if flag:enabled('my-feature-alpha')}...{/if}`
 
