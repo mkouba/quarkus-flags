@@ -1,4 +1,4 @@
-== Quarkus Feature Flags - Hibernate ORM
+= Quarkus Feature Flags - Hibernate ORM
 
 include::./includes/attributes.adoc[]
 
