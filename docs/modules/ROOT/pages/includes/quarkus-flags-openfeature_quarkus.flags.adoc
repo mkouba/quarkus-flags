@@ -28,7 +28,7 @@ Environment variable: `+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__TYPE+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
-|`+++boolean+++`
+|required icon:exclamation-circle[title=Configuration property is required]
 
 a| [[quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-default-value]] [.property-path]##link:#quarkus-flags-openfeature_quarkus-flags-openfeature-flag-name-default-value[`+++quarkus.flags.openfeature."flag-name".default-value+++`]##
 ifdef::add-copy-button-to-config-props[]
@@ -49,7 +49,7 @@ Environment variable: `+++QUARKUS_FLAGS_OPENFEATURE__FLAG_NAME__DEFAULT_VALUE+++
 endif::add-copy-button-to-env-var[]
 --
 |string
-|`+++true+++`
+|required icon:exclamation-circle[title=Configuration property is required]
 
 |===
 

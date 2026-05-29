@@ -67,8 +67,10 @@ quarkus.flags.openfeature.max-retries.default-value=3
 quarkus.flags.openfeature.ratio.type=double
 quarkus.flags.openfeature.ratio.default-value=0.0
 ```
-<1> The type determines which OpenFeature evaluation method is used. Supported values: `boolean` (default), `string`, `int`, `double`.
+<1> The type determines which OpenFeature evaluation method is used. Supported values: `boolean`, `string`, `int`, `double`.
 <2> The default value is returned by OpenFeature if the flag cannot be resolved by the backend provider.
+
+NOTE: Both `type` and `default-value` are required for each flag. The application will fail to start if either is missing.
 
 ==== Programmatic Registration
 

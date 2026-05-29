@@ -6,7 +6,6 @@ import io.quarkus.runtime.annotations.ConfigDocMapKey;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
-import io.smallrye.config.WithDefaults;
 import io.smallrye.config.WithParentName;
 
 @ConfigMapping(prefix = "quarkus.flags.openfeature")
@@ -18,7 +17,6 @@ public interface OpenFeatureConfig {
      */
     @ConfigDocMapKey("flag-name")
     @WithParentName
-    @WithDefaults
     Map<String, OpenFeatureFlagConfig> flags();
 
 }
