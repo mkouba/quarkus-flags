@@ -13,12 +13,18 @@ import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
 /**
- * A feature flag.
+ * A feature flag refers to a specific feature and provides several convenient methods to compute the current {@link Value}.
+ * <p>
+ * Use {@link Flags} as the central entry point for accessing feature flags.
+ * Use {@link #builder(String)} to create a new flag programmatically.
+ *
+ * @see Flags
+ * @see Builder
  */
 public interface Flag {
 
     /**
-     * @param feature (not {@code null})
+     * @param feature the unique feature name; must not be {@code null} or blank
      * @return a new flag builder
      */
     static Builder builder(String feature) {
@@ -28,19 +34,22 @@ public interface Flag {
     /**
      * There can be only one flag for a given feature at a given time.
      *
-     * @return the name of the feature (not {@code null})
+     * @return the name of the feature, never {@code null}
      */
     String feature();
 
     /**
      * The origin should identify the provider of the flag.
      *
-     * @return the description of the source (not {@code null})
+     * @return the description of the source, never {@code null}
      */
     String origin();
 
     /**
-     * @return the metadata
+     * Some keys have special meaning, e.g. {@value io.quarkiverse.flags.spi.FlagEvaluator#META_KEY} references
+     * a {@link io.quarkiverse.flags.spi.FlagEvaluator}.
+     *
+     * @return the metadata, never {@code null}
      */
     default Map<String, String> metadata() {
         return Map.of();
@@ -49,20 +58,22 @@ public interface Flag {
     /**
      * Computes the current value of the feature flag.
      * <p>
-     * Does not block the caller thread.
+     * Does not block the caller thread. If the flag references a {@link io.quarkiverse.flags.spi.FlagEvaluator} in its
+     * metadata, the evaluator is used to compute the value.
      *
-     * @param context (not {@code null})
+     * @param context the computation context, must not be {@code null}
      * @return the computed value
      */
     @CheckReturnValue
     Uni<Value> compute(ComputationContext context);
 
     /**
-     * Computes the current value of the feature flag.
+     * Computes the current value of the feature flag with an empty {@link ComputationContext}.
      * <p>
      * Does not block the caller thread.
      *
      * @return the computed value
+     * @see #compute(ComputationContext)
      */
     @CheckReturnValue
     default Uni<Value> compute() {
@@ -70,11 +81,12 @@ public interface Flag {
     }
 
     /**
-     * Computes the current value of the feature flag.
+     * Computes the current value of the feature flag with an empty {@link ComputationContext}.
      * <p>
      * Blocks the caller thread.
      *
      * @return the computed value
+     * @see #computeAndAwait(ComputationContext)
      */
     default Value computeAndAwait() {
         return computeAndAwait(ComputationContext.EMPTY);
@@ -93,9 +105,9 @@ public interface Flag {
     }
 
     /**
-     * Computes the current value and returns its boolean representation.
+     * Computes the current value with an empty {@link ComputationContext} and returns its boolean representation.
      * <p>
-     * Blocks the caller thread.
+     * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
      *
      * @return the computed boolean value
      */
@@ -104,9 +116,9 @@ public interface Flag {
     }
 
     /**
-     * Computes the current value and returns its string representation.
+     * Computes the current value with an empty {@link ComputationContext} and returns its string representation.
      * <p>
-     * Blocks the caller thread.
+     * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
      *
      * @return the computed string value
      */
@@ -115,9 +127,9 @@ public interface Flag {
     }
 
     /**
-     * Computes the current value and returns its integer representation.
+     * Computes the current value with an empty {@link ComputationContext} and returns its integer representation.
      * <p>
-     * Blocks the caller thread.
+     * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
      *
      * @return the computed integer value
      */
@@ -126,9 +138,9 @@ public interface Flag {
     }
 
     /**
-     * Computes the current value and returns its decimal representation.
+     * Computes the current value with an empty {@link ComputationContext} and returns its decimal representation.
      * <p>
-     * Blocks the caller thread.
+     * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
      *
      * @return the computed decimal value
      */
@@ -137,7 +149,13 @@ public interface Flag {
     }
 
     /**
-     * Represents the computed value of a feature flag.
+     * An immutable computed value of a feature flag. Provides conversion methods to obtain the value as boolean, string,
+     * integer or decimal. A conversion may throw {@link NoSuchElementException} if the underlying type cannot be converted.
+     *
+     * @see BooleanValue
+     * @see StringValue
+     * @see IntValue
+     * @see BigDecimalValue
      */
     interface Value {
 
@@ -210,10 +228,17 @@ public interface Flag {
 
     /**
      * A convenient flag builder.
+     * <p>
+     * The value setters ({@link #setEnabled(boolean)}, {@link #setString(String)}, {@link #setInt(int)},
+     * {@link #setDecimal(BigDecimal)}) are mutually exclusive — the last one called wins. Alternatively, use
+     * {@link #setCompute(Function)} or {@link #setComputeAsync(Function)} to provide a dynamic evaluation function.
+     * If neither a value nor a computing function is set, {@link BooleanValue#TRUE} is used as the default.
      */
     interface Builder {
 
         /**
+         * Sets a fixed boolean value.
+         *
          * @param value
          * @return self
          * @see Flag#compute()
@@ -221,6 +246,8 @@ public interface Flag {
         Builder setEnabled(boolean value);
 
         /**
+         * Sets a fixed string value.
+         *
          * @param value
          * @return self
          * @see Flag#compute()
@@ -228,6 +255,8 @@ public interface Flag {
         Builder setString(String value);
 
         /**
+         * Sets a fixed integer value.
+         *
          * @param value
          * @return self
          * @see Flag#compute()
@@ -235,6 +264,8 @@ public interface Flag {
         Builder setInt(int value);
 
         /**
+         * Sets a fixed decimal value.
+         *
          * @param value
          * @return self
          * @see Flag#compute()
@@ -242,18 +273,24 @@ public interface Flag {
         Builder setDecimal(BigDecimal value);
 
         /**
+         * Sets a synchronous evaluation function that computes the value dynamically.
+         *
          * @param fun
          * @return self
          * @see Flag#compute()
+         * @see #setComputeAsync(Function)
          */
         default Builder setCompute(Function<ComputationContext, Value> fun) {
             return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
         }
 
         /**
+         * Sets an asynchronous evaluation function that computes the value dynamically.
+         *
          * @param fun
          * @return self
          * @see Flag#compute()
+         * @see #setCompute(Function)
          */
         Builder setComputeAsync(Function<ComputationContext, Uni<Value>> fun);
 
@@ -288,6 +325,7 @@ public interface Flag {
          * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.
          *
          * @return a new flag
+         * @throws IllegalStateException if the origin is not set
          */
         Flag build();
 
