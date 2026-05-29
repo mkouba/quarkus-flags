@@ -1,4 +1,4 @@
-== Quarkus Feature Flags - Cron
+= Quarkus Feature Flags - Cron
 
 include::./includes/attributes.adoc[]
 

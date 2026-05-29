@@ -1,4 +1,4 @@
-== Quarkus Feature Flags - Qute
+= Quarkus Feature Flags - Qute
 
 include::./includes/attributes.adoc[]
 
