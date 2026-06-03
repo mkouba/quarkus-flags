@@ -207,7 +207,7 @@ public interface Flag {
          * @param key
          * @return the data or {@code null}
          */
-        <T> T get(String key);
+        Object get(String key);
 
         /**
          * @return an unmodifiable map of all context entries

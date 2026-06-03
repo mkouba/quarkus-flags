@@ -14,10 +14,9 @@ public class ComputationContextImpl implements Flag.ComputationContext {
         this.data = data;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T get(String key) {
-        return (T) data.get(key);
+    public Object get(String key) {
+        return data.get(key);
     }
 
     @Override
