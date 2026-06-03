@@ -24,7 +24,12 @@ public final class StringValue implements Flag.Value {
 
     @Override
     public boolean asBoolean() {
-        return Boolean.parseBoolean(value);
+        if (value.equalsIgnoreCase("true") || value.equals("1")) {
+            return true;
+        } else if (value.equalsIgnoreCase("false") || value.equals("0")) {
+            return false;
+        }
+        throw new NoSuchElementException();
     }
 
     @Override

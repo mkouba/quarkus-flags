@@ -45,15 +45,22 @@ public class ImmutableValuesTest {
         Value foo = new StringValue("foo");
         assertThrows(NoSuchElementException.class, () -> foo.asInt());
         assertEquals("foo", foo.asString());
-        assertFalse(foo.asBoolean());
+        assertThrows(NoSuchElementException.class, () -> foo.asBoolean());
         Value yes = new StringValue("true");
         assertThrows(NoSuchElementException.class, () -> yes.asInt());
         assertEquals("true", yes.asString());
         assertTrue(yes.asBoolean());
+        assertTrue(new StringValue("TRUE").asBoolean());
+        assertTrue(new StringValue("True").asBoolean());
+        assertTrue(new StringValue("1").asBoolean());
+        Value no = new StringValue("false");
+        assertFalse(no.asBoolean());
+        assertFalse(new StringValue("FALSE").asBoolean());
+        assertFalse(new StringValue("0").asBoolean());
         Value number = new StringValue("42");
         assertEquals(42, number.asInt());
         assertEquals("42", number.asString());
-        assertFalse(number.asBoolean());
+        assertThrows(NoSuchElementException.class, () -> number.asBoolean());
     }
 
 }
