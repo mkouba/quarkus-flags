@@ -69,7 +69,7 @@ public class InMemoryFlagsTest {
         assertFalse(flags.isEnabled("charlie"));
 
         Flag.Value deltaValue = flags.findAndAwait("delta").orElseThrow().computeAndAwait();
-        assertFalse(deltaValue.asBoolean());
+        assertThrows(NoSuchElementException.class, () -> deltaValue.asBoolean());
         assertEquals("no", deltaValue.asString());
         assertThrows(NoSuchElementException.class, () -> deltaValue.asInt());
 

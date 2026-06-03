@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.spi;
 
 import java.util.Map;
+import java.util.Objects;
 
 import io.quarkiverse.flags.Flag;
 import io.smallrye.mutiny.Uni;
@@ -12,7 +13,7 @@ public class InitializedEvaluatedFlag extends AbstractEvaluatedFlag {
     public InitializedEvaluatedFlag(String feature, String origin, Map<String, String> metadata, Flag.Value initialValue,
             FlagEvaluator evaluator) {
         super(feature, origin, metadata, evaluator);
-        this.initialValue = initialValue;
+        this.initialValue = Objects.requireNonNull(initialValue);
     }
 
     @Override

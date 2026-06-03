@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.spi;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import io.smallrye.mutiny.Uni;
@@ -12,7 +13,7 @@ public class ComputedFlag extends AbstractFlag {
     public ComputedFlag(String feature, String origin, Map<String, String> metadata,
             Function<ComputationContext, Uni<Value>> fun) {
         super(feature, origin, metadata);
-        this.fun = fun;
+        this.fun = Objects.requireNonNull(fun);
     }
 
     @Override
