@@ -7,13 +7,13 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import io.quarkiverse.flags.hibernate.common.FlagDefinition;
-import io.quarkiverse.flags.hibernate.common.FlagFeature;
-import io.quarkiverse.flags.hibernate.common.FlagMetadata;
-import io.quarkiverse.flags.hibernate.common.FlagValue;
+import io.quarkiverse.flags.hibernate.FlagFeature;
+import io.quarkiverse.flags.hibernate.FlagMetadata;
+import io.quarkiverse.flags.hibernate.FlagSource;
+import io.quarkiverse.flags.hibernate.FlagValue;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-@FlagDefinition
+@FlagSource
 @Entity
 @Table(name = "db_flag")
 public class DbFlag extends PanacheEntity {

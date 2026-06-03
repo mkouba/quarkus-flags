@@ -1,22 +1,22 @@
-= Quarkus Feature Flags - Hibernate ORM
+= Quarkus Feature Flags - Hibernate Reactive
 
 include::./includes/attributes.adoc[]
 
-The extension provides integration with Hibernate ORM.
+The extension provides integration with Hibernate Reactive.
 It attempts to discover all entities annotated with `@io.quarkiverse.flags.hibernate.FlagSource` and generates a `FlagProvider` automatically.
 
-If you want to use the Hibernate ORM integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-hibernate-orm` extension to your build file first.
+If you want to use the Hibernate Reactive integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-hibernate-reactive` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
 ```xml
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
-    <artifactId>quarkus-flags-hibernate-orm</artifactId>
+    <artifactId>quarkus-flags-hibernate-reactive</artifactId>
     <version>{project-version}</version>
 </dependency>
 ```
 
-TIP: We recommend to use the `quarkus-hibernate-orm-panache` extension as well to simplify your entities.
+TIP: We recommend to use the `quarkus-hibernate-reactive-panache` extension as well to simplify your entities.
 
 Then you can map an entity that represents a feature flag.
 
@@ -32,11 +32,11 @@ import io.quarkiverse.flags.hibernate.FlagSource;
 import io.quarkiverse.flags.hibernate.FlagFeature;
 import io.quarkiverse.flags.hibernate.FlagMetadata;
 import io.quarkiverse.flags.hibernate.FlagValue;
-import io.quarkus.hibernate.orm.panache.PanacheEntity; 
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 
 @FlagSource <1>
 @Entity
-public class MyFlag extends PanacheEntity {
+public class MyReactiveFlag extends PanacheEntity {
 
     @FlagFeature <2>
     public String feature;
@@ -61,4 +61,4 @@ A `FlagProvider` is generated automatically.
 [[extension-configuration-reference]]
 == Extension configuration reference
 
-include::includes/quarkus-flags-hibernate-orm.adoc[leveloffset=+1, opts=optional]
+include::includes/quarkus-flags-hibernate-reactive.adoc[leveloffset=+1, opts=optional]
