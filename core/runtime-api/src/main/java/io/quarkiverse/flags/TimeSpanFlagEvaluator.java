@@ -2,6 +2,7 @@ package io.quarkiverse.flags;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import jakarta.inject.Singleton;
 
@@ -35,19 +36,26 @@ public class TimeSpanFlagEvaluator implements FlagEvaluator {
             String startTime = flag.metadata().get(START_TIME);
             String endTime = flag.metadata().get(END_TIME);
             ZonedDateTime now = ZonedDateTime.now();
-            ZonedDateTime start = startTime != null ? parse(startTime) : now.minusSeconds(1);
-            ZonedDateTime end = endTime != null ? parse(endTime) : now.plusSeconds(1);
-            if (now.isAfter(start) && now.isBefore(end)) {
-                initialValue = BooleanValue.TRUE;
-            } else {
-                initialValue = BooleanValue.FALSE;
+            ZonedDateTime start = startTime != null ? parse(START_TIME, startTime) : null;
+            ZonedDateTime end = endTime != null ? parse(END_TIME, endTime) : null;
+            if (start != null && end != null && !start.isBefore(end)) {
+                throw new IllegalStateException(
+                        START_TIME + " [" + startTime + "] must be before " + END_TIME + " [" + endTime + "]");
             }
+            boolean afterStart = start == null || now.isAfter(start);
+            boolean beforeEnd = end == null || now.isBefore(end);
+            initialValue = BooleanValue.from(afterStart && beforeEnd);
         }
         return Uni.createFrom().item(initialValue);
     }
 
-    private ZonedDateTime parse(String value) {
-        return ZonedDateTime.parse(value, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+    private ZonedDateTime parse(String key, String value) {
+        try {
+            return ZonedDateTime.parse(value, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            throw new IllegalStateException(
+                    "Invalid " + key + " value [" + value + "]; expected ISO_ZONED_DATE_TIME format", e);
+        }
     }
 
 }
