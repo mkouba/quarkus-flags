@@ -6,6 +6,9 @@ import java.util.function.Function;
 
 import io.smallrye.mutiny.Uni;
 
+/**
+ * A flag whose initial value is computed dynamically and then transformed by a {@link FlagEvaluator}.
+ */
 public class ComputedEvaluatedFlag extends AbstractEvaluatedFlag {
 
     private final Function<ComputationContext, Uni<Value>> fun;

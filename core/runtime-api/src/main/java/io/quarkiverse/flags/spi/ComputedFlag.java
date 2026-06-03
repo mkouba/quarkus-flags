@@ -6,6 +6,9 @@ import java.util.function.Function;
 
 import io.smallrye.mutiny.Uni;
 
+/**
+ * A flag whose value is computed dynamically by the provided function.
+ */
 public class ComputedFlag extends AbstractFlag {
 
     private final Function<ComputationContext, Uni<Value>> fun;

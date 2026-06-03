@@ -5,6 +5,9 @@ import java.util.Objects;
 
 import io.smallrye.mutiny.Uni;
 
+/**
+ * Base class for flags that use a {@link FlagEvaluator} to transform the initial value.
+ */
 public abstract class AbstractEvaluatedFlag extends AbstractFlag {
 
     protected final FlagEvaluator evaluator;

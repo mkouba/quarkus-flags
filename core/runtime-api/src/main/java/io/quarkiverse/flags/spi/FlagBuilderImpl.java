@@ -16,6 +16,9 @@ import io.quarkus.arc.Arc;
 import io.quarkus.arc.ArcContainer;
 import io.smallrye.mutiny.Uni;
 
+/**
+ * Default {@link Flag.Builder} implementation. Not thread-safe — instances must not be shared across threads.
+ */
 public class FlagBuilderImpl implements Flag.Builder {
 
     private final String feature;

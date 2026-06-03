@@ -24,7 +24,8 @@ public interface FlagEvaluator {
     static String META_KEY = "evaluator";
 
     /**
-     * The initial flag value does not have to be used during evaluation.
+     * The initial flag value does not have to be used during evaluation. Exceptions are propagated through the
+     * {@link Uni} pipeline.
      *
      * @param flag
      * @param initialValue

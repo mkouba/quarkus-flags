@@ -6,6 +6,9 @@ import java.util.Map;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 
+/**
+ * Immutable {@link Flag.ComputationContext} implementation. Use {@link BuilderImpl} to construct instances.
+ */
 public class ComputationContextImpl implements Flag.ComputationContext {
 
     private final Map<String, Object> data;

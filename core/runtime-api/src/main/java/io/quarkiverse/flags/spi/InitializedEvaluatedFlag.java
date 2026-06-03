@@ -6,6 +6,9 @@ import java.util.Objects;
 import io.quarkiverse.flags.Flag;
 import io.smallrye.mutiny.Uni;
 
+/**
+ * A flag with a fixed initial value that is transformed by a {@link FlagEvaluator}.
+ */
 public class InitializedEvaluatedFlag extends AbstractEvaluatedFlag {
 
     private final Flag.Value initialValue;
