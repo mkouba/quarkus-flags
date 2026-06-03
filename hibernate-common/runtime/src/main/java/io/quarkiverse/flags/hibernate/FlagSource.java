@@ -1,4 +1,4 @@
-package io.quarkiverse.flags.hibernate.common;
+package io.quarkiverse.flags.hibernate;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -19,6 +19,6 @@ import io.quarkiverse.flags.Flag;
 @Retention(RUNTIME)
 @Target(TYPE)
 @Documented
-public @interface FlagDefinition {
+public @interface FlagSource {
 
 }

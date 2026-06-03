@@ -35,7 +35,7 @@ public class FlagEntityTest {
 
     @TestTransaction
     @Test
-    public void testFlagDefinition() {
+    public void testFlagSource() {
         assertEquals(0, flags.findAllAndAwait().size());
 
         MyFlag alpha = new MyFlag();

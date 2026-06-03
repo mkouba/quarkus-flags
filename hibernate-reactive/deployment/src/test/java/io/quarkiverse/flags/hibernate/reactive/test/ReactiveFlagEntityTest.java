@@ -38,7 +38,7 @@ public class ReactiveFlagEntityTest {
     Flags flags;
 
     @Test
-    public void testFlagDefinition() throws Throwable {
+    public void testFlagSource() throws Throwable {
         assertEquals(0, flags.findAllAndAwait().size());
 
         MyReactiveFlag alpha = new MyReactiveFlag();

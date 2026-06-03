@@ -15,7 +15,7 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
+import io.quarkiverse.flags.hibernate.orm.deployment.FlagSourceBuildItem.Property;
 import io.quarkiverse.flags.hibernate.orm.runtime.AbstractHibernateOrmFlagProvider;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.spi.ComponentOrder;
@@ -45,9 +45,9 @@ public class FlagHibernateOrmProcessor {
 
     @BuildStep
     void generateFlagProvider(FlagHibernateOrmBuildTimeConfig config, List<PersistenceUnitDescriptorBuildItem> descriptors,
-            List<FlagDefinitionBuildItem> flagDefinitions, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
-        if (flagDefinitions.isEmpty()) {
-            LOG.debugf("No @FlagDefinition found - no JPA FlagProvider will be generated");
+            List<FlagSourceBuildItem> flagSources, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
+        if (flagSources.isEmpty()) {
+            LOG.debugf("No @FlagSource found - no JPA FlagProvider will be generated");
             return;
         }
         if (descriptors.stream().noneMatch(pud -> pud.getPersistenceUnitName().equals(config.persistenceUnitName()))) {
@@ -56,13 +56,13 @@ public class FlagHibernateOrmProcessor {
         ClassOutput classOutput = new GeneratedBeanGizmo2Adaptor(generatedBeans);
         Gizmo gizmo = Gizmo.create(classOutput);
 
-        for (FlagDefinitionBuildItem flagDefinition : flagDefinitions) {
-            ClassInfo entityClass = flagDefinition.getEntityClass();
+        for (FlagSourceBuildItem flagSource : flagSources) {
+            ClassInfo entityClass = flagSource.getEntityClass();
             String className = entityClass.name() + "_HibernateOrmFlagProvider";
             gizmo.class_(className, cc -> {
                 This this_ = cc.this_();
                 cc.addAnnotation(Singleton.class);
-                cc.addAnnotation(Identifier.Literal.of(flagDefinition.getEntityName()));
+                cc.addAnnotation(Identifier.Literal.of(flagSource.getEntityName()));
                 cc.addAnnotation(ComponentOrder.class, ac -> {
                     ac.addArray("before", new String[] { ConfigFlagProvider.ID });
                     ac.addArray("after", new String[] { InMemoryFlagProvider.ID });
@@ -109,7 +109,7 @@ public class FlagHibernateOrmProcessor {
                         Expr query = bc.invokeInterface(
                                 MethodDesc.of(EntityManager.class, "createQuery", Query.class, String.class),
                                 this_.field(emField),
-                                Const.of("from " + flagDefinition.getEntityName()));
+                                Const.of("from " + flagSource.getEntityName()));
                         LocalVar flags = bc.localVar("flags",
                                 bc.invokeInterface(MethodDesc.of(Query.class, "getResultList", List.class),
                                         query));
@@ -119,10 +119,10 @@ public class FlagHibernateOrmProcessor {
                         //    ret.add(this.createFlag(myFlag.feature, myFlag.metadata, myFlag.value));
                         // }
                         bc.forEach(flags, (ibc, item) -> {
-                            Expr feature = flagDefinition.getFeature().read(item, ibc);
-                            Expr value = flagDefinition.getValue().read(item, ibc);
+                            Expr feature = flagSource.getFeature().read(item, ibc);
+                            Expr value = flagSource.getValue().read(item, ibc);
                             Expr metadata;
-                            Property metadataProperty = flagDefinition.getMetadata();
+                            Property metadataProperty = flagSource.getMetadata();
                             if (metadataProperty != null) {
                                 metadata = metadataProperty.read(item, ibc);
                             } else {
@@ -151,11 +151,11 @@ public class FlagHibernateOrmProcessor {
                         LocalVar query = bc.localVar("query", bc.invokeInterface(
                                 MethodDesc.of(EntityManager.class, "createQuery", Query.class, String.class),
                                 this_.field(emField),
-                                Const.of("from " + flagDefinition.getEntityName() + " where "
-                                        + flagDefinition.getFeature().name() + " = :feature")));
+                                Const.of("from " + flagSource.getEntityName() + " where "
+                                        + flagSource.getFeature().name() + " = :feature")));
                         // query.setParameter("feature", "foo");
                         bc.invokeInterface(MethodDesc.of(Query.class, "setParameter", Query.class, String.class, Object.class),
-                                query, Const.of(flagDefinition.getFeature().name()), featureParam);
+                                query, Const.of(flagSource.getFeature().name()), featureParam);
                         // List<MyFlag> resultList = query.getResultList();
                         LocalVar resultList = bc.localVar("resultList",
                                 bc.invokeInterface(MethodDesc.of(Query.class, "getResultList", List.class),
@@ -166,10 +166,10 @@ public class FlagHibernateOrmProcessor {
                                 this_, resultList, featureParam));
                         LocalVar ret = bc.localVar("ret", Const.ofNull(Flag.class));
                         bc.if_(bc.isNotNull(entity), entityNotNull -> {
-                            Expr feature = flagDefinition.getFeature().read(entity, entityNotNull);
-                            Expr value = flagDefinition.getValue().read(entity, entityNotNull);
+                            Expr feature = flagSource.getFeature().read(entity, entityNotNull);
+                            Expr value = flagSource.getValue().read(entity, entityNotNull);
                             Expr metadata;
-                            Property metadataProperty = flagDefinition.getMetadata();
+                            Property metadataProperty = flagSource.getMetadata();
                             if (metadataProperty != null) {
                                 metadata = metadataProperty.read(entity, entityNotNull);
                             } else {

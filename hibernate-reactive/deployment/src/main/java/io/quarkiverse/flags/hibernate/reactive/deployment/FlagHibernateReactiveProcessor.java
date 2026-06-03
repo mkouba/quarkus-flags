@@ -12,8 +12,8 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.InMemoryFlagProvider;
-import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem;
-import io.quarkiverse.flags.hibernate.orm.deployment.FlagDefinitionBuildItem.Property;
+import io.quarkiverse.flags.hibernate.orm.deployment.FlagSourceBuildItem;
+import io.quarkiverse.flags.hibernate.orm.deployment.FlagSourceBuildItem.Property;
 import io.quarkiverse.flags.hibernate.reactive.runtime.AbstractHibernateReactiveFlagProvider;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.spi.ComponentOrder;
@@ -45,9 +45,9 @@ public class FlagHibernateReactiveProcessor {
     @BuildStep
     void generateFlagProvider(FlagHibernateReactiveBuildTimeConfig config,
             List<PersistenceUnitDescriptorBuildItem> descriptors,
-            List<FlagDefinitionBuildItem> flagDefinitions, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
-        if (flagDefinitions.isEmpty()) {
-            LOG.debugf("No @FlagDefinition found - no Hibernate Reactive FlagProvider will be generated");
+            List<FlagSourceBuildItem> flagSources, BuildProducer<GeneratedBeanBuildItem> generatedBeans) {
+        if (flagSources.isEmpty()) {
+            LOG.debugf("No @FlagSource found - no Hibernate Reactive FlagProvider will be generated");
             return;
         }
         if (descriptors.stream().noneMatch(pud -> pud.getPersistenceUnitName().equals(config.persistenceUnitName()))) {
@@ -56,10 +56,10 @@ public class FlagHibernateReactiveProcessor {
         ClassOutput classOutput = new GeneratedBeanGizmo2Adaptor(generatedBeans);
         Gizmo gizmo = Gizmo.create(classOutput);
 
-        for (FlagDefinitionBuildItem flagDefinition : flagDefinitions) {
-            ClassInfo entityClass = flagDefinition.getEntityClass();
+        for (FlagSourceBuildItem flagSource : flagSources) {
+            ClassInfo entityClass = flagSource.getEntityClass();
             String className = entityClass.name() + "_HibernateReactiveFlagProvider";
-            String entityName = flagDefinition.getEntityName();
+            String entityName = flagSource.getEntityName();
 
             gizmo.class_(className, cc -> {
                 This this_ = cc.this_();
@@ -87,7 +87,7 @@ public class FlagHibernateReactiveProcessor {
                     ParamVar manager = constructor.parameter("fm", FlagManager.class);
                     ParamVar vertx = constructor.parameter("vertx", Vertx.class);
                     constructor.body(bc -> {
-                        Property metadataProperty = flagDefinition.getMetadata();
+                        Property metadataProperty = flagSource.getMetadata();
                         Expr metadataParam = metadataProperty != null
                                 ? Const.of(metadataProperty.name())
                                 : Const.ofNull(String.class);
@@ -97,7 +97,7 @@ public class FlagHibernateReactiveProcessor {
                                         String.class, String.class, Class.class, String.class),
                                 this_,
                                 manager, Const.of(className), vertx, sf,
-                                Const.of(flagDefinition.getFeature().name()), Const.of(flagDefinition.getEntityName()),
+                                Const.of(flagSource.getFeature().name()), Const.of(flagSource.getEntityName()),
                                 Const.of(Jandex2Gizmo.classDescOf(entityClass)), metadataParam);
                         bc.return_();
                     });
@@ -108,10 +108,10 @@ public class FlagHibernateReactiveProcessor {
                     mc.protected_();
                     ParamVar entityParam = mc.parameter("entity", Object.class);
                     mc.body(bc -> {
-                        Expr feature = flagDefinition.getFeature().read(entityParam, bc);
-                        Expr value = flagDefinition.getValue().read(entityParam, bc);
+                        Expr feature = flagSource.getFeature().read(entityParam, bc);
+                        Expr value = flagSource.getValue().read(entityParam, bc);
                         Expr metadata;
-                        Property metadataProperty = flagDefinition.getMetadata();
+                        Property metadataProperty = flagSource.getMetadata();
                         if (metadataProperty != null) {
                             metadata = metadataProperty.read(entityParam, bc);
                         } else {

@@ -1,5 +1,6 @@
 * xref:index.adoc[Reference Guide]
 * xref:hibernate-orm.adoc[Hibernate ORM]
+* xref:hibernate-reactive.adoc[Hibernate Reactive]
 * xref:security.adoc[Security]
 * xref:qute.adoc[Qute]
 * xref:cron.adoc[Cron]
