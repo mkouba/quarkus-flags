@@ -39,14 +39,14 @@ public class CompositeFlagEvaluator implements FlagEvaluator {
             String subEvaluators = flag.metadata().get(SUB_EVALUATORS);
             if (subEvaluators != null && !subEvaluators.isBlank()) {
                 String[] ids = subEvaluators.split(",");
-                if (ids.length != 0) {
-                    List<FlagEvaluator> all = new ArrayList<>(ids.length);
-                    for (String id : ids) {
-                        all.add(flagManager.getEvaluator(id.strip()).orElseThrow(
-                                () -> new IllegalStateException("Flag evaluator with id %s not found".formatted(id))));
-                    }
-                    return doEvaluate(flag, value, all.iterator(), computationContext);
+                List<FlagEvaluator> all = new ArrayList<>(ids.length);
+                for (String id : ids) {
+                    String strippedId = id.strip();
+                    all.add(flagManager.getEvaluator(strippedId).orElseThrow(
+                            () -> new IllegalStateException(
+                                    "Flag evaluator with id [%s] not found".formatted(strippedId))));
                 }
+                return doEvaluate(flag, value, all.iterator(), computationContext);
             }
         }
         return value;
