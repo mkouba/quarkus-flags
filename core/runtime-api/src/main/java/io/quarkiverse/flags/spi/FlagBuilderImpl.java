@@ -66,6 +66,9 @@ public class FlagBuilderImpl implements Flag.Builder {
 
     @Override
     public Builder setComputeAsync(Function<ComputationContext, Uni<Value>> fun) {
+        if (fun == null) {
+            throw new IllegalArgumentException("Compute function must not be null");
+        }
         this.fun = fun;
         return this;
     }

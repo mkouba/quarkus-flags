@@ -397,6 +397,9 @@ public interface Flag {
          * @see #setComputeAsync(Function)
          */
         default Builder setCompute(Function<ComputationContext, Value> fun) {
+            if (fun == null) {
+                throw new IllegalArgumentException("Compute function must not be null");
+            }
             return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
         }
 
