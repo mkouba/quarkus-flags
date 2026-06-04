@@ -2,6 +2,7 @@ package io.quarkiverse.flags.spi;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
@@ -33,6 +34,8 @@ public class ComputationContextImpl implements Flag.ComputationContext {
 
         @Override
         public Builder put(String key, Object value) {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(value, "value");
             data.put(key, value);
             return this;
         }

@@ -35,7 +35,7 @@ public class CompositeFlagEvaluator implements FlagEvaluator {
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
         Uni<Value> value = Uni.createFrom().item(initialValue);
-        if (initialValue.asBoolean()) {
+        if (initialValue.asBoolean(false)) {
             String subEvaluators = flag.metadata().get(SUB_EVALUATORS);
             if (subEvaluators != null && !subEvaluators.isBlank()) {
                 String[] ids = subEvaluators.split(",");

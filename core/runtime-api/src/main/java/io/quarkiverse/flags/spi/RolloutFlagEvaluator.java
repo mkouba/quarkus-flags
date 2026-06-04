@@ -21,7 +21,7 @@ public abstract class RolloutFlagEvaluator implements FlagEvaluator {
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-        if (initialValue.asBoolean()) {
+        if (initialValue.asBoolean(false)) {
             String rolloutPercentage = flag.metadata().get(ROLLOUT_PERCENTAGE);
             if (rolloutPercentage != null) {
                 int percentage;

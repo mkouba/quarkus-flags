@@ -58,7 +58,7 @@ public class CronFlagEvaluator implements FlagEvaluator {
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-        if (initialValue.asBoolean()) {
+        if (initialValue.asBoolean(false)) {
             String cronExpr = flag.metadata().get(CRON_EXPR);
             if (cronExpr == null || cronExpr.isBlank()) {
                 throw new IllegalStateException("Cron expression not set");

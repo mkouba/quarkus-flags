@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
+import io.quarkiverse.flags.StringValue;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
@@ -78,6 +79,14 @@ public class TimeSpanFlagEvaluatorTest {
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> flag.computeAndAwait());
         assertTrue(e.getMessage().contains("Invalid start-time"));
         assertTrue(e.getMessage().contains("not-a-date"));
+    }
+
+    @Test
+    public void testNonBooleanInitialValue() {
+        FlagEvaluator evaluator = flagManager.getEvaluator(TimeSpanFlagEvaluator.ID).orElseThrow();
+        Flag flag = new InitializedEvaluatedFlag("test", "test",
+                Map.of("evaluator", TimeSpanFlagEvaluator.ID), new StringValue("hello"), evaluator);
+        assertEquals("hello", flag.computeAndAwait().asString());
     }
 
     @Test
