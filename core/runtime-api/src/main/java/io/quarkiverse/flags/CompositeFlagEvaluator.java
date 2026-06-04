@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
@@ -20,6 +21,7 @@ import io.smallrye.mutiny.Uni;
  * comma-separated list of sub-evaluator identifiers.
  */
 @Identifier(CompositeFlagEvaluator.ID)
+@Singleton
 public class CompositeFlagEvaluator implements FlagEvaluator {
 
     public static final String ID = "quarkus.composite";
