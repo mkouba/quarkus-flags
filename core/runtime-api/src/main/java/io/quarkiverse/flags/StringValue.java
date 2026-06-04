@@ -29,7 +29,7 @@ public final class StringValue implements Flag.Value {
         } else if (value.equalsIgnoreCase("false") || value.equals("0")) {
             return false;
         }
-        throw new NoSuchElementException();
+        throw new NoSuchElementException("String value [" + value + "] cannot be converted to boolean");
     }
 
     @Override
@@ -42,7 +42,7 @@ public final class StringValue implements Flag.Value {
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("String value [" + value + "] cannot be converted to int", e);
         }
     }
 
@@ -51,7 +51,7 @@ public final class StringValue implements Flag.Value {
         try {
             return new BigDecimal(value);
         } catch (NumberFormatException e) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("String value [" + value + "] cannot be converted to decimal", e);
         }
     }
 

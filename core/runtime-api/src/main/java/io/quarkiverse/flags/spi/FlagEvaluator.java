@@ -27,9 +27,9 @@ public interface FlagEvaluator {
      * The initial flag value does not have to be used during evaluation. Exceptions are propagated through the
      * {@link Uni} pipeline.
      *
-     * @param flag
+     * @param flag must not be {@code null}
      * @param initialValue
-     * @param computationContext
+     * @param computationContext must not be {@code null}
      * @return the evaluated value
      */
     Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext);

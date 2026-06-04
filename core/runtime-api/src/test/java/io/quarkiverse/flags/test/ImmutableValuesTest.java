@@ -2,6 +2,7 @@ package io.quarkiverse.flags.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,9 +47,19 @@ public class ImmutableValuesTest {
     @Test
     public void testString() {
         Value foo = new StringValue("foo");
-        assertThrows(NoSuchElementException.class, () -> foo.asInt());
         assertEquals("foo", foo.asString());
-        assertThrows(NoSuchElementException.class, () -> foo.asBoolean());
+
+        NoSuchElementException intEx = assertThrows(NoSuchElementException.class, () -> foo.asInt());
+        assertTrue(intEx.getMessage().contains("foo"));
+        assertInstanceOf(NumberFormatException.class, intEx.getCause());
+
+        NoSuchElementException boolEx = assertThrows(NoSuchElementException.class, () -> foo.asBoolean());
+        assertTrue(boolEx.getMessage().contains("foo"));
+
+        NoSuchElementException decEx = assertThrows(NoSuchElementException.class, () -> foo.asDecimal());
+        assertTrue(decEx.getMessage().contains("foo"));
+        assertInstanceOf(NumberFormatException.class, decEx.getCause());
+
         Value yes = new StringValue("true");
         assertThrows(NoSuchElementException.class, () -> yes.asInt());
         assertEquals("true", yes.asString());
