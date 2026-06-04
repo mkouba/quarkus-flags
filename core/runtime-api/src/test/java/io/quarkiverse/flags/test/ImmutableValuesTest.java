@@ -2,6 +2,7 @@ package io.quarkiverse.flags.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,14 +42,27 @@ public class ImmutableValuesTest {
         assertEquals(1, one.asInt());
         assertEquals("1", one.asString());
         assertTrue(one.asBoolean());
+        Value fortyTwo = new IntValue(42);
+        NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> fortyTwo.asBoolean());
+        assertTrue(e.getMessage().contains("42"));
     }
 
     @Test
     public void testString() {
         Value foo = new StringValue("foo");
-        assertThrows(NoSuchElementException.class, () -> foo.asInt());
         assertEquals("foo", foo.asString());
-        assertThrows(NoSuchElementException.class, () -> foo.asBoolean());
+
+        NoSuchElementException intEx = assertThrows(NoSuchElementException.class, () -> foo.asInt());
+        assertTrue(intEx.getMessage().contains("foo"));
+        assertInstanceOf(NumberFormatException.class, intEx.getCause());
+
+        NoSuchElementException boolEx = assertThrows(NoSuchElementException.class, () -> foo.asBoolean());
+        assertTrue(boolEx.getMessage().contains("foo"));
+
+        NoSuchElementException decEx = assertThrows(NoSuchElementException.class, () -> foo.asDecimal());
+        assertTrue(decEx.getMessage().contains("foo"));
+        assertInstanceOf(NumberFormatException.class, decEx.getCause());
+
         Value yes = new StringValue("true");
         assertThrows(NoSuchElementException.class, () -> yes.asInt());
         assertEquals("true", yes.asString());
@@ -71,9 +85,13 @@ public class ImmutableValuesTest {
         Value ten = new BigDecimalValue(BigDecimal.TEN);
         assertEquals(10, ten.asInt());
         assertEquals("10", ten.asString());
-        assertFalse(ten.asBoolean());
+        NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> ten.asBoolean());
+        assertTrue(e.getMessage().contains("10"));
         Value one = new BigDecimalValue(BigDecimal.ONE);
         assertTrue(one.asBoolean());
+        Value zero = new BigDecimalValue(BigDecimal.ZERO);
+        assertFalse(zero.asBoolean());
+        assertTrue(new BigDecimalValue(new BigDecimal("1.0")).asBoolean());
     }
 
     @Test

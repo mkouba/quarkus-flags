@@ -46,7 +46,7 @@ public class VariantFlagEvaluator implements FlagEvaluator {
         Map<String, String> metadata = flag.metadata();
         String variantKey = metadata.get(VARIANT_KEY);
         String selectedVariant = null;
-        if (variantKey != null && computationContext != null) {
+        if (variantKey != null) {
             Object contextValue = computationContext.get(variantKey);
             if (contextValue != null) {
                 selectedVariant = contextValue.toString();

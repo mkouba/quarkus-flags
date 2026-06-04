@@ -1,6 +1,7 @@
 package io.quarkiverse.flags;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 
 import io.quarkiverse.flags.Flag.Value;
 import io.smallrye.mutiny.Uni;
@@ -22,7 +23,12 @@ public final class IntValue implements Flag.Value {
 
     @Override
     public boolean asBoolean() {
-        return value == 1;
+        if (value == 1) {
+            return true;
+        } else if (value == 0) {
+            return false;
+        }
+        throw new NoSuchElementException("Int value [" + value + "] cannot be converted to boolean");
     }
 
     @Override

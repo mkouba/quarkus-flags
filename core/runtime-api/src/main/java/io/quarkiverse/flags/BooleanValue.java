@@ -48,6 +48,22 @@ public final class BooleanValue implements Flag.Value {
     }
 
     @Override
+    public int hashCode() {
+        return Boolean.hashCode(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof BooleanValue other) {
+            return value == other.value;
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return Boolean.toString(value);
     }

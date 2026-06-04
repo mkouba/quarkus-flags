@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,6 +28,20 @@ public class ComputationContextTest {
         assertEquals(2, map.size());
         assertEquals("value1", map.get("key1"));
         assertEquals(42, map.get("key2"));
+    }
+
+    @Test
+    public void testPutNullKey() {
+        NullPointerException e = assertThrows(NullPointerException.class,
+                () -> ComputationContext.builder().put(null, "value"));
+        assertNotNull(e.getMessage());
+    }
+
+    @Test
+    public void testPutNullValue() {
+        NullPointerException e = assertThrows(NullPointerException.class,
+                () -> ComputationContext.builder().put("key", null));
+        assertNotNull(e.getMessage());
     }
 
     @Test
