@@ -6,6 +6,7 @@ import java.util.concurrent.CompletionStage;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkus.qute.CompletedStage;
 import io.quarkus.qute.EngineConfiguration;
@@ -35,6 +36,7 @@ public class FlagNamespaceResolver implements NamespaceResolver {
         // flag:disabled('delta-feature')
         // flag:string('delta-feature')
         // flag:int('delta-feature')
+        // flag:decimal('delta-feature')
         // flag:find('delta-feature')
         List<Expression> params = ctx.getParams();
         if (params.isEmpty()) {
@@ -48,14 +50,18 @@ public class FlagNamespaceResolver implements NamespaceResolver {
                             }
                             return switch (ctx.getName()) {
                                 case "bool", "enabled" -> cast(
-                                        flag.get().compute().map(v -> v.asBoolean()).subscribeAsCompletionStage());
+                                        flag.get().compute().map(Value::asBoolean).subscribeAsCompletionStage());
                                 case "disabled" -> cast(
                                         flag.get().compute().map(v -> !v.asBoolean()).subscribeAsCompletionStage());
-                                case "string" -> cast(flag.get().compute().map(v -> v.asString()).subscribeAsCompletionStage());
-                                case "int" -> cast(flag.get().compute().map(v -> v.asInt()).subscribeAsCompletionStage());
+                                case "string" -> cast(
+                                        flag.get().compute().map(Value::asString).subscribeAsCompletionStage());
+                                case "int" -> cast(
+                                        flag.get().compute().map(Value::asInt).subscribeAsCompletionStage());
+                                case "decimal" -> cast(
+                                        flag.get().compute().map(Value::asDecimal).subscribeAsCompletionStage());
                                 case "meta" -> CompletedStage.of(flag.get().metadata());
                                 case "find" -> CompletedStage.of(flag.get());
-                                default -> throw new IllegalArgumentException("Unexpected value: " + ctx.getName());
+                                default -> Results.notFound(ctx);
                             };
                         }));
     }
