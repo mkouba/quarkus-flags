@@ -2,6 +2,7 @@ package io.quarkiverse.flags.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,6 +11,7 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkiverse.flags.BigDecimalValue;
 import io.quarkiverse.flags.BooleanValue;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.IntValue;
@@ -62,6 +64,49 @@ public class ImmutableValuesTest {
         assertEquals(42, number.asInt());
         assertEquals("42", number.asString());
         assertThrows(NoSuchElementException.class, () -> number.asBoolean());
+    }
+
+    @Test
+    public void testBigDecimal() {
+        Value ten = new BigDecimalValue(BigDecimal.TEN);
+        assertEquals(10, ten.asInt());
+        assertEquals("10", ten.asString());
+        assertFalse(ten.asBoolean());
+        Value one = new BigDecimalValue(BigDecimal.ONE);
+        assertTrue(one.asBoolean());
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        // StringValue
+        assertEquals(new StringValue("foo"), new StringValue("foo"));
+        assertEquals(new StringValue("foo").hashCode(), new StringValue("foo").hashCode());
+        assertNotEquals(new StringValue("foo"), new StringValue("bar"));
+
+        // IntValue
+        assertEquals(new IntValue(42), new IntValue(42));
+        assertEquals(new IntValue(42).hashCode(), new IntValue(42).hashCode());
+        assertNotEquals(new IntValue(1), new IntValue(2));
+
+        // BigDecimalValue - compareTo-based equality
+        assertEquals(new BigDecimalValue(new BigDecimal("1.0")), new BigDecimalValue(new BigDecimal("1.00")));
+        assertNotEquals(new BigDecimalValue(BigDecimal.ONE), new BigDecimalValue(BigDecimal.TEN));
+
+        // BooleanValue singletons
+        assertEquals(BooleanValue.from(true), BooleanValue.from(true));
+        assertEquals(BooleanValue.from(false), BooleanValue.from(false));
+
+        // Cross-type
+        assertNotEquals(new IntValue(1), new StringValue("1"));
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("true", BooleanValue.from(true).toString());
+        assertEquals("false", BooleanValue.from(false).toString());
+        assertEquals("foo", new StringValue("foo").toString());
+        assertEquals("42", new IntValue(42).toString());
+        assertEquals("3.14", new BigDecimalValue(new BigDecimal("3.14")).toString());
     }
 
     @Test

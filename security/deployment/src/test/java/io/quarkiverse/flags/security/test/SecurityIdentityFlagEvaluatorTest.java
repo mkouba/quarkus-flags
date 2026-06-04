@@ -25,10 +25,17 @@ public class SecurityIdentityFlagEvaluatorTest {
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.evaluator", SecurityIdentityFlagEvaluator.ID)
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.authenticated", "true")
-            .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.roles-allowed", "foo,bar");
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.roles-allowed", "foo, bar")
+            // roles-allowed with spaces around roles
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.echo.value", "true")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.echo.meta.evaluator", SecurityIdentityFlagEvaluator.ID)
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.echo.meta.roles-allowed", " baz , qux ");
 
     @Feature("delta")
     Flag delta;
+
+    @Feature("echo")
+    Flag echo;
 
     @Inject
     CurrentIdentityAssociation identityAssociation;
@@ -53,6 +60,36 @@ public class SecurityIdentityFlagEvaluatorTest {
                 .addRole("qux")
                 .build());
         assertFalse(delta.isEnabled());
+
+        // "bar" with leading space in config - should still match after trimming
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal("Foo"))
+                .addRole("bar")
+                .build());
+        assertTrue(delta.isEnabled());
+    }
+
+    @ActivateRequestContext
+    @Test
+    public void testRolesWithWhitespace() {
+        // Roles in config: " baz , qux " - whitespace should be stripped
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal("Baz"))
+                .addRole("baz")
+                .build());
+        assertTrue(echo.isEnabled());
+
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal("Qux"))
+                .addRole("qux")
+                .build());
+        assertTrue(echo.isEnabled());
+
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal("Other"))
+                .addRole("other")
+                .build());
+        assertFalse(echo.isEnabled());
     }
 
 }

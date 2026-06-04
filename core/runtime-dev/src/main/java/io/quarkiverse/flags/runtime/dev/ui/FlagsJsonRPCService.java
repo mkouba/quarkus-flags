@@ -36,8 +36,11 @@ public class FlagsJsonRPCService {
             JsonObject flagJson = new JsonObject();
             flagJson.put("feature", flag.feature());
             flagJson.put("origin", flag.origin());
-            flagJson.put("metadata", flag.metadata().entrySet().stream()
-                    .map(e -> new JsonObject().put("key", e.getKey()).put("value", e.getValue())));
+            JsonArray metadataArray = new JsonArray();
+            for (Entry<String, String> e : flag.metadata().entrySet()) {
+                metadataArray.add(new JsonObject().put("key", e.getKey()).put("value", e.getValue()));
+            }
+            flagJson.put("metadata", metadataArray);
             data.add(flagJson);
         }
         return data;

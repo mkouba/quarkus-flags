@@ -40,4 +40,25 @@ public final class IntValue implements Flag.Value {
         return BigDecimal.valueOf(value);
     }
 
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof IntValue other) {
+            return value == other.value;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(value);
+    }
+
 }
