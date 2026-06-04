@@ -36,7 +36,7 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-        if (initialValue.asBoolean(false)) {
+        if (initialValue != null && initialValue.asBoolean(false)) {
             String authenticated = flag.metadata().get(AUTHENTICATED);
             if (authenticated != null
                     && Boolean.parseBoolean(authenticated)

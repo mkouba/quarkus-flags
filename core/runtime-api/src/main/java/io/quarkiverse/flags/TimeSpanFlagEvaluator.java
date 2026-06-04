@@ -32,7 +32,7 @@ public class TimeSpanFlagEvaluator implements FlagEvaluator {
 
     @Override
     public Uni<Value> evaluate(Flag flag, Value initialValue, ComputationContext computationContext) {
-        if (initialValue.asBoolean(false)) {
+        if (initialValue != null && initialValue.asBoolean(false)) {
             String startTime = flag.metadata().get(START_TIME);
             String endTime = flag.metadata().get(END_TIME);
             ZonedDateTime now = ZonedDateTime.now();
