@@ -40,6 +40,16 @@ public class FlagNamespaceResolverTest {
         // conversion error - "true" cannot be converted to int
         assertThrows(NoSuchElementException.class,
                 () -> Qute.fmt("{flag:int('alpha')}").render());
+        // default values - conversion fails, default returned
+        assertEquals("42", Qute.fmt("{flag:int('alpha', 42)}").render());
+        assertEquals("true", Qute.fmt("{flag:bool('charlie', true)}").render());
+        // default values - conversion succeeds, actual value returned
+        assertEquals("true", Qute.fmt("{flag:bool('alpha', false)}").render());
+        assertEquals("5", Qute.fmt("{flag:int('charlie', 99)}").render());
+        assertEquals("true", Qute.fmt("{flag:string('alpha', 'fallback')}").render());
+        // default values - non-existent flag, default returned
+        assertEquals("99", Qute.fmt("{flag:int('nonexistent', 99)}").render());
+        assertEquals("false", Qute.fmt("{flag:bool('nonexistent', false)}").render());
         String allFlags = Qute.fmt("""
                 {#for flag in flag:flags}{flag.feature}{#if flag_hasNext}:{/if}{/for}
                 """).render();

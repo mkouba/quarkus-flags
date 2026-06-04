@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,22 @@ public class ImmutableValuesTest {
         assertEquals(42, number.asInt());
         assertEquals("42", number.asString());
         assertThrows(NoSuchElementException.class, () -> number.asBoolean());
+    }
+
+    @Test
+    public void testDefaultValues() {
+        Value foo = new StringValue("foo");
+        // conversion fails, default returned
+        assertFalse(foo.asBoolean(false));
+        assertTrue(foo.asBoolean(true));
+        assertEquals(99, foo.asInt(99));
+        assertEquals(BigDecimal.TEN, foo.asDecimal(BigDecimal.TEN));
+        // conversion succeeds, actual value returned
+        assertEquals("foo", foo.asString("bar"));
+
+        Value one = new IntValue(1);
+        assertTrue(one.asBoolean(false));
+        assertEquals(1, one.asInt(99));
     }
 
 }

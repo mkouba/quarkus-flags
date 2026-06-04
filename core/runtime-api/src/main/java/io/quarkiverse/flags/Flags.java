@@ -65,6 +65,21 @@ public interface Flags {
     }
 
     /**
+     * Returns the computed boolean value, or the default if the flag is not found, computation fails, or the value cannot
+     * be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param feature
+     * @param defaultValue the value to return on failure
+     * @return the computed boolean value or the default
+     */
+    default boolean isEnabled(String feature, boolean defaultValue) {
+        Optional<Flag> flag = findAndAwait(feature);
+        return flag.isPresent() ? flag.get().isEnabled(defaultValue) : defaultValue;
+    }
+
+    /**
      * Blocks the caller thread.
      *
      * @param feature
@@ -73,6 +88,21 @@ public interface Flags {
      */
     default String getString(String feature) {
         return findAndAwait(feature).orElseThrow().getString();
+    }
+
+    /**
+     * Returns the computed string value, or the default if the flag is not found, computation fails, or the value cannot
+     * be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param feature
+     * @param defaultValue the value to return on failure
+     * @return the computed string value or the default
+     */
+    default String getString(String feature, String defaultValue) {
+        Optional<Flag> flag = findAndAwait(feature);
+        return flag.isPresent() ? flag.get().getString(defaultValue) : defaultValue;
     }
 
     /**
@@ -87,6 +117,21 @@ public interface Flags {
     }
 
     /**
+     * Returns the computed integer value, or the default if the flag is not found, computation fails, or the value cannot
+     * be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param feature
+     * @param defaultValue the value to return on failure
+     * @return the computed integer value or the default
+     */
+    default int getInt(String feature, int defaultValue) {
+        Optional<Flag> flag = findAndAwait(feature);
+        return flag.isPresent() ? flag.get().getInt(defaultValue) : defaultValue;
+    }
+
+    /**
      * Blocks the caller thread.
      *
      * @param feature
@@ -95,5 +140,20 @@ public interface Flags {
      */
     default BigDecimal getDecimal(String feature) {
         return findAndAwait(feature).orElseThrow().getDecimal();
+    }
+
+    /**
+     * Returns the computed decimal value, or the default if the flag is not found, computation fails, or the value cannot
+     * be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param feature
+     * @param defaultValue the value to return on failure
+     * @return the computed decimal value or the default
+     */
+    default BigDecimal getDecimal(String feature, BigDecimal defaultValue) {
+        Optional<Flag> flag = findAndAwait(feature);
+        return flag.isPresent() ? flag.get().getDecimal(defaultValue) : defaultValue;
     }
 }
