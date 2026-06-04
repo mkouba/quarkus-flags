@@ -117,7 +117,7 @@ public interface Flag {
 
     /**
      * Computes the current value with an empty {@link ComputationContext} and returns its boolean representation, or the
-     * default value if the computation fails or the value cannot be converted.
+     * default value if the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -145,7 +145,7 @@ public interface Flag {
 
     /**
      * Computes the current value with an empty {@link ComputationContext} and returns its string representation, or the
-     * default value if the computation fails or the value cannot be converted.
+     * default value if the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -173,7 +173,7 @@ public interface Flag {
 
     /**
      * Computes the current value with an empty {@link ComputationContext} and returns its integer representation, or the
-     * default value if the computation fails or the value cannot be converted.
+     * default value if the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -201,7 +201,7 @@ public interface Flag {
 
     /**
      * Computes the current value with an empty {@link ComputationContext} and returns its decimal representation, or the
-     * default value if the computation fails or the value cannot be converted.
+     * default value if the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
