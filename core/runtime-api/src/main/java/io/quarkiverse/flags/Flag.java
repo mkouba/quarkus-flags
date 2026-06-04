@@ -343,7 +343,7 @@ public interface Flag {
     }
 
     /**
-     * A convenient flag builder.
+     * A convenient flag builder. Not reusable — a builder instance must not be used after {@link #build()} is called.
      * <p>
      * The value setters ({@link #setEnabled(boolean)}, {@link #setString(String)}, {@link #setInt(int)},
      * {@link #setDecimal(BigDecimal)}) are mutually exclusive — the last one called wins. Alternatively, use
