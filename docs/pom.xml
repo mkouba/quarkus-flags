@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0.CR1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -118,4 +118,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>1.0.0.CR1</tag>
+  </scm>
 </project>
