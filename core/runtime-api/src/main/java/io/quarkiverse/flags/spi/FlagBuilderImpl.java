@@ -86,7 +86,7 @@ public class FlagBuilderImpl implements Flag.Builder {
     }
 
     @Override
-    public Builder setFeatureManager(FlagManager manager) {
+    public Builder setFlagManager(FlagManager manager) {
         this.manager = manager;
         return this;
     }

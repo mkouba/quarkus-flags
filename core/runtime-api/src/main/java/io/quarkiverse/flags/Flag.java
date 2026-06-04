@@ -435,7 +435,7 @@ public interface Flag {
          * @param manager
          * @return self
          */
-        Builder setFeatureManager(FlagManager manager);
+        Builder setFlagManager(FlagManager manager);
 
         /**
          * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.
