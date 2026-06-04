@@ -61,7 +61,7 @@ public interface Flags {
      * @throws NoSuchElementException If no such feature flag exists
      */
     default boolean isEnabled(String feature) {
-        return findAndAwait(feature).orElseThrow().isEnabled();
+        return findAndAwait(feature).orElseThrow(() -> featureNotFound(feature)).isEnabled();
     }
 
     /**
@@ -87,7 +87,7 @@ public interface Flags {
      * @throws NoSuchElementException If no such feature flag exists
      */
     default String getString(String feature) {
-        return findAndAwait(feature).orElseThrow().getString();
+        return findAndAwait(feature).orElseThrow(() -> featureNotFound(feature)).getString();
     }
 
     /**
@@ -113,7 +113,7 @@ public interface Flags {
      * @throws NoSuchElementException If no such feature flag exists
      */
     default int getInt(String feature) {
-        return findAndAwait(feature).orElseThrow().getInt();
+        return findAndAwait(feature).orElseThrow(() -> featureNotFound(feature)).getInt();
     }
 
     /**
@@ -139,7 +139,7 @@ public interface Flags {
      * @throws NoSuchElementException If no such feature flag exists
      */
     default BigDecimal getDecimal(String feature) {
-        return findAndAwait(feature).orElseThrow().getDecimal();
+        return findAndAwait(feature).orElseThrow(() -> featureNotFound(feature)).getDecimal();
     }
 
     /**
@@ -155,5 +155,9 @@ public interface Flags {
     default BigDecimal getDecimal(String feature, BigDecimal defaultValue) {
         Optional<Flag> flag = findAndAwait(feature);
         return flag.isPresent() ? flag.get().getDecimal(defaultValue) : defaultValue;
+    }
+
+    private static NoSuchElementException featureNotFound(String feature) {
+        return new NoSuchElementException("Feature flag not found: " + feature);
     }
 }
