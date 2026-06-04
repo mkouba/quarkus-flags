@@ -28,7 +28,7 @@ public interface FlagEvaluator {
      * {@link Uni} pipeline.
      *
      * @param flag must not be {@code null}
-     * @param initialValue
+     * @param initialValue may be {@code null}
      * @param computationContext must not be {@code null}
      * @return the evaluated value
      */

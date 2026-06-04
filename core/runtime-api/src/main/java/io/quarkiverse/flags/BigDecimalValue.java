@@ -39,7 +39,11 @@ public final class BigDecimalValue implements Flag.Value {
 
     @Override
     public int asInt() {
-        return value.intValue();
+        try {
+            return value.intValueExact();
+        } catch (ArithmeticException e) {
+            throw new NoSuchElementException("Decimal value [" + value + "] cannot be converted to int", e);
+        }
     }
 
     @Override
@@ -49,7 +53,7 @@ public final class BigDecimalValue implements Flag.Value {
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return value.stripTrailingZeros().hashCode();
     }
 
     @Override

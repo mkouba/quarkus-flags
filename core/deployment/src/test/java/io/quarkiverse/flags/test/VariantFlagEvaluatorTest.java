@@ -39,7 +39,13 @@ public class VariantFlagEvaluatorTest {
             .overrideRuntimeConfigKey("quarkus.flags.runtime.composite.meta.variant-key", "tier")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.composite.meta.default-variant", "free")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.composite.meta.variant-free", "Basic")
-            .overrideRuntimeConfigKey("quarkus.flags.runtime.composite.meta.variant-pro", "Premium");
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.composite.meta.variant-pro", "Premium")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.value", "3")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.meta.evaluator", VariantFlagEvaluator.ID)
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.meta.variant-key", "tier")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.meta.default-variant", "free")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.meta.variant-free", "3")
+            .overrideRuntimeConfigKey("quarkus.flags.runtime.max-retries.meta.variant-pro", "10");
 
     @Inject
     Flags flags;
@@ -83,6 +89,15 @@ public class VariantFlagEvaluatorTest {
         assertEquals("BASIC", flag.computeAndAwait().asString());
         assertEquals("PREMIUM",
                 flag.computeAndAwait(ComputationContext.of("tier", "pro")).asString());
+    }
+
+    @Test
+    public void testIntVariant() {
+        Flag flag = flags.findAndAwait("max-retries").orElseThrow();
+        // Variant values are always StringValue; use asInt() to convert
+        assertEquals(3, flag.computeAndAwait().asInt());
+        assertEquals(10,
+                flag.computeAndAwait(ComputationContext.of("tier", "pro")).asInt());
     }
 
     @Identifier("upper-case")

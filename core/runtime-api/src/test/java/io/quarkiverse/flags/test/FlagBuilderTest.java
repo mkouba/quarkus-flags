@@ -17,6 +17,8 @@ public class FlagBuilderTest {
         assertThrows(IllegalArgumentException.class, () -> Flag.builder(null));
         assertThrows(IllegalArgumentException.class, () -> Flag.builder(""));
         assertThrows(IllegalArgumentException.class, () -> Flag.builder("foo").setMetadata(null));
+        assertThrows(IllegalArgumentException.class, () -> Flag.builder("foo").setCompute(null));
+        assertThrows(IllegalArgumentException.class, () -> Flag.builder("foo").setComputeAsync(null));
         assertThrows(IllegalStateException.class,
                 () -> Flag.builder("foo").setEnabled(true).build(),
                 "Origin must be set");

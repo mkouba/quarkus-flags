@@ -92,6 +92,15 @@ public class ImmutableValuesTest {
         Value zero = new BigDecimalValue(BigDecimal.ZERO);
         assertFalse(zero.asBoolean());
         assertTrue(new BigDecimalValue(new BigDecimal("1.0")).asBoolean());
+
+        // asInt() rejects fractional and out-of-range values
+        NoSuchElementException fractionalEx = assertThrows(NoSuchElementException.class,
+                () -> new BigDecimalValue(new BigDecimal("1.5")).asInt());
+        assertTrue(fractionalEx.getMessage().contains("1.5"));
+        assertInstanceOf(ArithmeticException.class, fractionalEx.getCause());
+        NoSuchElementException overflowEx = assertThrows(NoSuchElementException.class,
+                () -> new BigDecimalValue(new BigDecimal("99999999999")).asInt());
+        assertTrue(overflowEx.getMessage().contains("99999999999"));
     }
 
     @Test
@@ -106,8 +115,10 @@ public class ImmutableValuesTest {
         assertEquals(new IntValue(42).hashCode(), new IntValue(42).hashCode());
         assertNotEquals(new IntValue(1), new IntValue(2));
 
-        // BigDecimalValue - compareTo-based equality
+        // BigDecimalValue - compareTo-based equality and consistent hashCode
         assertEquals(new BigDecimalValue(new BigDecimal("1.0")), new BigDecimalValue(new BigDecimal("1.00")));
+        assertEquals(new BigDecimalValue(new BigDecimal("1.0")).hashCode(),
+                new BigDecimalValue(new BigDecimal("1.00")).hashCode());
         assertNotEquals(new BigDecimalValue(BigDecimal.ONE), new BigDecimalValue(BigDecimal.TEN));
 
         // BooleanValue singletons

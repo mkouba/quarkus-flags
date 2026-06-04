@@ -31,6 +31,9 @@ import io.smallrye.mutiny.Uni;
  *
  * With this configuration, {@code ctx.get("group")} is used to look up the variant. If the context value is
  * {@code "treatment"}, the flag evaluates to {@code "Add to Cart"}.
+ * <p>
+ * Since variant values originate from string metadata, the evaluated value is always a {@link StringValue}. Use
+ * {@link Value#asBoolean()}, {@link Value#asInt()}, etc. to convert to the desired type.
  */
 @Identifier(VariantFlagEvaluator.ID)
 @Singleton

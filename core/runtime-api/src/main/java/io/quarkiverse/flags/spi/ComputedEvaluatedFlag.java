@@ -24,4 +24,9 @@ public class ComputedEvaluatedFlag extends AbstractEvaluatedFlag {
         return fun.apply(context);
     }
 
+    @Override
+    public String toString() {
+        return "ComputedEvaluatedFlag [feature=" + feature() + "]";
+    }
+
 }

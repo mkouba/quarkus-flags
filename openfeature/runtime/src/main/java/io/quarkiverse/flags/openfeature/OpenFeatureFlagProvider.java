@@ -136,7 +136,7 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
                         }
                     });
                 })
-                .setFeatureManager(manager)
+                .setFlagManager(manager)
                 .build();
     }
 

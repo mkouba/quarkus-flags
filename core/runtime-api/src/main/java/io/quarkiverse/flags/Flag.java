@@ -343,7 +343,7 @@ public interface Flag {
     }
 
     /**
-     * A convenient flag builder.
+     * A convenient flag builder. Not reusable — a builder instance must not be used after {@link #build()} is called.
      * <p>
      * The value setters ({@link #setEnabled(boolean)}, {@link #setString(String)}, {@link #setInt(int)},
      * {@link #setDecimal(BigDecimal)}) are mutually exclusive — the last one called wins. Alternatively, use
@@ -397,6 +397,9 @@ public interface Flag {
          * @see #setComputeAsync(Function)
          */
         default Builder setCompute(Function<ComputationContext, Value> fun) {
+            if (fun == null) {
+                throw new IllegalArgumentException("Compute function must not be null");
+            }
             return setComputeAsync(cc -> Uni.createFrom().item(fun.apply(cc)));
         }
 
@@ -435,7 +438,7 @@ public interface Flag {
          * @param manager
          * @return self
          */
-        Builder setFeatureManager(FlagManager manager);
+        Builder setFlagManager(FlagManager manager);
 
         /**
          * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.
