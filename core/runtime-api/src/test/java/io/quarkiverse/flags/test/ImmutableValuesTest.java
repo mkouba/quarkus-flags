@@ -42,6 +42,9 @@ public class ImmutableValuesTest {
         assertEquals(1, one.asInt());
         assertEquals("1", one.asString());
         assertTrue(one.asBoolean());
+        Value fortyTwo = new IntValue(42);
+        NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> fortyTwo.asBoolean());
+        assertTrue(e.getMessage().contains("42"));
     }
 
     @Test
@@ -82,9 +85,13 @@ public class ImmutableValuesTest {
         Value ten = new BigDecimalValue(BigDecimal.TEN);
         assertEquals(10, ten.asInt());
         assertEquals("10", ten.asString());
-        assertFalse(ten.asBoolean());
+        NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> ten.asBoolean());
+        assertTrue(e.getMessage().contains("10"));
         Value one = new BigDecimalValue(BigDecimal.ONE);
         assertTrue(one.asBoolean());
+        Value zero = new BigDecimalValue(BigDecimal.ZERO);
+        assertFalse(zero.asBoolean());
+        assertTrue(new BigDecimalValue(new BigDecimal("1.0")).asBoolean());
     }
 
     @Test

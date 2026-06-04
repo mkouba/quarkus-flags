@@ -1,6 +1,7 @@
 package io.quarkiverse.flags;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import io.quarkiverse.flags.Flag.Value;
@@ -23,7 +24,12 @@ public final class BigDecimalValue implements Flag.Value {
 
     @Override
     public boolean asBoolean() {
-        return value.compareTo(BigDecimal.ONE) == 0;
+        if (value.compareTo(BigDecimal.ONE) == 0) {
+            return true;
+        } else if (value.compareTo(BigDecimal.ZERO) == 0) {
+            return false;
+        }
+        throw new NoSuchElementException("Decimal value [" + value + "] cannot be converted to boolean");
     }
 
     @Override
