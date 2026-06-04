@@ -47,4 +47,9 @@ public final class BooleanValue implements Flag.Value {
         return value ? BigDecimal.ONE : BigDecimal.ZERO;
     }
 
+    @Override
+    public String toString() {
+        return Boolean.toString(value);
+    }
+
 }

@@ -70,6 +70,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
     }
 
     private Flag findFlag(String feature, Map<String, FlagConfig> config) {
+        // Do not use Map.get() - @WithDefaults returns a default value for any key
         for (Entry<String, FlagConfig> entry : config.entrySet()) {
             if (feature.equals(entry.getKey())) {
                 return Flag.builder(feature)

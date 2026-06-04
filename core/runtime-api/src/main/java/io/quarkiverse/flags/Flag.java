@@ -116,6 +116,23 @@ public interface Flag {
     }
 
     /**
+     * Computes the current value with an empty {@link ComputationContext} and returns its boolean representation, or the
+     * default value if the computation fails or the value cannot be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param defaultValue the value to return if the value cannot be converted
+     * @return the computed boolean value or the default
+     */
+    default boolean isEnabled(boolean defaultValue) {
+        try {
+            return computeAndAwait().asBoolean(defaultValue);
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Computes the current value with an empty {@link ComputationContext} and returns its string representation.
      * <p>
      * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
@@ -124,6 +141,23 @@ public interface Flag {
      */
     default String getString() {
         return computeAndAwait().asString();
+    }
+
+    /**
+     * Computes the current value with an empty {@link ComputationContext} and returns its string representation, or the
+     * default value if the computation fails or the value cannot be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param defaultValue the value to return if the value cannot be converted
+     * @return the computed string value or the default
+     */
+    default String getString(String defaultValue) {
+        try {
+            return computeAndAwait().asString(defaultValue);
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
     }
 
     /**
@@ -138,6 +172,23 @@ public interface Flag {
     }
 
     /**
+     * Computes the current value with an empty {@link ComputationContext} and returns its integer representation, or the
+     * default value if the computation fails or the value cannot be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param defaultValue the value to return if the value cannot be converted
+     * @return the computed integer value or the default
+     */
+    default int getInt(int defaultValue) {
+        try {
+            return computeAndAwait().asInt(defaultValue);
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Computes the current value with an empty {@link ComputationContext} and returns its decimal representation.
      * <p>
      * Blocks the caller thread. Use {@link #computeAndAwait(ComputationContext)} when context is needed.
@@ -146,6 +197,23 @@ public interface Flag {
      */
     default BigDecimal getDecimal() {
         return computeAndAwait().asDecimal();
+    }
+
+    /**
+     * Computes the current value with an empty {@link ComputationContext} and returns its decimal representation, or the
+     * default value if the computation fails or the value cannot be converted.
+     * <p>
+     * Blocks the caller thread.
+     *
+     * @param defaultValue the value to return if the value cannot be converted
+     * @return the computed decimal value or the default
+     */
+    default BigDecimal getDecimal(BigDecimal defaultValue) {
+        try {
+            return computeAndAwait().asDecimal(defaultValue);
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
     }
 
     /**
@@ -167,11 +235,35 @@ public interface Flag {
         boolean asBoolean();
 
         /**
+         * @param defaultValue the value to return if conversion fails
+         * @return the boolean value or the default
+         */
+        default boolean asBoolean(boolean defaultValue) {
+            try {
+                return asBoolean();
+            } catch (NoSuchElementException e) {
+                return defaultValue;
+            }
+        }
+
+        /**
          *
          * @return the string value
          * @throws NoSuchElementException if the value cannot be represented as string
          */
         String asString();
+
+        /**
+         * @param defaultValue the value to return if conversion fails
+         * @return the string value or the default
+         */
+        default String asString(String defaultValue) {
+            try {
+                return asString();
+            } catch (NoSuchElementException e) {
+                return defaultValue;
+            }
+        }
 
         /**
          *
@@ -181,11 +273,35 @@ public interface Flag {
         int asInt();
 
         /**
+         * @param defaultValue the value to return if conversion fails
+         * @return the integer value or the default
+         */
+        default int asInt(int defaultValue) {
+            try {
+                return asInt();
+            } catch (NoSuchElementException e) {
+                return defaultValue;
+            }
+        }
+
+        /**
          *
          * @return the decimal value
          * @throws NoSuchElementException if the value cannot be represented as decimal
          */
         BigDecimal asDecimal();
+
+        /**
+         * @param defaultValue the value to return if conversion fails
+         * @return the decimal value or the default
+         */
+        default BigDecimal asDecimal(BigDecimal defaultValue) {
+            try {
+                return asDecimal();
+            } catch (NoSuchElementException e) {
+                return defaultValue;
+            }
+        }
     }
 
     /**
@@ -207,7 +323,7 @@ public interface Flag {
          * @param key
          * @return the data or {@code null}
          */
-        <T> T get(String key);
+        Object get(String key);
 
         /**
          * @return an unmodifiable map of all context entries

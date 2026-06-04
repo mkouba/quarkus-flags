@@ -188,11 +188,11 @@ public class OpenFeatureFlagProvider extends AbstractFlagProvider implements Ope
 
     private dev.openfeature.sdk.EvaluationContext mapContext(Flag.ComputationContext computationContext) {
         if (computationContext == null || computationContext == Flag.ComputationContext.EMPTY) {
-            return new ImmutableContext();
+            return ImmutableContext.EMPTY;
         }
         Map<String, Object> data = computationContext.asMap();
         if (data.isEmpty()) {
-            return new ImmutableContext();
+            return ImmutableContext.EMPTY;
         }
         String targetingKey = null;
         Map<String, Value> attributes = new HashMap<>();

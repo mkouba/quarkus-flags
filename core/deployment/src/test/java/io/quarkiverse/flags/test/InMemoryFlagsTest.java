@@ -69,9 +69,20 @@ public class InMemoryFlagsTest {
         assertFalse(flags.isEnabled("charlie"));
 
         Flag.Value deltaValue = flags.findAndAwait("delta").orElseThrow().computeAndAwait();
-        assertFalse(deltaValue.asBoolean());
+        assertThrows(NoSuchElementException.class, () -> deltaValue.asBoolean());
         assertEquals("no", deltaValue.asString());
         assertThrows(NoSuchElementException.class, () -> deltaValue.asInt());
+
+        // Flag-level defaults: conversion fails, default returned
+        assertTrue(flags.findAndAwait("delta").orElseThrow().isEnabled(true));
+        assertEquals(42, flags.findAndAwait("delta").orElseThrow().getInt(42));
+        // Flag-level defaults: conversion succeeds, actual value returned
+        assertEquals("no", flags.findAndAwait("delta").orElseThrow().getString("fallback"));
+
+        // Flags-level defaults: non-existent flag, default returned
+        assertFalse(flags.isEnabled("nonexistent", false));
+        assertEquals("fallback", flags.getString("nonexistent", "fallback"));
+        assertEquals(99, flags.getInt("nonexistent", 99));
 
         flags.findAllAndAwait().forEach(f -> inMemoryFlagProvider.removeFlag(f.feature()));
         assertEquals(0, flags.findAllAndAwait().size());

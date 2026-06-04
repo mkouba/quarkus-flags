@@ -24,7 +24,12 @@ public final class StringValue implements Flag.Value {
 
     @Override
     public boolean asBoolean() {
-        return Boolean.parseBoolean(value);
+        if (value.equalsIgnoreCase("true") || value.equals("1")) {
+            return true;
+        } else if (value.equalsIgnoreCase("false") || value.equals("0")) {
+            return false;
+        }
+        throw new NoSuchElementException();
     }
 
     @Override
@@ -48,6 +53,27 @@ public final class StringValue implements Flag.Value {
         } catch (NumberFormatException e) {
             throw new NoSuchElementException();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof StringValue other) {
+            return value.equals(other.value);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
 }

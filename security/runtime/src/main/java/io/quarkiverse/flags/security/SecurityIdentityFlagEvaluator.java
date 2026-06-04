@@ -48,11 +48,14 @@ public class SecurityIdentityFlagEvaluator implements FlagEvaluator {
             if (rolesAllowed != null) {
                 String[] roles = rolesAllowed.split(",");
                 for (String role : roles) {
-                    if (identity.hasRole(role)) {
+                    if (identity.hasRole(role.strip())) {
                         return BooleanValue.createUni(true);
                     }
                 }
-                LOG.debugf("User [%s] has none of the allowed roles: %s", identity.getPrincipal().getName(), rolesAllowed);
+                if (LOG.isDebugEnabled()) {
+                    String name = identity.getPrincipal() != null ? identity.getPrincipal().getName() : "unknown";
+                    LOG.debugf("User [%s] has none of the allowed roles: %s", name, rolesAllowed);
+                }
                 return BooleanValue.createUni(false);
             }
         }

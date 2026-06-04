@@ -1,6 +1,7 @@
 package io.quarkiverse.flags.spi;
 
 import java.util.Map;
+import java.util.Objects;
 
 import io.quarkiverse.flags.Flag;
 
@@ -13,9 +14,9 @@ public abstract class AbstractFlag implements Flag {
     private final Map<String, String> metadata;
 
     protected AbstractFlag(String feature, String origin, Map<String, String> metadata) {
-        this.feature = feature;
-        this.origin = origin;
-        this.metadata = Map.copyOf(metadata);
+        this.feature = Objects.requireNonNull(feature);
+        this.origin = Objects.requireNonNull(origin);
+        this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     }
 
     @Override

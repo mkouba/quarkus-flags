@@ -81,7 +81,7 @@ public class ConfigFlagsTest {
             if (!initialValue.asBoolean()) {
                 throw new IllegalStateException();
             }
-            String username = computationContext.get("username");
+            String username = (String) computationContext.get("username");
             if (username == null) {
                 return BooleanValue.createUni(!initialValue.asBoolean());
             }

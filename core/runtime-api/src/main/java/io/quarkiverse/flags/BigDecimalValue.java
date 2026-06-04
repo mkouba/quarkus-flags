@@ -41,4 +41,25 @@ public final class BigDecimalValue implements Flag.Value {
         return value;
     }
 
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof BigDecimalValue other) {
+            return value.compareTo(other.value) == 0;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+
 }
