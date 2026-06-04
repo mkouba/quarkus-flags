@@ -54,7 +54,7 @@ public interface Flags {
     }
 
     /**
-     * Blocks the caller thread.
+     * Returns the computed boolean value. Blocks the caller thread.
      *
      * @param feature
      * @return the computed boolean value
@@ -65,8 +65,8 @@ public interface Flags {
     }
 
     /**
-     * Returns the computed boolean value, or the default if the flag is not found, computation fails, or the value cannot
-     * be converted.
+     * Returns the computed boolean value, or the default if the flag is not found
+     * or the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -80,7 +80,7 @@ public interface Flags {
     }
 
     /**
-     * Blocks the caller thread.
+     * Returns the computed string value. Blocks the caller thread.
      *
      * @param feature
      * @return the computed string value
@@ -91,8 +91,8 @@ public interface Flags {
     }
 
     /**
-     * Returns the computed string value, or the default if the flag is not found, computation fails, or the value cannot
-     * be converted.
+     * Returns the computed string value, or the default if the flag is not found or
+     * the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -106,7 +106,7 @@ public interface Flags {
     }
 
     /**
-     * Blocks the caller thread.
+     * Returns the computed integer value. Blocks the caller thread.
      *
      * @param feature
      * @return the computed integer value
@@ -117,8 +117,8 @@ public interface Flags {
     }
 
     /**
-     * Returns the computed integer value, or the default if the flag is not found, computation fails, or the value cannot
-     * be converted.
+     * Returns the computed integer value, or the default if the flag is not found
+     * or the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
@@ -132,7 +132,7 @@ public interface Flags {
     }
 
     /**
-     * Blocks the caller thread.
+     * Returns the computed decimal value. Blocks the caller thread.
      *
      * @param feature
      * @return the computed decimal value
@@ -143,8 +143,8 @@ public interface Flags {
     }
 
     /**
-     * Returns the computed decimal value, or the default if the flag is not found, computation fails, or the value cannot
-     * be converted.
+     * Returns the computed decimal value, or the default if the flag is not found
+     * or the value cannot be converted.
      * <p>
      * Blocks the caller thread.
      *
