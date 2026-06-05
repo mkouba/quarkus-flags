@@ -3,7 +3,21 @@
 include::./includes/attributes.adoc[]
 
 This projects aims to provide a lightweight and extensible feature flag Quarkus extension.
-More specifically, it provides:
+
+To get started, add the `io.quarkiverse.flags:quarkus-flags` extension to your build file first.
+For instance, with Maven, add the following dependency to your POM file:
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.flags</groupId>
+    <artifactId>quarkus-flags</artifactId>
+    <version>{project-version}</version>
+</dependency>
+```
+
+NOTE: This dependency is not necessary if you use one of the extending modules, such as xref:qute.adoc[Qute], xref:hibernate-orm.adoc[Hibernate ORM], xref:security.adoc[Security], etc., as they already depend on the core module.
+
+More specifically, the extension provides:
 
 * An API to access feature flags.
 * An SPI to provide flags and externalize the computation of a flag value.
