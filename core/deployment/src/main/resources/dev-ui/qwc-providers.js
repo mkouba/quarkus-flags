@@ -1,6 +1,7 @@
 import { LitElement, html, css} from 'lit';
 import { columnBodyRenderer } from '@vaadin/grid/lit.js';
 import { JsonRpc } from 'jsonrpc';
+import { providerOrdering } from 'build-time-data';
 import '@vaadin/grid';
 import '@vaadin/grid/vaadin-grid-sort-column.js';
 import '@vaadin/text-field';
@@ -26,7 +27,7 @@ export class QwcFlagProviders extends LitElement {
     static properties = {
          _providers: {state: true},
          _providerFlags: {state: true},
-         _providerClassName: {state: true},
+         _providerId: {state: true},
     };
     
     constructor() {
@@ -56,19 +57,24 @@ export class QwcFlagProviders extends LitElement {
                 class="flags-table"
                 theme="no-border">
                 <vaadin-grid-sort-column
-                    path="className"
+                    path="id"
                     auto-width
                     header="Id"
                     ${columnBodyRenderer(this._renderId, [])}
                     resizable>
                 </vaadin-grid-sort-column>
-                <vaadin-grid-sort-column
-                    path="priority"
+                <vaadin-grid-column
                     auto-width
-                    header="Priority"
-                    ${columnBodyRenderer(this._renderPriority, [])}
+                    header="Before"
+                    ${columnBodyRenderer(this._renderBefore, [])}
                     resizable>
-                </vaadin-grid-sort-column>
+                </vaadin-grid-column>
+                <vaadin-grid-column
+                    auto-width
+                    header="After"
+                    ${columnBodyRenderer(this._renderAfter, [])}
+                    resizable>
+                </vaadin-grid-column>
                 <vaadin-grid-column
                     header="Actions"
                     auto-width
@@ -78,7 +84,7 @@ export class QwcFlagProviders extends LitElement {
             </vaadin-grid>
             
             <vaadin-dialog
-               header-title="Flags for ${this._providerClassName}"
+               header-title="Flags for ${this._providerId}"
                .opened="${this._providerFlags}"
                @closed="${() => {
                    this._providerFlags = null;
@@ -121,14 +127,20 @@ export class QwcFlagProviders extends LitElement {
             `;
    }
    
-   _renderPriority(provider) {
-               return html`
-                   ${provider.priority}
-               `;
-      }
+   _renderBefore(provider) {
+        const ordering = providerOrdering?.[provider.id];
+        const before = ordering?.before;
+        return before && before.length > 0 ? html`${before.join(', ')}` : html``;
+   }
+
+   _renderAfter(provider) {
+        const ordering = providerOrdering?.[provider.id];
+        const after = ordering?.after;
+        return after && after.length > 0 ? html`${after.join(', ')}` : html``;
+   }
         
    _listFlags(provider) {
-        this._providerClassName = provider.className;
+        this._providerId = provider.id;
         this.jsonRpc.getProviderFlags({"id": provider.id}).then(jsonRpcResponse => {
             this._providerFlags = jsonRpcResponse.result;
         });

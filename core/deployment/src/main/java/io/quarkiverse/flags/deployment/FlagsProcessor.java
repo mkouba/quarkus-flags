@@ -101,7 +101,7 @@ public class FlagsProcessor {
             }
         }
 
-        return new FlagProviderInfoBuildItem(orderedIds);
+        return new FlagProviderInfoBuildItem(orderedIds, beforeEdges, afterEdges);
     }
 
     @BuildStep

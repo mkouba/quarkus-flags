@@ -51,7 +51,7 @@ export class QwcFeatureFlags extends LitElement {
 
     _renderFlags(){
         return html`
-            <qui-alert level="success">This view contains all feature flags. A flag from a provider with higher priority takes precedence and overrides flags with the same feature name from providers with lower priority.</qui-alert>
+            <qui-alert level="success">This view contains all feature flags. A flag from a provider with higher precedence overrides flags with the same feature name from providers with lower precedence. The precedence is defined by the @ComponentOrder annotation.</qui-alert>
             <vaadin-grid
                 .items="${this._flags}"
                 class="flags-table"
