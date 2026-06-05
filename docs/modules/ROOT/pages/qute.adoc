@@ -28,7 +28,7 @@ Then you can access the flags directly in a template.
    <h1>Hello - Quarkus Club 2025</h1>
    {#if flag:enabled('my-feature-alpha')}
    <p>Feature alpha is enabled!
-   {/if}  
+   {/if}
    <ul>
    <h2>List of all flags</h2>
    {#for flag in flag:flags}
@@ -38,3 +38,23 @@ Then you can access the flags directly in a template.
 </body>
 </html>
 ```
+
+== Default values
+
+The value accessor methods (`bool`, `enabled`, `disabled`, `string`, `int`, `decimal`) accept an optional default value as the second parameter.
+The default value is returned if the flag is not found or if the underlying value cannot be converted to the requested type.
+
+```html
+{flag:enabled('my-feature', true)} <1>
+{flag:bool('my-feature', false)} <2>
+{flag:disabled('my-feature', true)} <3>
+{flag:string('my-feature', 'fallback')} <4>
+{flag:int('my-feature', 42)} <5>
+{flag:decimal('my-feature', 3.14)} <6>
+```
+<1> Returns `true` if the flag does not exist or the value cannot be converted to boolean.
+<2> Same as `enabled` but returns `false` as the default.
+<3> Returns `true` (i.e. the feature is considered disabled) if the flag does not exist or the value cannot be converted.
+<4> Returns `'fallback'` if the flag does not exist or the value cannot be converted to string.
+<5> Returns `42` if the flag does not exist or the value cannot be converted to integer.
+<6> Returns `3.14` if the flag does not exist or the value cannot be converted to decimal.

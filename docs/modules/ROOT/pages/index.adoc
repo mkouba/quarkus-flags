@@ -88,6 +88,37 @@ int count = alpha.getInt();
 BigDecimal ratio = alpha.getDecimal();
 ----
 
+=== Default values
+
+All value accessor methods have overloads that accept a default value.
+The default value is returned if the flag is not found or if the underlying value cannot be converted to the requested type.
+
+[source,java]
+----
+boolean enabled = flags.isEnabled("my-feature-alpha", false); <1>
+String name = flags.getString("my-feature-alpha", "default-name"); <2>
+int count = flags.getInt("my-feature-alpha", 42); <3>
+BigDecimal ratio = flags.getDecimal("my-feature-alpha", BigDecimal.ZERO); <4>
+----
+<1> Returns `false` if the flag does not exist or the value cannot be converted to boolean.
+<2> Returns `"default-name"` if the flag does not exist or the value cannot be converted to string.
+<3> Returns `42` if the flag does not exist or the value cannot be converted to integer.
+<4> Returns `BigDecimal.ZERO` if the flag does not exist or the value cannot be converted to decimal.
+
+The equivalent methods are also available on the `Flag` interface:
+
+[source,java]
+----
+boolean enabled = alpha.isEnabled(false); <1>
+String name = alpha.getString("default-name"); <2>
+int count = alpha.getInt(42); <3>
+BigDecimal ratio = alpha.getDecimal(BigDecimal.ZERO); <4>
+----
+<1> Returns `false` if the value cannot be converted to boolean.
+<2> Returns `"default-name"` if the value cannot be converted to string.
+<3> Returns `42` if the value cannot be converted to integer.
+<4> Returns `BigDecimal.ZERO` if the value cannot be converted to decimal.
+
 === Non-blocking computation
 
 The convenience methods shown above block the caller thread.
