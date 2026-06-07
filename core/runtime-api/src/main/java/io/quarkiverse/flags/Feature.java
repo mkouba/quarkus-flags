@@ -26,9 +26,16 @@ import jakarta.inject.Qualifier;
 public @interface Feature {
 
     /**
+     * Constant indicating that the feature name should be derived from the annotated element name.
+     */
+    String ELEMENT_NAME = "<<element name>>";
+
+    /**
+     * The feature name. Defaults to the name of the annotated element.
+     *
      * @see Flag#feature()
      */
     @Nonbinding
-    String value();
+    String value() default ELEMENT_NAME;
 
 }

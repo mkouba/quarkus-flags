@@ -16,6 +16,7 @@ import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.DotName;
 
 import io.quarkiverse.flags.CompositeFlagEvaluator;
+import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
 import io.quarkiverse.flags.VariantFlagEvaluator;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
@@ -30,6 +31,7 @@ import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanDiscoveryFinishedBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.processor.BeanInfo;
+import io.quarkus.arc.processor.InjectionPointInfo;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
@@ -39,6 +41,7 @@ import io.quarkus.runtime.RuntimeValue;
 
 public class FlagsProcessor {
 
+    static final DotName FEATURE = DotName.createSimple(Feature.class);
     static final DotName IDENTIFIER = DotName.createSimple("io.smallrye.common.annotation.Identifier");
     static final DotName FLAG_PROVIDER_ORDER = DotName.createSimple(ComponentOrder.class);
 
@@ -58,6 +61,18 @@ public class FlagsProcessor {
 
     @BuildStep
     FlagProviderInfoBuildItem validateAndOrderProviders(BeanDiscoveryFinishedBuildItem beanDiscovery) {
+        // Validate @Feature injection points
+        for (InjectionPointInfo injectionPoint : beanDiscovery.getInjectionPoints()) {
+            AnnotationInstance feature = injectionPoint.getRequiredQualifier(FEATURE);
+            if (feature != null) {
+                AnnotationValue value = feature.value();
+                if (value != null && value.asString().isEmpty()) {
+                    throw new IllegalStateException(
+                            "@Feature with an empty value is not allowed: " + injectionPoint.getTargetInfo());
+                }
+            }
+        }
+
         // Discover and validate FlagProvider beans
         Map<String, List<String>> beforeEdges = new HashMap<>(); // id -> list of ids it must come before
         Map<String, List<String>> afterEdges = new HashMap<>(); // id -> list of ids it must come after
