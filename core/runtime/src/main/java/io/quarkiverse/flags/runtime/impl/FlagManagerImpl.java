@@ -129,7 +129,7 @@ public class FlagManagerImpl implements FlagManager {
         return Optional.ofNullable(evaluator);
     }
 
-    @Feature("")
+    @Feature
     @Produces
     Flag produceFlag(InjectionPoint injectionPoint) {
         Feature feature = null;
@@ -142,7 +142,11 @@ public class FlagManagerImpl implements FlagManager {
             // This should never happen
             throw new IllegalStateException("Injection point does not declare @Feature");
         }
-        return new InjectedFlag(feature.value());
+        String featureName = feature.value();
+        if (Feature.ELEMENT_NAME.equals(featureName)) {
+            featureName = injectionPoint.getMember().getName();
+        }
+        return new InjectedFlag(featureName);
     }
 
     public List<FlagProviderWithId> getProviders() {

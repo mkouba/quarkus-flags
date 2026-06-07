@@ -33,6 +33,10 @@ public class InjectedFlagTest {
     @Feature("alpha")
     Flag alpha;
 
+    @Inject
+    @Feature
+    Flag bravo;
+
     @Test
     public void testFlags() {
         assertNotNull(alpha);
@@ -45,6 +49,15 @@ public class InjectedFlagTest {
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false).setMetadata(Map.of("foo", "bar")));
         assertFalse(alpha.isEnabled());
         assertEquals("bar", alpha.metadata().get("foo"));
+    }
+
+    @Test
+    public void testDefaultFeatureName() {
+        assertNotNull(bravo);
+        assertEquals("bravo", bravo.feature());
+        assertThrows(NoSuchElementException.class, () -> bravo.isEnabled());
+        inMemoryFlagProvider.addFlag(Flag.builder("bravo").setEnabled(true));
+        assertTrue(bravo.isEnabled());
     }
 
 }
