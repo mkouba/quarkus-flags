@@ -57,27 +57,40 @@ public class MyService {
 
     @Inject
     Flags flags; <1>
-    
+
+    @Inject
     @Feature("my-feature-alpha")
     Flag alpha; <2>
-    
+
+    @Inject
+    @Feature
+    Flag bravo; <3>
+
     void serviceCall1() {
-        if (flags.isEnabled("my-feature-alpha")) { <3>
-            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true
+        if (flags.isEnabled("my-feature-alpha")) { <4>
+            // Business logic...
         }
     }
 
     void serviceCall2() {
-        if (alpha.isEnabled()) { <4>
-            // Business logic that is executed only if the boolean representation of the "my-feature-alpha" value evaluates to true
+        if (alpha.isEnabled()) { <5>
+            // Business logic...
+        }
+    }
+
+    void serviceCall3() {
+        if (Flag.get("my-feature-alpha").isEnabled()) { <6>
+            // Business logic...
         }
     }
 }
 ----
 <1> You can inject `Flags` in any CDI bean.
 <2> You can also inject a `Flag` for the given feature. The injected flag is never `null` but subsequent computations can throw `NoSuchElementException` if no such feature flag exists.
-<3> `Flags#isEnabled(String)` is a shortcut for `findAndAwait(feature).orElseThrow().isEnabled()`.
-<4> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
+<3> If the `@Feature` value is not specified then the feature name is derived from the name of the annotated element, i.e. in this case the feature name is `bravo`.
+<4> `Flags#isEnabled(String)` is a shortcut for `findAndAwait(feature).orElseThrow().isEnabled()`.
+<5> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
+<6> `Flag#get(String)` is a static convenience method to obtain a flag by feature name. It blocks the caller thread and throws `NoSuchElementException` if no such feature flag exists.
 
 === Other value types
 

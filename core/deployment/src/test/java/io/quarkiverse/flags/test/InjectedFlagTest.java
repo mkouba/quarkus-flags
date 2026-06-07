@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -25,6 +26,9 @@ public class InjectedFlagTest {
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
             .withEmptyApplication();
+
+    @Inject
+    Flags flags;
 
     @Inject
     InMemoryFlagProvider inMemoryFlagProvider;
@@ -58,6 +62,24 @@ public class InjectedFlagTest {
         assertThrows(NoSuchElementException.class, () -> bravo.isEnabled());
         inMemoryFlagProvider.addFlag(Flag.builder("bravo").setEnabled(true));
         assertTrue(bravo.isEnabled());
+    }
+
+    @Test
+    public void testStaticGet() {
+        assertThrows(IllegalArgumentException.class, () -> Flag.get(null));
+        assertThrows(IllegalArgumentException.class, () -> Flag.get(""));
+        assertThrows(NoSuchElementException.class, () -> Flag.get("charlie"));
+        inMemoryFlagProvider.addFlag(Flag.builder("charlie").setEnabled(true));
+        Flag charlie = Flag.get("charlie");
+        assertNotNull(charlie);
+        assertEquals("charlie", charlie.feature());
+        assertTrue(charlie.isEnabled());
+    }
+
+    @Test
+    public void testFindValidation() {
+        assertThrows(IllegalArgumentException.class, () -> flags.findAndAwait(null));
+        assertThrows(IllegalArgumentException.class, () -> flags.findAndAwait(""));
     }
 
 }

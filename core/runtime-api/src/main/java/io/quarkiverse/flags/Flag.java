@@ -9,6 +9,7 @@ import java.util.function.Function;
 import io.quarkiverse.flags.spi.ComputationContextImpl;
 import io.quarkiverse.flags.spi.FlagBuilderImpl;
 import io.quarkiverse.flags.spi.FlagManager;
+import io.quarkus.arc.Arc;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
 
@@ -24,11 +25,31 @@ import io.smallrye.mutiny.Uni;
 public interface Flag {
 
     /**
+     * Creates a new flag builder for the given feature.
+     *
      * @param feature the unique feature name; must not be {@code null} or blank
      * @return a new flag builder
      */
     static Builder builder(String feature) {
         return new FlagBuilderImpl(feature);
+    }
+
+    /**
+     * Obtains the flag for the given feature. Blocks the caller thread.
+     *
+     * @param feature the unique feature name; must not be {@code null} or blank
+     * @return the flag, never {@code null}
+     * @throws java.util.NoSuchElementException if no such feature flag exists
+     */
+    static Flag get(String feature) {
+        if (feature == null || feature.isBlank()) {
+            throw new IllegalArgumentException("Feature name must not be null or blank");
+        }
+        return Arc.requireContainer()
+                .instance(Flags.class)
+                .get()
+                .findAndAwait(feature)
+                .orElseThrow();
     }
 
     /**
