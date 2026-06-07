@@ -39,6 +39,40 @@ Then you can access the flags directly in a template.
 </html>
 ```
 
+== Value accessors
+
+The namespace resolver provides the following value accessor methods.
+If the flag does not exist, `io.quarkus.qute.Results.NotFound` is returned.
+You can use https://quarkus.io/guides/qute-reference#strict_rendering[Qute default values] to handle this case, e.g. `{flag:string('my-feature').or('some default value')}`.
+
+```html
+{flag:enabled('my-feature')} <1>
+{flag:bool('my-feature')} <2>
+{flag:disabled('my-feature')} <3>
+{flag:string('my-feature')} <4>
+{flag:int('my-feature')} <5>
+{flag:decimal('my-feature')} <6>
+```
+<1> Returns `true` if the flag value is `true`, `false` otherwise.
+<2> Same as `enabled`.
+<3> Returns `true` if the flag value is `false` (negated boolean).
+<4> Returns the flag value as a string.
+<5> Returns the flag value as an integer.
+<6> Returns the flag value as a decimal (`BigDecimal`).
+
+== Other methods
+
+If the flag does not exist, `io.quarkus.qute.Results.NotFound` is returned.
+
+```html
+{flag:flags} <1>
+{flag:find('my-feature')} <2>
+{flag:meta('my-feature')} <3>
+```
+<1> Returns a list of all flags.
+<2> Returns the `Flag` object for the given feature name.
+<3> Returns the metadata of the flag.
+
 == Default values
 
 The value accessor methods (`bool`, `enabled`, `disabled`, `string`, `int`, `decimal`) accept an optional default value as the second parameter.

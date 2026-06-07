@@ -33,8 +33,15 @@ public class FlagNamespaceResolverTest {
         assertEquals("true", Qute.fmt("{flag:meta('charlie').get('foo')}").render());
         assertEquals("true", Qute.fmt("{flag:find('charlie').metadata.get('foo')}").render());
         assertEquals("3.14", Qute.fmt("{flag:decimal('delta')}").render());
-        // non-existent flag - not found
+        // non-existent flag - not found; Qute default values can be used
         assertEquals("none", Qute.fmt("{flag:bool('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:enabled('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:disabled('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:string('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:int('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:decimal('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:find('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:meta('nonexistent').or('none')}").render());
         // unknown method name - not found
         assertEquals("none", Qute.fmt("{flag:unknown('alpha').or('none')}").render());
         // conversion error - "true" cannot be converted to int
