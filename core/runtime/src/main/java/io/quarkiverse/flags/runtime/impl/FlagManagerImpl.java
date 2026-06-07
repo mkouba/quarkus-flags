@@ -104,6 +104,9 @@ public class FlagManagerImpl implements FlagManager {
 
     @Override
     public Uni<Optional<Flag>> find(String feature) {
+        if (feature == null || feature.isBlank()) {
+            throw new IllegalArgumentException("Feature name must not be null or blank");
+        }
         if (providers.isEmpty()) {
             return Uni.createFrom().item(Optional.empty());
         }
