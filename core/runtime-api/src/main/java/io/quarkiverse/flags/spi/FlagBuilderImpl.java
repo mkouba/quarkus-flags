@@ -3,6 +3,7 @@ package io.quarkiverse.flags.spi;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import io.quarkiverse.flags.BigDecimalValue;
 import io.quarkiverse.flags.BooleanValue;
@@ -13,7 +14,6 @@ import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.IntValue;
 import io.quarkiverse.flags.StringValue;
 import io.quarkus.arc.Arc;
-import io.quarkus.arc.ArcContainer;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -30,8 +30,6 @@ public class FlagBuilderImpl implements Flag.Builder {
     private Function<ComputationContext, Uni<Value>> fun;
 
     private Flag.Value value;
-
-    private FlagManager manager;
 
     public FlagBuilderImpl(String feature) {
         if (feature == null || feature.isBlank()) {
@@ -89,12 +87,6 @@ public class FlagBuilderImpl implements Flag.Builder {
     }
 
     @Override
-    public Builder setFlagManager(FlagManager manager) {
-        this.manager = manager;
-        return this;
-    }
-
-    @Override
     public Flag build() {
         if (origin == null || origin.isBlank()) {
             throw new IllegalStateException("Origin must be set");
@@ -104,26 +96,19 @@ public class FlagBuilderImpl implements Flag.Builder {
         }
         String evaluatorId = metadata.get(FlagEvaluator.META_KEY);
         if (evaluatorId != null) {
-            FlagManager flagManager;
-            if (manager != null) {
-                flagManager = manager;
-            } else {
-                ArcContainer container = Arc.container();
-                if (container == null) {
-                    throw new IllegalStateException(
-                            "Unable to find the ArC container - flag builder must not be used outside a Quarkus app");
-                }
-                flagManager = container.instance(FlagManager.class).get();
-            }
-            FlagEvaluator evaluator = flagManager.getEvaluator(evaluatorId)
-                    .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));
-            return value != null ? new InitializedEvaluatedFlag(feature, origin, metadata, value, evaluator)
-                    : new ComputedEvaluatedFlag(feature, origin, metadata, evaluator, fun);
+            return value != null
+                    ? new InitializedEvaluatedFlag(feature, origin, metadata, value, evaluatorSupplier(evaluatorId))
+                    : new ComputedEvaluatedFlag(feature, origin, metadata, evaluatorSupplier(evaluatorId), fun);
         }
         if (value != null) {
             return new ImmutableFlag(feature, origin, metadata, value);
         }
         return new ComputedFlag(feature, origin, metadata, fun);
+    }
+
+    private Supplier<FlagEvaluator> evaluatorSupplier(String evaluatorId) {
+        return () -> Arc.requireContainer().instance(FlagManager.class).get().getEvaluator(evaluatorId)
+                .orElseThrow(() -> new IllegalStateException("Flag evaluator does not exist: " + evaluatorId));
     }
 
 }

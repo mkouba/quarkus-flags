@@ -8,7 +8,6 @@ import java.util.function.Function;
 
 import io.quarkiverse.flags.spi.ComputationContextImpl;
 import io.quarkiverse.flags.spi.FlagBuilderImpl;
-import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkus.arc.Arc;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Uni;
@@ -16,9 +15,10 @@ import io.smallrye.mutiny.Uni;
 /**
  * A feature flag refers to a specific feature and provides several convenient methods to compute the current {@link Value}.
  * <p>
- * Use {@link Flags} as the central entry point for accessing feature flags.
- * Use {@link #builder(String)} to create a new flag programmatically.
+ * Use {@link #get(String)} to obtain a flag by feature name, {@link Flags} as a central entry point for accessing feature
+ * flags, or {@link #builder(String)} to create a new flag programmatically.
  *
+ * @see #get(String)
  * @see Flags
  * @see Builder
  */
@@ -447,19 +447,6 @@ public interface Flag {
          * @see Flag#origin()
          */
         Builder setOrigin(String origin);
-
-        /**
-         * By default, a flag can reference one evaluator in its metadata with a key
-         * {@link io.quarkiverse.flags.spi.FlagEvaluator#META_KEY}. This evaluator is automatically used to compute the current
-         * value for the flag produced by {@link #build()}.
-         * <p>
-         * {@link FlagManager#getEvaluator(String)} is used to obtain the evaluator instance. You can specify the manager
-         * instance explicitly, otherwise the CDI lookup is performed.
-         *
-         * @param manager
-         * @return self
-         */
-        Builder setFlagManager(FlagManager manager);
 
         /**
          * If neither value nor computing function is set then {@link BooleanValue#TRUE} is used.

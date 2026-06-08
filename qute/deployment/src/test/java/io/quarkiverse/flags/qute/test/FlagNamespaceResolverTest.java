@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.WithMetadata;
 import io.quarkus.qute.Qute;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -16,7 +18,7 @@ public class FlagNamespaceResolverTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .withEmptyApplication()
+            .withApplicationRoot(root -> root.addClasses(QuteFlags.class))
             .overrideRuntimeConfigKey("quarkus.flags.runtime.alpha.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.bravo.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.charlie.value", "5")
@@ -63,6 +65,23 @@ public class FlagNamespaceResolverTest {
         assertTrue(allFlags.contains("alpha"));
         assertTrue(allFlags.contains("bravo"));
         assertTrue(allFlags.contains("charlie"));
+    }
+
+    @Test
+    public void testRegisteredFlag() {
+        assertEquals("true", Qute.fmt("{flag:bool('foxtrot')}").render());
+        assertEquals("42", Qute.fmt("{flag:int('foxtrot-int')}").render());
+        assertEquals("baz", Qute.fmt("{flag:meta('foxtrot').get('foo')}").render());
+    }
+
+    public static class QuteFlags {
+
+        @RegisterFlag
+        @WithMetadata(key = "foo", value = "baz")
+        static boolean foxtrot = true;
+
+        @RegisterFlag(name = "foxtrot-int")
+        static int foxtrotInt = 42;
     }
 
 }

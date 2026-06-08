@@ -64,7 +64,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
                     .setOrigin(ID)
                     .setMetadata(metadata)
                     .setString(entry.getValue().value())
-                    .setFlagManager(manager)
+
                     .build());
         }
     }
@@ -77,7 +77,7 @@ public class ConfigFlagProvider extends AbstractFlagProvider {
                         .setOrigin(ID)
                         .setMetadata(entry.getValue().meta())
                         .setString(entry.getValue().value())
-                        .setFlagManager(manager)
+
                         .build();
             }
         }
