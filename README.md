@@ -30,17 +30,20 @@ Use it in your code:
 Flags flags;
 
 void doWork() {
+    if (Flag.get("my-feature").isEnabled()) {
+        // static access — no injection needed
+    }
     if (flags.isEnabled("my-feature")) {
-        // feature is active
+        // Flags central entry point
     }
 }
 ```
 
 ## Features
 
-* **Simple API** — inject `Flags` or individual `Flag` instances into any CDI bean.
+* **Simple API** — inject `Flags` or individual `Flag` instances into any CDI bean; or declare flags with `@RegisterFlag` on static fields and methods.
 * **Multiple value types** — boolean, string, integer, and decimal.
-* **Built-in providers** — define flags via Quarkus config or use the in-memory repository for testing.
+* **Built-in providers** — define flags via Quarkus config, declarative `@RegisterFlag` annotations, or the in-memory repository for testing.
 * **Built-in evaluators** — time span, composite, and variant evaluators out of the box.
 * **Extensible SPI** — implement custom `FlagProvider` or `FlagEvaluator` to fit your needs.
 * **[Hibernate ORM](https://docs.quarkiverse.io/quarkus-flags/dev/hibernate-orm.html)** and **[Hibernate Reactive](https://docs.quarkiverse.io/quarkus-flags/dev/hibernate-reactive.html)** — load flags from a database.

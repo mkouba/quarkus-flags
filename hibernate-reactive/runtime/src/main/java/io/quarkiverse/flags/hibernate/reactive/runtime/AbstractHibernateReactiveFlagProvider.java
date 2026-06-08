@@ -116,7 +116,6 @@ public abstract class AbstractHibernateReactiveFlagProvider<E> extends AbstractF
                 .setOrigin(origin)
                 .setMetadata(metadata)
                 .setString(value)
-                .setFlagManager(manager)
                 .build();
     }
 

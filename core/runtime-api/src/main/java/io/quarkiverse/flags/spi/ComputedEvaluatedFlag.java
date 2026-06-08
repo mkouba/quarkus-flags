@@ -3,6 +3,7 @@ package io.quarkiverse.flags.spi;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import io.smallrye.mutiny.Uni;
 
@@ -13,7 +14,15 @@ public class ComputedEvaluatedFlag extends AbstractEvaluatedFlag {
 
     private final Function<ComputationContext, Uni<Value>> fun;
 
-    public ComputedEvaluatedFlag(String feature, String origin, Map<String, String> metadata, FlagEvaluator evaluator,
+    public ComputedEvaluatedFlag(String feature, String origin, Map<String, String> metadata,
+            Supplier<FlagEvaluator> evaluatorSupplier,
+            Function<ComputationContext, Uni<Value>> fun) {
+        super(feature, origin, metadata, evaluatorSupplier);
+        this.fun = Objects.requireNonNull(fun);
+    }
+
+    public ComputedEvaluatedFlag(String feature, String origin, Map<String, String> metadata,
+            FlagEvaluator evaluator,
             Function<ComputationContext, Uni<Value>> fun) {
         super(feature, origin, metadata, evaluator);
         this.fun = Objects.requireNonNull(fun);

@@ -23,10 +23,11 @@ public class FlagBuilderTest {
                 () -> Flag.builder("foo").setEnabled(true).build(),
                 "Origin must be set");
 
-        IllegalStateException containerNotFound = assertThrows(IllegalStateException.class,
-                () -> Flag.builder("foo").setOrigin("test").setMetadata(Map.of(FlagEvaluator.META_KEY, "bar")).setEnabled(true)
-                        .build());
-        assertTrue(containerNotFound.getMessage().startsWith("Unable to find the ArC container"));
+        // Evaluator resolution is lazy - build() succeeds even without the Arc container;
+        // the container lookup happens when the flag is actually evaluated
+        Flag withEvaluator = Flag.builder("foo").setOrigin("test")
+                .setMetadata(Map.of(FlagEvaluator.META_KEY, "bar")).setEnabled(true).build();
+        assertTrue(withEvaluator.feature().equals("foo"));
 
         Flag trueByDefault = Flag.builder("foo").setOrigin("test").build();
         assertTrue(trueByDefault.isEnabled());

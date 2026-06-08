@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.security.SecurityIdentityFlagEvaluator;
 import io.quarkus.security.identity.CurrentIdentityAssociation;
 import io.quarkus.security.runtime.QuarkusPrincipal;
@@ -21,7 +23,7 @@ public class SecurityIdentityFlagEvaluatorTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .withEmptyApplication()
+            .withApplicationRoot(root -> root.addClasses(SecurityFlags.class))
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.value", "true")
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.evaluator", SecurityIdentityFlagEvaluator.ID)
             .overrideRuntimeConfigKey("quarkus.flags.runtime.delta.meta.authenticated", "true")
@@ -71,6 +73,24 @@ public class SecurityIdentityFlagEvaluatorTest {
 
     @ActivateRequestContext
     @Test
+    public void testRegisteredFlag() {
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal("Admin"))
+                .addRole("admin")
+                .build());
+        assertTrue(Flag.get("foxtrot").isEnabled());
+        // Direct field access - bytecode transformation replaces with Flag.get()
+        assertTrue(SecurityFlags.foxtrot);
+
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setAnonymous(true)
+                .build());
+        assertFalse(Flag.get("foxtrot").isEnabled());
+        assertFalse(SecurityFlags.foxtrot);
+    }
+
+    @ActivateRequestContext
+    @Test
     public void testRolesWithWhitespace() {
         // Roles in config: " baz , qux " - whitespace should be stripped
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
@@ -90,6 +110,14 @@ public class SecurityIdentityFlagEvaluatorTest {
                 .addRole("other")
                 .build());
         assertFalse(echo.isEnabled());
+    }
+
+    public static class SecurityFlags {
+
+        @RegisterFlag(evaluator = SecurityIdentityFlagEvaluator.ID)
+        @WithMetadata(key = SecurityIdentityFlagEvaluator.AUTHENTICATED, value = "true")
+        @WithMetadata(key = SecurityIdentityFlagEvaluator.ROLES_ALLOWED, value = "admin")
+        static boolean foxtrot = true;
     }
 
 }

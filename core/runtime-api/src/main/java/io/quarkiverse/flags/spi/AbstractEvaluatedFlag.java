@@ -2,7 +2,9 @@ package io.quarkiverse.flags.spi;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
+import io.quarkus.arc.impl.LazyValue;
 import io.smallrye.mutiny.Uni;
 
 /**
@@ -10,18 +12,31 @@ import io.smallrye.mutiny.Uni;
  */
 public abstract class AbstractEvaluatedFlag extends AbstractFlag {
 
-    protected final FlagEvaluator evaluator;
+    protected final LazyValue<FlagEvaluator> evaluator;
 
-    public AbstractEvaluatedFlag(String feature, String origin, Map<String, String> metadata, FlagEvaluator evaluator) {
+    public AbstractEvaluatedFlag(String feature, String origin, Map<String, String> metadata,
+            Supplier<FlagEvaluator> evaluatorSupplier) {
         super(feature, origin, metadata);
-        this.evaluator = Objects.requireNonNull(evaluator);
+        this.evaluator = new LazyValue<>(Objects.requireNonNull(evaluatorSupplier));
+    }
+
+    public AbstractEvaluatedFlag(String feature, String origin, Map<String, String> metadata,
+            FlagEvaluator evaluator) {
+        super(feature, origin, metadata);
+        Objects.requireNonNull(evaluator);
+        this.evaluator = new LazyValue<>(new Supplier<FlagEvaluator>() {
+            @Override
+            public FlagEvaluator get() {
+                return evaluator;
+            }
+        });
     }
 
     protected abstract Uni<Value> initialValue(ComputationContext context);
 
     @Override
     public Uni<Value> compute(ComputationContext context) {
-        return initialValue(context).chain(value -> evaluator.evaluate(this, value, context));
+        return initialValue(context).chain(value -> evaluator.get().evaluate(this, value, context));
     }
 
 }

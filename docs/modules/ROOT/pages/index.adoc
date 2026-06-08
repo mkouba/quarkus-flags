@@ -21,8 +21,9 @@ More specifically, the extension provides:
 
 * An API to access feature flags.
 * An SPI to provide flags and externalize the computation of a flag value.
-* Several built-in flag providers 
+* Several built-in flag providers
 ** Leverage Quarkus config to define feature flags,
+** Declarative `@RegisterFlag` annotation for code-first flag definition,
 ** In-memory repository (useful for testing and dynamic registration).
 * xref:hibernate-orm.adoc[*Hibernate ORM module*], where feature flags are mapped from an annotated entity and are automatically loaded from the database.
 * xref:hibernate-reactive.adoc[*Hibernate Reactive module*], the reactive variant of the Hibernate ORM module.
@@ -43,8 +44,7 @@ Metadata enable further configuration which can be leveraged in <<spi,SPI>>.
 
 == Accessing feature flags
 
-The `io.quarkiverse.flags.Flags` represents a central point to access feature flags.
-A CDI bean that implements `Flags` is automatically registered.
+There are several ways to access feature flags: inject the `io.quarkiverse.flags.Flags` central entry point, inject individual `Flag` instances with `@Feature`, use the static `Flag.get(String)` method, or read `@RegisterFlag`-annotated static fields and methods directly.
 
 [source,java]
 ----
@@ -52,17 +52,15 @@ import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.Feature;
 import jakarta.inject.Inject;
 
-@ApplicanScoped
+@ApplicationScoped
 public class MyService {
 
     @Inject
     Flags flags; <1>
 
-    @Inject
     @Feature("my-feature-alpha")
     Flag alpha; <2>
 
-    @Inject
     @Feature
     Flag bravo; <3>
 
@@ -83,6 +81,12 @@ public class MyService {
             // Business logic...
         }
     }
+
+    void serviceCall4() {
+        if (MyFlags.myFeatureAlpha) { <7>
+            // Business logic...
+        }
+    }
 }
 ----
 <1> You can inject `Flags` in any CDI bean.
@@ -91,6 +95,7 @@ public class MyService {
 <4> `Flags#isEnabled(String)` is a shortcut for `findAndAwait(feature).orElseThrow().isEnabled()`.
 <5> `Flag#isEnabled()` computes the current value and returns its boolean representation. It blocks the caller thread.
 <6> `Flag#get(String)` is a static convenience method to obtain a flag by feature name. It blocks the caller thread and throws `NoSuchElementException` if no such feature flag exists.
+<7> Reading a `@RegisterFlag`-annotated static field is automatically transformed at build time to compute the current flag value. See <<Declarative flag registration>>.
 
 === Other value types
 
@@ -182,6 +187,8 @@ Cycles in the ordering are detected at build time and result in a deployment err
 By default, `getFlag(String)` filters the result of `getFlags()`.
 Implementations backed by a database or remote service should override this method with an optimized lookup.
 
+=== Built-in providers
+
 The core extension provides two built-in flag providers.
 The first one is built on top of Quarkus config service.
 It allows users to configure _build time_ and _runtime_ feature flags.
@@ -225,6 +232,66 @@ public class MyService {
 <1> You can inject `InMemoryFlagProvider` in any CDI bean.
 <2> It's possible to register a new feature flag at any time.
 <3> You can also remove the flag.
+
+=== Declarative flag registration
+
+The `@io.quarkiverse.flags.RegisterFlag` annotation provides a code-first way to declare feature flags.
+Annotate static fields or static methods and the extension will automatically generate a `FlagProvider` and register the flags at build time.
+The annotated field is read and the annotated method is invoked during each flag value computation, so that changes to the field value or method return value are always reflected.
+
+[source,java]
+----
+import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.TimeSpanFlagEvaluator;
+import io.quarkiverse.flags.WithMetadata;
+
+public class MyFlags {
+
+    @RegisterFlag <1>
+    static boolean newCheckout = true;
+
+    @RegisterFlag <2>
+    static volatile int maxRetries = 3;
+
+    @RegisterFlag(name = "custom-name") <3>
+    static String greeting = "hello";
+
+    @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID) <4>
+    @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2026-07-01T00:00:00+00:00[UTC]")
+    static final boolean summerSale = true;
+
+    @RegisterFlag <5>
+    static boolean computeDiscount(Flag.ComputationContext ctx) {
+        return true;
+    }
+}
+----
+<1> A boolean flag named `newCheckout` (derived from the field name) with an initial value of `true`. The value is re-read from the field on every computation so changes to the field are reflected.
+<2> An integer flag named `maxRetries`.
+<3> A string flag with an explicit name `custom-name`.
+<4> A boolean flag using the built-in `TimeSpanFlagEvaluator`. The `@WithMetadata` annotation adds metadata entries to the flag.
+<5> A method-based flag. The method can optionally accept a single `Flag.ComputationContext` parameter.
+
+Supported field/return types are: `boolean`/`Boolean`, `int`/`Integer`, `String`, `BigDecimal`, and `Flag.Value`.
+
+==== Flag name resolution
+
+By default, the flag name is derived from the annotated element name (field name or method name).
+You can also use `@RegisterFlag(name = RegisterFlag.FQCN_ELEMENT_NAME)` to use the fully qualified class name combined with the element name, e.g. `com.example.MyFlags.newCheckout`.
+Or specify an explicit name with `@RegisterFlag(name = "my-flag")`.
+
+==== Bytecode transformation
+
+Reading an annotated static field or calling an annotated static method in application code is automatically replaced at build time with a call to `Flag.get("flagName")` followed by the appropriate value accessor.
+This means that code like `MyFlags.newCheckout` actually computes the current flag value at runtime.
+
+[source,java]
+----
+if (MyFlags.newCheckout) { <1>
+    // Business logic...
+}
+----
+<1> This is transformed to `Flag.get("newCheckout").isEnabled()` at build time.
 
 [[spi]]
 == Flag evaluator SPI

@@ -56,7 +56,6 @@ public abstract class AbstractHibernateOrmFlagProvider extends AbstractFlagProvi
                 .setOrigin(origin)
                 .setMetadata(metadata)
                 .setString(value)
-                .setFlagManager(manager)
                 .build();
     }
 
