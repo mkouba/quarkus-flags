@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 
@@ -19,6 +21,7 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
+import io.quarkiverse.flags.spi.FlagCache;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
 import io.quarkiverse.flags.spi.FlagProvider;
@@ -40,9 +43,16 @@ public class FlagManagerImpl implements FlagManager {
     // id -> evaluator
     private final Map<String, FlagEvaluator> evaluators;
 
+    // null if caching is not enabled or no FlagCache bean is available
+    private final FlagCache cache;
+
+    private final FlagsCacheConfig cacheConfig;
+
     FlagManagerImpl(@All List<InstanceHandle<FlagProvider>> providerHandles,
             @All List<InstanceHandle<FlagEvaluator>> evaluatorHandles,
-            FlagContext context) {
+            FlagContext context,
+            FlagsCacheConfig cacheConfig,
+            @Any Instance<FlagCache> cacheInstance) {
         // Build provider ID map from @Identifier qualifiers
         Map<String, FlagProvider> providerById = new LinkedHashMap<>();
         for (InstanceHandle<FlagProvider> handle : providerHandles) {
@@ -67,6 +77,17 @@ public class FlagManagerImpl implements FlagManager {
             evaluatorMap.put(id, evaluator);
         }
         this.evaluators = Map.copyOf(evaluatorMap);
+        if (cacheConfig.enabled() && !cacheInstance.isUnsatisfied()) {
+            if (cacheInstance.isAmbiguous()) {
+                LOG.warnf("Multiple FlagCache beans found, caching is disabled");
+                this.cache = null;
+            } else {
+                this.cache = cacheInstance.get();
+            }
+        } else {
+            this.cache = null;
+        }
+        this.cacheConfig = cacheConfig;
     }
 
     @Override
@@ -77,12 +98,12 @@ public class FlagManagerImpl implements FlagManager {
         ConcurrentMap<String, Flag> ret = new ConcurrentHashMap<>();
         Iterator<FlagProviderWithId> it = providers.iterator();
         FlagProviderWithId first = it.next();
-        Uni<Collection<Flag>> uni = first.provider().getFlags();
+        Uni<Collection<Flag>> uni = getFlags(first);
         while (it.hasNext()) {
             FlagProviderWithId next = it.next();
             uni = uni.chain(c -> {
                 addFlags(c, ret);
-                return next.provider().getFlags();
+                return getFlags(next);
             });
         }
         return uni.map(c -> {
@@ -113,9 +134,31 @@ public class FlagManagerImpl implements FlagManager {
         return findInProviders(feature, providers.iterator());
     }
 
+    private Uni<Collection<Flag>> getFlags(FlagProviderWithId p) {
+        if (cache != null && isCachingEnabled(p)) {
+            return cache.getOrComputeFlags(p.id(), () -> p.provider().getFlags());
+        }
+        return p.provider().getFlags();
+    }
+
+    private Uni<Flag> getFlag(FlagProviderWithId p, String feature) {
+        if (cache != null && isCachingEnabled(p)) {
+            return cache.getOrComputeFlag(p.id(), feature, () -> p.provider().getFlag(feature));
+        }
+        return p.provider().getFlag(feature);
+    }
+
+    private boolean isCachingEnabled(FlagProviderWithId p) {
+        FlagsCacheConfig.ProviderCacheConfig providerConfig = cacheConfig.providers().get(p.id());
+        if (providerConfig != null) {
+            return providerConfig.enabled();
+        }
+        return p.provider().isCacheable();
+    }
+
     private Uni<Optional<Flag>> findInProviders(String feature, Iterator<FlagProviderWithId> it) {
         FlagProviderWithId p = it.next();
-        return p.provider().getFlag(feature).chain(f -> {
+        return getFlag(p, feature).chain(f -> {
             if (f != null) {
                 return Uni.createFrom().item(Optional.of(f));
             }

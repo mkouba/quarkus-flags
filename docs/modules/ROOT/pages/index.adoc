@@ -395,47 +395,67 @@ quarkus.flags.runtime.greeting.meta.variant-es=Hola
 
 == Caching
 
-Some flag providers may involve long running operations.
-In that case, caching of flags might be useful.
-Let's use the `quarkus-cache` extension and CDI to implement a simple caching.
-First, you need to add the `io.quarkus:quarkus-cache` extension to your project.
-Then create a simple CDI decorator like this:
+Some flag providers may involve long-running operations.
+Built-in caching avoids repeated invocations of `FlagProvider#getFlags()` and `FlagProvider#getFlag()`.
+The cache is disabled by default; enable it and configure the TTL in `application.properties`:
+
+[source,properties]
+----
+quarkus.flags.cache.enabled=true
+quarkus.flags.cache.ttl=5m <1>
+quarkus.flags.cache.my-remote-provider.ttl=30s <2>
+quarkus.flags.cache.my-local-provider.enabled=false <3>
+----
+<1> Global TTL for all providers (default is `10m`).
+<2> Per-provider TTL override; the key is the `@Identifier` value of the flag provider.
+<3> Disable caching for a specific provider.
+
+=== Provider-level caching opt-out
+
+A flag provider can declare itself as non-cacheable by overriding `FlagProvider#isCacheable()`:
 
 [source,java]
 ----
-@Priority(1)
-@Decorator
-public class CachingDecorator implements FlagProvider {
-
-    @Inject
-    @Any
-    @Delegate
-    FlagProvider delegate;
-
-    @Inject
-    @Decorated
-    Bean<FlagProvider> decoratedBean; <1>
-
-    @CacheName("quarkus-flags-cache") <2>
-    Cache cache;
+@Identifier("my-provider")
+@Singleton
+public class MyProvider implements FlagProvider {
 
     @Override
-    public Uni<Collection<Flag>> getFlags() {
-        String cacheKey = decoratedBean.getQualifiers().stream()
-                .filter(q -> q instanceof Identifier)
-                .map(q -> ((Identifier) q).value())
-                .findFirst()
-                .orElse(decoratedBean.getBeanClass().getName()); <3>
-        return cache.getAsync(cacheKey, k -> {
-            return delegate.getFlags().memoize().indefinitely(); <4>
-        });
+    public boolean isCacheable() {
+        return false;
     }
+
+    // ...
 }
 ----
-<1> The `@Decorated` injection point gives access to the metadata of the decorated bean, including its qualifiers.
-<2> Inject the cache named `quarkus-flags-cache`. You can configure the cache based on the cache implementation used. For example, `quarkus.cache.caffeine."quarkus-flags-cache".expire-after-write=10m`. See https://quarkus.io/guides/cache for more information.
-<3> The `@Identifier` value of the decorated provider is used as the cache key.
-<4> The returned `Uni` is memoized so that subsequent subscriptions do not trigger computation again.
+
+Providers that manage flags in-memory (such as the built-in `InMemoryFlagProvider`) return `false` by default because caching would only introduce staleness with no performance benefit.
+
+The per-provider configuration property `quarkus.flags.cache."provider-id".enabled` takes precedence over the provider's `isCacheable()` declaration.
+
+=== Invalidation
+
+The default implementation is an in-memory cache backed by `ConcurrentHashMap`.
+You can inject `FlagCache` to programmatically invalidate cache entries:
+
+[source,java]
+----
+@Inject
+FlagCache cache;
+
+void onConfigChange() {
+    cache.invalidateAll().await().indefinitely(); <1>
+    cache.invalidate("my-remote-provider").await().indefinitely(); <2>
+}
+----
+<1> Invalidate all cached entries.
+<2> Invalidate entries for a specific provider.
+
+TIP: You can replace the default in-memory cache with a custom implementation.
+Simply implement the `io.quarkiverse.flags.spi.FlagCache` interface as a CDI bean and the default bean will be overridden automatically.
+
+NOTE: The `quarkus-flags-cache` extension provides an alternative `FlagCache` implementation backed by the https://quarkus.io/guides/cache[Quarkus Cache extension].
+It uses one cache per provider and the TTL is configured via standard Quarkus Cache properties, for example `quarkus.cache.caffeine."quarkus-flags.my-provider".expire-after-write=30s`.
 
 [[extension-configuration-reference]]
 == Extension configuration reference

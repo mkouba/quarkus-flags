@@ -60,4 +60,18 @@ public interface FlagProvider {
                 .orElse(null));
     }
 
+    /**
+     * Indicates whether the results of this provider can be cached.
+     * <p>
+     * Providers that manage flags in-memory (such as {@link io.quarkiverse.flags.InMemoryFlagProvider}) should return
+     * {@code false} because caching would only introduce staleness with no performance benefit.
+     * <p>
+     * This value can be overridden per provider via {@code quarkus.flags.cache."provider-id".enabled}.
+     *
+     * @return {@code true} if caching is beneficial for this provider, {@code false} otherwise
+     */
+    default boolean isCacheable() {
+        return true;
+    }
+
 }
