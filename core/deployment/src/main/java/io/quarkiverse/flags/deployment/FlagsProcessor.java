@@ -23,6 +23,7 @@ import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.runtime.impl.FlagContext;
 import io.quarkiverse.flags.runtime.impl.FlagManagerImpl;
 import io.quarkiverse.flags.runtime.impl.FlagsRecorder;
+import io.quarkiverse.flags.runtime.impl.InMemoryFlagCache;
 import io.quarkiverse.flags.runtime.impl.InMemoryFlagProviderImpl;
 import io.quarkiverse.flags.spi.ComponentOrder;
 import io.quarkiverse.flags.spi.FlagEvaluator;
@@ -54,7 +55,8 @@ public class FlagsProcessor {
     void beans(BuildProducer<AdditionalBeanBuildItem> beans) {
         beans.produce(AdditionalBeanBuildItem.builder()
                 .addBeanClasses(FlagManagerImpl.class, ConfigFlagProvider.class,
-                        InMemoryFlagProviderImpl.class, TimeSpanFlagEvaluator.class, CompositeFlagEvaluator.class,
+                        InMemoryFlagProviderImpl.class, InMemoryFlagCache.class,
+                        TimeSpanFlagEvaluator.class, CompositeFlagEvaluator.class,
                         VariantFlagEvaluator.class)
                 .build());
     }

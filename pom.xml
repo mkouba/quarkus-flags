@@ -19,6 +19,7 @@
         <module>security</module>
         <module>qute</module>
         <module>cron</module>
+        <module>cache</module>
         <module>openfeature</module>
     </modules>
     <properties>

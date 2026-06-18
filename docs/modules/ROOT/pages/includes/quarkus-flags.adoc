@@ -7,6 +7,48 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
+a| [[quarkus-flags_quarkus-flags-cache-enabled]] [.property-path]##link:#quarkus-flags_quarkus-flags-cache-enabled[`+++quarkus.flags.cache.enabled+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.cache.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+If set to `true` the flag provider cache is enabled.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_CACHE_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_CACHE_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++false+++`
+
+a| [[quarkus-flags_quarkus-flags-cache-ttl]] [.property-path]##link:#quarkus-flags_quarkus-flags-cache-ttl[`+++quarkus.flags.cache.ttl+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.cache.ttl+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The default time-to-live for cache entries.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_CACHE_TTL+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_CACHE_TTL+++`
+endif::add-copy-button-to-env-var[]
+--
+|link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html[Duration] link:#duration-note-anchor-quarkus-flags_quarkus-flags[icon:question-circle[title=More information about the Duration format]]
+|`+++10M+++`
+
 a|icon:lock[title=Fixed at build time] [[quarkus-flags_quarkus-flags-build-flag-name-value]] [.property-path]##link:#quarkus-flags_quarkus-flags-build-flag-name-value[`+++quarkus.flags.build."flag-name".value+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.flags.build."flag-name".value+++[]
@@ -47,6 +89,50 @@ Environment variable: `+++QUARKUS_FLAGS_BUILD__FLAG_NAME__META__META_+++`
 endif::add-copy-button-to-env-var[]
 --
 |Map<String,String>
+|
+
+a| [[quarkus-flags_quarkus-flags-cache-provider-id-enabled]] [.property-path]##link:#quarkus-flags_quarkus-flags-cache-provider-id-enabled[`+++quarkus.flags.cache."provider-id".enabled+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.cache."provider-id".enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+If set to `false`, the cache is bypassed for the given provider and the loader is always invoked.
+
+This property only applies when the global `quarkus.flags.cache.enabled` is set to `true`.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_CACHE__PROVIDER_ID__ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_CACHE__PROVIDER_ID__ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
+
+a| [[quarkus-flags_quarkus-flags-cache-provider-id-ttl]] [.property-path]##link:#quarkus-flags_quarkus-flags-cache-provider-id-ttl[`+++quarkus.flags.cache."provider-id".ttl+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.flags.cache."provider-id".ttl+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The time-to-live for cache entries of this provider. If not set, the global `quarkus.flags.cache.ttl` is used.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_FLAGS_CACHE__PROVIDER_ID__TTL+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_FLAGS_CACHE__PROVIDER_ID__TTL+++`
+endif::add-copy-button-to-env-var[]
+--
+|link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html[Duration] link:#duration-note-anchor-quarkus-flags_quarkus-flags[icon:question-circle[title=More information about the Duration format]]
 |
 
 a| [[quarkus-flags_quarkus-flags-runtime-flag-name-value]] [.property-path]##link:#quarkus-flags_quarkus-flags-runtime-flag-name-value[`+++quarkus.flags.runtime."flag-name".value+++`]##
@@ -93,3 +179,22 @@ endif::add-copy-button-to-env-var[]
 
 |===
 
+ifndef::no-duration-note[]
+[NOTE]
+[id=duration-note-anchor-quarkus-flags_quarkus-flags]
+.About the Duration format
+====
+To write duration values, use the standard `java.time.Duration` format.
+See the link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)[Duration#parse() Java API documentation] for more information.
+
+You can also use a simplified format, starting with a number:
+
+* If the value is only a number, it represents time in seconds.
+* If the value is a number followed by `ms`, it represents time in milliseconds.
+
+In other cases, the simplified format is translated to the `java.time.Duration` format for parsing:
+
+* If the value is a number followed by `h`, `m`, or `s`, it is prefixed with `PT`.
+* If the value is a number followed by `d`, it is prefixed with `P`.
+====
+endif::no-duration-note[]
