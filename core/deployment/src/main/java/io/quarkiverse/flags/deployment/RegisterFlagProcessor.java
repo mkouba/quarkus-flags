@@ -78,8 +78,6 @@ public class RegisterFlagProcessor {
             DotName.createSimple(BigDecimal.class),
             FLAG_VALUE);
 
-    // --- Build steps ---
-
     @BuildStep
     void collectRegisteredFlags(CombinedIndexBuildItem index,
             BuildProducer<RegisteredFlagBuildItem> registeredFlags) {
@@ -196,6 +194,14 @@ public class RegisterFlagProcessor {
                     mc.public_();
                     mc.body(bc -> {
                         bc.return_(this_.field(flagsField));
+                    });
+                });
+
+                cc.method("isCacheable", mc -> {
+                    mc.returning(boolean.class);
+                    mc.public_();
+                    mc.body(bc -> {
+                        bc.return_(Const.of(false));
                     });
                 });
             });
