@@ -429,7 +429,8 @@ public class MyProvider implements FlagProvider {
 }
 ----
 
-Providers that manage flags in-memory (such as the built-in `InMemoryFlagProvider`) return `false` by default because caching would only introduce staleness with no performance benefit.
+Providers that manage flags in-memory return `false` by default because caching would only introduce staleness with no performance benefit.
+The built-in non-cacheable providers are `InMemoryFlagProvider`, `ConfigFlagProvider`, and providers generated for `@RegisterFlag` declarations.
 
 The per-provider configuration property `quarkus.flags.cache."provider-id".enabled` takes precedence over the provider's `isCacheable()` declaration.
 
