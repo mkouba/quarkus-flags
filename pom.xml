@@ -8,7 +8,7 @@
     </parent>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>1.0.0.CR2</version>
     <packaging>pom</packaging>
     <name>Quarkus Feature Flags - Parent</name>
     <modules>
@@ -122,4 +122,8 @@
             </build>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>1.0.0.CR2</tag>
+  </scm>
 </project>

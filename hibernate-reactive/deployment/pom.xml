@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-hibernate-reactive-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0.CR2</version>
     </parent>
     <artifactId>quarkus-flags-hibernate-reactive-deployment</artifactId>
     <name>Quarkus Feature Flags - Hibernate Reactive - Deployment</name>
@@ -55,4 +55,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>1.0.0.CR2</tag>
+  </scm>
 </project>
