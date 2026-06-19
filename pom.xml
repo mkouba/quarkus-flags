@@ -23,7 +23,7 @@
         <module>openfeature</module>
     </modules>
     <properties>
-        <quarkus.version>3.33.2</quarkus.version>
+        <quarkus.version>3.33.2.1</quarkus.version>
         <sundrio.version>0.300.0</sundrio.version>
         <openfeature-sdk.version>1.20.2</openfeature-sdk.version>
     </properties>
