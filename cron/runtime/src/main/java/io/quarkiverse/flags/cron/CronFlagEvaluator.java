@@ -2,7 +2,8 @@ package io.quarkiverse.flags.cron;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.EnumMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import jakarta.inject.Singleton;
 
@@ -47,13 +48,10 @@ public class CronFlagEvaluator implements FlagEvaluator {
 
     private static final Logger LOG = Logger.getLogger(CronFlagEvaluator.class);
 
-    private final EnumMap<CronType, CronParser> parsers;
+    private final ConcurrentMap<CronExprKey, Cron> cronCache;
 
     CronFlagEvaluator() {
-        parsers = new EnumMap<>(CronType.class);
-        for (CronType cronType : CronType.values()) {
-            parsers.put(cronType, new CronParser(CronDefinitionBuilder.instanceDefinitionFor(cronType)));
-        }
+        cronCache = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -64,7 +62,7 @@ public class CronFlagEvaluator implements FlagEvaluator {
                 throw new IllegalStateException("Cron expression not set");
             }
             CronType cronType = getCronType(flag);
-            Cron cron = parsers.get(cronType).parse(cronExpr);
+            Cron cron = cronCache.computeIfAbsent(new CronExprKey(cronType, cronExpr), CronFlagEvaluator::parseCronExpr);
             ExecutionTime executionTime = ExecutionTime.forCron(cron);
             ZonedDateTime now = ZonedDateTime.now();
             boolean val = executionTime.isMatch(now);
@@ -74,6 +72,13 @@ public class CronFlagEvaluator implements FlagEvaluator {
             return BooleanValue.createUni(val);
         }
         return Uni.createFrom().item(initialValue);
+    }
+
+    private static Cron parseCronExpr(CronExprKey key) {
+        return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(key.cronType())).parse(key.cronExpr());
+    }
+
+    record CronExprKey(CronType cronType, String cronExpr) {
     }
 
     private CronType getCronType(Flag flag) {
