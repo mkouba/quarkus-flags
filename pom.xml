@@ -21,6 +21,7 @@
         <module>cron</module>
         <module>cache</module>
         <module>openfeature</module>
+        <module>docs-rag</module>
     </modules>
     <properties>
         <quarkus.version>3.33.2.1</quarkus.version>
