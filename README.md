@@ -45,6 +45,7 @@ void doWork() {
 * **Multiple value types** — boolean, string, integer, and decimal.
 * **Built-in providers** — define flags via Quarkus config, declarative `@RegisterFlag` annotations, or the in-memory repository for testing.
 * **Built-in evaluators** — time span, composite, and variant evaluators out of the box.
+* **Caching** — built-in in-memory cache for flag provider results with configurable TTL and per-provider overrides; extensible via the `FlagCache` SPI, with an optional `quarkus-flags-cache` module backed by [Quarkus Cache](https://quarkus.io/guides/cache).
 * **Extensible SPI** — implement custom `FlagProvider` or `FlagEvaluator` to fit your needs.
 * **[Hibernate ORM](https://docs.quarkiverse.io/quarkus-flags/dev/hibernate-orm.html)** and **[Hibernate Reactive](https://docs.quarkiverse.io/quarkus-flags/dev/hibernate-reactive.html)** — load flags from a database.
 * **[Security](https://docs.quarkiverse.io/quarkus-flags/dev/security.html)** — evaluate flags based on the current `SecurityIdentity`, including percentage-based rollouts.
