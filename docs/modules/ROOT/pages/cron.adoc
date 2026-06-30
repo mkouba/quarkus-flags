@@ -5,13 +5,14 @@ include::./includes/attributes.adoc[]
 If you want to use a flag evaluator to match a specific CRON expression in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-cron` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
-```xml
+[source,xml,subs=attributes+]
+----
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-cron</artifactId>
     <version>{project-version}</version>
 </dependency>
-```
+----
 The extension provides the `CronFlagEvaluator` that can be used to compute the current value of a feature flag based on the current date-time obtained from the system clock in the default time-zone and the configured CRON expression. 
 A typical feature flag configuration may look like:
 

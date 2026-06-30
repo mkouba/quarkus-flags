@@ -8,13 +8,14 @@ It attempts to discover all entities annotated with `@io.quarkiverse.flags.hiber
 If you want to use the Hibernate Reactive integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-hibernate-reactive` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
-```xml
+[source,xml,subs=attributes+]
+----
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-hibernate-reactive</artifactId>
     <version>{project-version}</version>
 </dependency>
-```
+----
 
 TIP: We recommend to use the `quarkus-hibernate-reactive-panache` extension as well to simplify your entities.
 

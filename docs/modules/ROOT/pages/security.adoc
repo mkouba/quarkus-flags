@@ -5,13 +5,14 @@ include::./includes/attributes.adoc[]
 If you want to use the Quarkus Security integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-security` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
-```xml
+[source,xml,subs=attributes+]
+----
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-security</artifactId>
     <version>{project-version}</version>
 </dependency>
-```
+----
 The extension provides the `SecurityIdentityFlagEvaluator` that can be used to compute the current value of a feature flag based on the current `SecurityIdentity`. 
 A typical feature flag configuration looks like:
 
