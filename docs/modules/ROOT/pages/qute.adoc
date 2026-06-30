@@ -8,13 +8,14 @@ It provides a namespace resolver that makes it possible to use the flags directl
 If you want to use the Qute integration in your application you'll need to add the `io.quarkiverse.flags:quarkus-flags-qute` extension to your build file first.
 For instance, with Maven, add the following dependency to your POM file:
 
-```xml
+[source,xml,subs=attributes+]
+----
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-qute</artifactId>
     <version>{project-version}</version>
 </dependency>
-```
+----
 
 Then you can access the flags directly in a template.
 

@@ -11,13 +11,14 @@ Applications use the familiar quarkus-flags API (`@Feature`, `Flags`) while flag
 Add the `io.quarkiverse.flags:quarkus-flags-openfeature` extension to your build file.
 For instance, with Maven, add the following dependency to your POM file:
 
-```xml
+[source,xml,subs=attributes+]
+----
 <dependency>
     <groupId>io.quarkiverse.flags</groupId>
     <artifactId>quarkus-flags-openfeature</artifactId>
     <version>{project-version}</version>
 </dependency>
-```
+----
 
 You also need to add a concrete OpenFeature provider dependency to your project (e.g. LaunchDarkly, Flagsmith, etc.).
 The https://github.com/open-feature/java-sdk[OpenFeature Java SDK] is already included as a transitive dependency.
