@@ -15,7 +15,6 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
@@ -33,35 +32,20 @@ public class InjectedFlagTest {
     @Inject
     InMemoryFlagProvider inMemoryFlagProvider;
 
-    @Inject
-    @Feature("alpha")
-    Flag alpha;
-
-    @Inject
-    @Feature
-    Flag bravo;
-
     @Test
     public void testFlags() {
-        assertNotNull(alpha);
-        assertThrows(NoSuchElementException.class, () -> alpha.isEnabled());
+        assertThrows(NoSuchElementException.class, () -> Flag.get("alpha"));
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(true));
+        Flag alpha = Flag.get("alpha");
+        assertNotNull(alpha);
         assertTrue(alpha.isEnabled());
         assertNull(alpha.metadata().get("foo"));
         inMemoryFlagProvider.removeFlag("alpha");
-        assertThrows(NoSuchElementException.class, () -> alpha.origin());
+        assertThrows(NoSuchElementException.class, () -> Flag.get("alpha"));
         inMemoryFlagProvider.addFlag(Flag.builder("alpha").setEnabled(false).setMetadata(Map.of("foo", "bar")));
+        alpha = Flag.get("alpha");
         assertFalse(alpha.isEnabled());
         assertEquals("bar", alpha.metadata().get("foo"));
-    }
-
-    @Test
-    public void testDefaultFeatureName() {
-        assertNotNull(bravo);
-        assertEquals("bravo", bravo.feature());
-        assertThrows(NoSuchElementException.class, () -> bravo.isEnabled());
-        inMemoryFlagProvider.addFlag(Flag.builder("bravo").setEnabled(true));
-        assertTrue(bravo.isEnabled());
     }
 
     @Test

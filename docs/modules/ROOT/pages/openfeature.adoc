@@ -4,7 +4,7 @@ include::./includes/attributes.adoc[]
 
 https://openfeature.dev[OpenFeature] is a vendor-neutral, community-driven standard for feature flagging.
 This extension integrates OpenFeature as a backend for Quarkus Feature Flags.
-Applications use the familiar quarkus-flags API (`@Feature`, `Flags`) while flag values are resolved via the OpenFeature Java SDK, which can be backed by any OpenFeature-compatible provider (LaunchDarkly, Flagsmith, CloudBees, Split, etc.).
+Applications use the familiar quarkus-flags API (`Flags`, `Flag.get()`) while flag values are resolved via the OpenFeature Java SDK, which can be backed by any OpenFeature-compatible provider (LaunchDarkly, Flagsmith, CloudBees, Split, etc.).
 
 == Dependency
 
@@ -110,18 +110,13 @@ Once registered, flags are resolved through the standard quarkus-flags API:
 ```java
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
-import io.quarkiverse.flags.Feature;
 import jakarta.inject.Inject;
-
-@Inject
-@Feature("dark-mode")
-Flag darkMode;
 
 @Inject
 Flags flags;
 
 // Boolean flag
-if (darkMode.isEnabled()) {
+if (Flag.get("dark-mode").isEnabled()) {
     // ...
 }
 

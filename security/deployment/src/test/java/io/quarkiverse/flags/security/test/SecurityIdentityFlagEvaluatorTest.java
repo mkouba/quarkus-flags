@@ -9,7 +9,6 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.RegisterFlag;
 import io.quarkiverse.flags.WithMetadata;
@@ -33,12 +32,6 @@ public class SecurityIdentityFlagEvaluatorTest {
             .overrideRuntimeConfigKey("quarkus.flags.runtime.echo.meta.evaluator", SecurityIdentityFlagEvaluator.ID)
             .overrideRuntimeConfigKey("quarkus.flags.runtime.echo.meta.roles-allowed", " baz , qux ");
 
-    @Feature("delta")
-    Flag delta;
-
-    @Feature("echo")
-    Flag echo;
-
     @Inject
     CurrentIdentityAssociation identityAssociation;
 
@@ -49,26 +42,26 @@ public class SecurityIdentityFlagEvaluatorTest {
                 .setPrincipal(new QuarkusPrincipal("Foo"))
                 .addRole("foo")
                 .build());
-        assertTrue(delta.isEnabled());
+        assertTrue(Flag.get("delta").isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setAnonymous(true)
                 .build());
-        assertFalse(delta.isEnabled());
+        assertFalse(Flag.get("delta").isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setPrincipal(new QuarkusPrincipal("Foo"))
                 .addRole("baz")
                 .addRole("qux")
                 .build());
-        assertFalse(delta.isEnabled());
+        assertFalse(Flag.get("delta").isEnabled());
 
         // "bar" with leading space in config - should still match after trimming
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setPrincipal(new QuarkusPrincipal("Foo"))
                 .addRole("bar")
                 .build());
-        assertTrue(delta.isEnabled());
+        assertTrue(Flag.get("delta").isEnabled());
     }
 
     @ActivateRequestContext
@@ -97,19 +90,19 @@ public class SecurityIdentityFlagEvaluatorTest {
                 .setPrincipal(new QuarkusPrincipal("Baz"))
                 .addRole("baz")
                 .build());
-        assertTrue(echo.isEnabled());
+        assertTrue(Flag.get("echo").isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setPrincipal(new QuarkusPrincipal("Qux"))
                 .addRole("qux")
                 .build());
-        assertTrue(echo.isEnabled());
+        assertTrue(Flag.get("echo").isEnabled());
 
         identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
                 .setPrincipal(new QuarkusPrincipal("Other"))
                 .addRole("other")
                 .build());
-        assertFalse(echo.isEnabled());
+        assertFalse(Flag.get("echo").isEnabled());
     }
 
     public static class SecurityFlags {
