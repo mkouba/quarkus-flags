@@ -55,4 +55,40 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>test-coverage</id>
+            <activation>
+                <property>
+                    <name>jacoco</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-jacoco</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <quarkus.jacoco.instrument-artifacts.api.group-id>io.quarkiverse.flags</quarkus.jacoco.instrument-artifacts.api.group-id>
+                                <quarkus.jacoco.instrument-artifacts.api.artifact-id>quarkus-flags-api</quarkus.jacoco.instrument-artifacts.api.artifact-id>
+                                <quarkus.jacoco.instrument-artifacts.core.group-id>io.quarkiverse.flags</quarkus.jacoco.instrument-artifacts.core.group-id>
+                                <quarkus.jacoco.instrument-artifacts.core.artifact-id>quarkus-flags</quarkus.jacoco.instrument-artifacts.core.artifact-id>
+                                <quarkus.jacoco.instrument-artifacts.hc.group-id>io.quarkiverse.flags</quarkus.jacoco.instrument-artifacts.hc.group-id>
+                                <quarkus.jacoco.instrument-artifacts.hc.artifact-id>quarkus-flags-hibernate-common</quarkus.jacoco.instrument-artifacts.hc.artifact-id>
+                                <quarkus.jacoco.instrument-artifacts.horm.group-id>io.quarkiverse.flags</quarkus.jacoco.instrument-artifacts.horm.group-id>
+                                <quarkus.jacoco.instrument-artifacts.horm.artifact-id>quarkus-flags-hibernate-orm</quarkus.jacoco.instrument-artifacts.horm.artifact-id>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
