@@ -46,13 +46,13 @@ public class RegisterFlagNamingTest {
     public static class NamingFlags {
 
         @RegisterFlag
-        static boolean alpha = true;
+        static volatile boolean alpha = true;
 
         @RegisterFlag(name = RegisterFlag.FQCN_ELEMENT_NAME)
-        static boolean bravo = true;
+        static volatile boolean bravo = true;
 
         @RegisterFlag(name = "my-custom-flag")
-        static boolean charlie = true;
+        static volatile boolean charlie = true;
 
         @RegisterFlag
         static boolean delta() {

@@ -78,10 +78,10 @@ public class FlagNamespaceResolverTest {
 
         @RegisterFlag
         @WithMetadata(key = "foo", value = "baz")
-        static boolean foxtrot = true;
+        static volatile boolean foxtrot = true;
 
         @RegisterFlag(name = "foxtrot-int")
-        static int foxtrotInt = 42;
+        static volatile int foxtrotInt = 42;
     }
 
 }

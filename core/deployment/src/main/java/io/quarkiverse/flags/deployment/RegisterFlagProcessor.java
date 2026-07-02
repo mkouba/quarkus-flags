@@ -110,6 +110,11 @@ public class RegisterFlagProcessor {
                         "@RegisterFlag field has an unsupported type [" + field.type().name() + "]: "
                                 + field.declaringClass().name() + "." + field.name());
             }
+            if (!Modifier.isVolatile(field.flags()) && !Modifier.isFinal(field.flags())) {
+                throw new IllegalStateException(
+                        "@RegisterFlag field must be volatile or final: " + field.declaringClass().name() + "."
+                                + field.name());
+            }
         } else if (annotation.target().kind() == AnnotationTarget.Kind.METHOD) {
             MethodInfo method = annotation.target().asMethod();
             if (!Modifier.isStatic(method.flags())) {
