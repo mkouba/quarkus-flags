@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,10 +27,12 @@ public class ImmutableValuesTest {
         assertEquals(1, yes.asInt());
         assertEquals("true", yes.asString());
         assertTrue(yes.asBoolean());
+        assertEquals(BigDecimal.ONE, yes.asDecimal());
         Value no = BooleanValue.from(false);
         assertEquals(0, no.asInt());
         assertEquals("false", no.asString());
         assertFalse(no.asBoolean());
+        assertEquals(BigDecimal.ZERO, no.asDecimal());
     }
 
     @Test
@@ -38,11 +41,14 @@ public class ImmutableValuesTest {
         assertEquals(0, zero.asInt());
         assertEquals("0", zero.asString());
         assertFalse(zero.asBoolean());
+        assertEquals(BigDecimal.valueOf(0), zero.asDecimal());
         Value one = new IntValue(1);
         assertEquals(1, one.asInt());
         assertEquals("1", one.asString());
         assertTrue(one.asBoolean());
+        assertEquals(BigDecimal.valueOf(1), one.asDecimal());
         Value fortyTwo = new IntValue(42);
+        assertEquals(BigDecimal.valueOf(42), fortyTwo.asDecimal());
         NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> fortyTwo.asBoolean());
         assertTrue(e.getMessage().contains("42"));
     }
@@ -77,7 +83,11 @@ public class ImmutableValuesTest {
         Value number = new StringValue("42");
         assertEquals(42, number.asInt());
         assertEquals("42", number.asString());
+        assertEquals(new BigDecimal("42"), number.asDecimal());
         assertThrows(NoSuchElementException.class, () -> number.asBoolean());
+
+        Value decimalString = new StringValue("3.14");
+        assertEquals(new BigDecimal("3.14"), decimalString.asDecimal());
     }
 
     @Test
@@ -85,12 +95,14 @@ public class ImmutableValuesTest {
         Value ten = new BigDecimalValue(BigDecimal.TEN);
         assertEquals(10, ten.asInt());
         assertEquals("10", ten.asString());
+        assertEquals(BigDecimal.TEN, ten.asDecimal());
         NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> ten.asBoolean());
         assertTrue(e.getMessage().contains("10"));
         Value one = new BigDecimalValue(BigDecimal.ONE);
         assertTrue(one.asBoolean());
         Value zero = new BigDecimalValue(BigDecimal.ZERO);
         assertFalse(zero.asBoolean());
+        assertFalse(new BigDecimalValue(new BigDecimal("0.0")).asBoolean());
         assertTrue(new BigDecimalValue(new BigDecimal("1.0")).asBoolean());
 
         // asInt() rejects fractional and out-of-range values
@@ -124,6 +136,11 @@ public class ImmutableValuesTest {
         // BooleanValue singletons
         assertEquals(BooleanValue.from(true), BooleanValue.from(true));
         assertEquals(BooleanValue.from(false), BooleanValue.from(false));
+        assertNotEquals(BooleanValue.TRUE, BooleanValue.FALSE);
+        assertNotEquals(BooleanValue.FALSE, BooleanValue.TRUE);
+        assertNotEquals(BooleanValue.TRUE, null);
+        assertNotEquals(BooleanValue.TRUE, "true");
+        assertNotEquals(BooleanValue.FALSE, new IntValue(0));
 
         // Cross-type
         assertNotEquals(new IntValue(1), new StringValue("1"));
@@ -136,6 +153,21 @@ public class ImmutableValuesTest {
         assertEquals("foo", new StringValue("foo").toString());
         assertEquals("42", new IntValue(42).toString());
         assertEquals("3.14", new BigDecimalValue(new BigDecimal("3.14")).toString());
+    }
+
+    @Test
+    public void testCreateUni() {
+        assertSame(BooleanValue.TRUE, BooleanValue.createUni(true).await().indefinitely());
+        assertSame(BooleanValue.FALSE, BooleanValue.createUni(false).await().indefinitely());
+        assertEquals(new StringValue("hello"), StringValue.createUni("hello").await().indefinitely());
+        assertEquals(new IntValue(42), IntValue.createUni(42).await().indefinitely());
+        assertEquals(new BigDecimalValue(BigDecimal.TEN), BigDecimalValue.createUni(BigDecimal.TEN).await().indefinitely());
+    }
+
+    @Test
+    public void testNullConstructorArgs() {
+        assertThrows(NullPointerException.class, () -> new BigDecimalValue(null));
+        assertThrows(NullPointerException.class, () -> new StringValue(null));
     }
 
     @Test
@@ -152,6 +184,31 @@ public class ImmutableValuesTest {
         Value one = new IntValue(1);
         assertTrue(one.asBoolean(false));
         assertEquals(1, one.asInt(99));
+        assertEquals("1", one.asString("fallback"));
+        assertEquals(BigDecimal.valueOf(1), one.asDecimal(BigDecimal.TEN));
+
+        Value fortyTwo = new IntValue(42);
+        // conversion fails, default returned
+        assertTrue(fortyTwo.asBoolean(true));
+        assertFalse(fortyTwo.asBoolean(false));
+
+        Value ten = new BigDecimalValue(BigDecimal.TEN);
+        // conversion fails, default returned
+        assertFalse(ten.asBoolean(false));
+        // conversion succeeds, actual value returned
+        assertEquals(10, ten.asInt(99));
+        assertEquals("10", ten.asString("fallback"));
+        assertEquals(BigDecimal.TEN, ten.asDecimal(BigDecimal.ZERO));
+
+        Value fractional = new BigDecimalValue(new BigDecimal("1.5"));
+        // asInt conversion fails for fractional values, default returned
+        assertEquals(99, fractional.asInt(99));
+
+        Value boolTrue = BooleanValue.from(true);
+        assertTrue(boolTrue.asBoolean(false));
+        assertEquals(1, boolTrue.asInt(99));
+        assertEquals("true", boolTrue.asString("fallback"));
+        assertEquals(BigDecimal.ONE, boolTrue.asDecimal(BigDecimal.ZERO));
     }
 
 }

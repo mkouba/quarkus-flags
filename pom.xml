@@ -29,6 +29,7 @@
         <openfeature-sdk.version>1.21.0</openfeature-sdk.version>
         <jacoco.version>0.8.15</jacoco.version>
         <jacoco.dest-file>${maven.multiModuleProjectDirectory}/target/jacoco.exec</jacoco.dest-file>
+        <argLine/>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -118,7 +119,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <!-- See for example https://github.com/jboss/jboss-threads/pull/215 -->
-                            <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                            <argLine>@{argLine} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
