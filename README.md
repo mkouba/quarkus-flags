@@ -41,7 +41,7 @@ void doWork() {
 
 ## Features
 
-* **Simple API** — inject `Flags` or individual `Flag` instances into any CDI bean; or declare flags with `@RegisterFlag` on static fields and methods.
+* **Simple API** — inject `Flags`, use static `Flag.get()`, or declare flags with `@RegisterFlag` on static fields and methods.
 * **Multiple value types** — boolean, string, integer, and decimal.
 * **Built-in providers** — define flags via Quarkus config, declarative `@RegisterFlag` annotations, or the in-memory repository for testing.
 * **Built-in evaluators** — time span, composite, and variant evaluators out of the box.

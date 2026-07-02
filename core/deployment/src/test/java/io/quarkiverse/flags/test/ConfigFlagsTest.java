@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.BooleanValue;
-import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
@@ -44,15 +42,6 @@ public class ConfigFlagsTest {
     @Inject
     Flags flags;
 
-    @Feature("alpha")
-    Flag alpha;
-
-    @Feature("delta")
-    Flag delta;
-
-    @Feature("bravo")
-    Instance<Flag> bravo;
-
     @Test
     public void testFlags() {
         List<Flag> all = flags.findAllAndAwait();
@@ -62,11 +51,12 @@ public class ConfigFlagsTest {
         assertEquals(0, flags.findAndAwait("bravo").orElseThrow().getInt());
         assertTrue(flags.isEnabled("charlie"));
         assertFalse(flags.isEnabled("delta"));
-        assertTrue(alpha.isEnabled());
+        assertTrue(Flag.get("alpha").isEnabled());
 
-        assertFalse(bravo.get().computeAndAwait().asBoolean());
-        assertEquals("0", bravo.get().getString());
+        assertFalse(Flag.get("bravo").computeAndAwait().asBoolean());
+        assertEquals("0", Flag.get("bravo").getString());
 
+        Flag delta = Flag.get("delta");
         assertEquals("deltaEval", delta.metadata().get(FlagEvaluator.META_KEY));
         assertTrue(delta.computeAndAwait(Flag.ComputationContext.of("username", "foo")).asBoolean());
         assertFalse(delta.computeAndAwait(Flag.ComputationContext.of("username", "qux")).asBoolean());

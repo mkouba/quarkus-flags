@@ -14,12 +14,9 @@ import java.util.concurrent.ConcurrentMap;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
-import jakarta.enterprise.inject.Produces;
-import jakarta.enterprise.inject.spi.InjectionPoint;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.flags.Feature;
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.spi.FlagCache;
 import io.quarkiverse.flags.spi.FlagEvaluator;
@@ -175,26 +172,6 @@ public class FlagManagerImpl implements FlagManager {
         return Optional.ofNullable(evaluator);
     }
 
-    @Feature
-    @Produces
-    Flag produceFlag(InjectionPoint injectionPoint) {
-        Feature feature = null;
-        for (Annotation qualifier : injectionPoint.getQualifiers()) {
-            if (qualifier.annotationType().equals(Feature.class)) {
-                feature = (Feature) qualifier;
-            }
-        }
-        if (feature == null) {
-            // This should never happen
-            throw new IllegalStateException("Injection point does not declare @Feature");
-        }
-        String featureName = feature.value();
-        if (Feature.ELEMENT_NAME.equals(featureName)) {
-            featureName = injectionPoint.getMember().getName();
-        }
-        return new InjectedFlag(featureName);
-    }
-
     public List<FlagProviderWithId> getProviders() {
         return providers;
     }
@@ -214,36 +191,6 @@ public class FlagManagerImpl implements FlagManager {
     }
 
     public record FlagProviderWithId(FlagProvider provider, String id) {
-    }
-
-    class InjectedFlag implements Flag {
-
-        private final String feature;
-
-        private InjectedFlag(String feature) {
-            this.feature = feature;
-        }
-
-        @Override
-        public String feature() {
-            return feature;
-        }
-
-        @Override
-        public String origin() {
-            return findAndAwait(feature).orElseThrow().origin();
-        }
-
-        @Override
-        public Uni<Value> compute(ComputationContext context) {
-            return find(feature).chain(f -> f.orElseThrow().compute(context));
-        }
-
-        @Override
-        public Map<String, String> metadata() {
-            return findAndAwait(feature).orElseThrow().metadata();
-        }
-
     }
 
 }
