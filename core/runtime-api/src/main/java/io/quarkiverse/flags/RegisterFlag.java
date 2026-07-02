@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
  * Supported types: {@code boolean}, {@code Boolean}, {@code int}, {@code Integer}, {@code String},
  * {@code java.math.BigDecimal}, and {@link Flag.Value}. Methods may optionally accept a single
  * {@link Flag.ComputationContext} parameter.
+ * <p>
+ * Fields must be {@code volatile} or {@code final} to ensure thread-safe visibility.
  *
  * @see WithMetadata
  * @see Flag#get(String)

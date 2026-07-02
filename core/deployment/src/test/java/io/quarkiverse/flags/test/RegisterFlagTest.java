@@ -92,6 +92,7 @@ public class RegisterFlagTest {
         } finally {
             MyFlags.julietValue = 10;
         }
+
     }
 
     @Test
@@ -111,13 +112,13 @@ public class RegisterFlagTest {
         static final boolean alpha = true;
 
         @RegisterFlag
-        static int bravo = 42;
+        static volatile int bravo = 42;
 
         @RegisterFlag
-        static String charlie = "hello";
+        static volatile String charlie = "hello";
 
         @RegisterFlag
-        static BigDecimal delta = new BigDecimal("3.14");
+        static volatile BigDecimal delta = new BigDecimal("3.14");
 
         @RegisterFlag
         static boolean echo() {
@@ -131,21 +132,22 @@ public class RegisterFlagTest {
         }
 
         @RegisterFlag
-        static Flag.Value golf = BooleanValue.TRUE;
+        static volatile Flag.Value golf = BooleanValue.TRUE;
 
         @RegisterFlag
         @WithMetadata(key = "foo", value = "bar")
-        static boolean hotel = true;
+        static volatile boolean hotel = true;
 
         @RegisterFlag(evaluator = "negateEval")
-        static boolean india = true;
+        static volatile boolean india = true;
 
-        static int julietValue = 10;
+        static volatile int julietValue = 10;
 
         @RegisterFlag
         static int juliet() {
             return julietValue;
         }
+
     }
 
     @Singleton

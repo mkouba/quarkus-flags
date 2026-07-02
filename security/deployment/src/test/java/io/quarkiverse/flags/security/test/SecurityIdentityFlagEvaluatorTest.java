@@ -110,7 +110,7 @@ public class SecurityIdentityFlagEvaluatorTest {
         @RegisterFlag(evaluator = SecurityIdentityFlagEvaluator.ID)
         @WithMetadata(key = SecurityIdentityFlagEvaluator.AUTHENTICATED, value = "true")
         @WithMetadata(key = SecurityIdentityFlagEvaluator.ROLES_ALLOWED, value = "admin")
-        static boolean foxtrot = true;
+        static volatile boolean foxtrot = true;
     }
 
 }

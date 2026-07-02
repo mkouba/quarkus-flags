@@ -127,13 +127,13 @@ import io.quarkiverse.flags.WithMetadata;
 public class MyFlags {
 
     @RegisterFlag <1>
-    static boolean newCheckout = true;
+    static volatile boolean newCheckout = true;
 
     @RegisterFlag <2>
     static volatile int maxRetries = 3;
 
     @RegisterFlag(name = "custom-name") <3>
-    static String greeting = "hello";
+    static volatile String greeting = "hello";
 
     @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID) <4>
     @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2026-07-01T00:00:00+00:00[UTC]")
@@ -146,7 +146,7 @@ public class MyFlags {
     }
 }
 ----
-<1> A boolean flag named `newCheckout` (derived from the field name) with an initial value of `true`. The value is re-read from the field on every computation so changes to the field are reflected.
+<1> A boolean flag named `newCheckout` (derived from the field name) with an initial value of `true`. The value is re-read from the field on every computation so changes to the field are reflected. Fields must be `volatile` or `final` to ensure thread-safe visibility.
 <2> An integer flag named `maxRetries`.
 <3> A string flag with an explicit name `custom-name`.
 <4> A boolean flag using the built-in `TimeSpanFlagEvaluator`. The `@WithMetadata` annotation adds metadata entries to the flag.

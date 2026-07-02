@@ -77,11 +77,11 @@ public class CronFlagEvaluatorTest {
 
         @RegisterFlag(evaluator = CronFlagEvaluator.ID)
         @WithMetadata(key = CronFlagEvaluator.CRON_EXPR, value = "* * * * *")
-        static boolean foxtrot = true;
+        static volatile boolean foxtrot = true;
 
         @RegisterFlag(evaluator = CronFlagEvaluator.ID)
         @WithMetadata(key = CronFlagEvaluator.CRON_EXPR, value = "* * 31 2 *")
-        static boolean golf = true;
+        static volatile boolean golf = true;
     }
 
 }

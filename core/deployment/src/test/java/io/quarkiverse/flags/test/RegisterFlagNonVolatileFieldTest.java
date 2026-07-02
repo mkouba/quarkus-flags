@@ -8,11 +8,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.flags.RegisterFlag;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class RegisterFlagDuplicateNameTest {
+public class RegisterFlagNonVolatileFieldTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .withApplicationRoot(root -> root.addClass(DuplicateNameFlags.class))
+            .withApplicationRoot(root -> root.addClass(NonVolatileFlags.class))
             .setExpectedException(IllegalStateException.class, true);
 
     @Test
@@ -20,12 +20,9 @@ public class RegisterFlagDuplicateNameTest {
         fail();
     }
 
-    public static class DuplicateNameFlags {
+    public static class NonVolatileFlags {
 
-        @RegisterFlag(name = "same")
-        static volatile boolean alpha = true;
-
-        @RegisterFlag(name = "same")
-        static volatile boolean bravo = false;
+        @RegisterFlag
+        static boolean alpha = true;
     }
 }

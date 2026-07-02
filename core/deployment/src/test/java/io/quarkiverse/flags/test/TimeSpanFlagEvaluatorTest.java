@@ -123,11 +123,11 @@ public class TimeSpanFlagEvaluatorTest {
 
         @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID)
         @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2011-11-01T10:15:30+01:00[Europe/Prague]")
-        static boolean foxtrot = true;
+        static final boolean foxtrot = true;
 
         @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID)
         @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2115-11-01T10:15:30+01:00[Europe/Prague]")
-        static boolean golf = true;
+        static final boolean golf = true;
     }
 
 }
