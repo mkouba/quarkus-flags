@@ -26,6 +26,13 @@ public interface FlagEvaluator {
     /**
      * The initial flag value does not have to be used during evaluation. Exceptions are propagated through the
      * {@link Uni} pipeline.
+     * <p>
+     * Must not block the caller thread unless blocking is allowed. Blocking operations include remote service calls,
+     * database queries, distributed cache lookups, etc.
+     * <p>
+     * An implementation can use {@link io.quarkus.runtime.BlockingOperationControl#isBlockingAllowed()} to detect if blocking
+     * is allowed on the current thread. If blocking is not allowed but an implementation still needs to perform a blocking
+     * operation then it has to offload the execution on a worker thread.
      *
      * @param flag must not be {@code null}
      * @param initialValue may be {@code null}

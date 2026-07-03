@@ -22,7 +22,8 @@ import io.smallrye.mutiny.Uni;
 public interface FlagProvider {
 
     /**
-     * Must not block the caller thread unless blocking is allowed.
+     * Must not block the caller thread unless blocking is allowed. Blocking operations include remote service calls,
+     * database queries, distributed cache lookups, etc.
      * <p>
      * An implementation can use {@link BlockingOperationControl#isBlockingAllowed()} to detect if blocking is allowed on the
      * current thread. If blocking is not allowed but an implementation still needs to perform a blocking operation then it has
@@ -39,7 +40,8 @@ public interface FlagProvider {
     Uni<Collection<Flag>> getFlags();
 
     /**
-     * Must not block the caller thread unless blocking is allowed.
+     * Must not block the caller thread unless blocking is allowed. Blocking operations include remote service calls,
+     * database queries, distributed cache lookups, etc.
      * <p>
      * An implementation can use {@link BlockingOperationControl#isBlockingAllowed()} to detect if blocking is allowed on the
      * current thread. If blocking is not allowed but an implementation still needs to perform a blocking operation then it has
