@@ -25,6 +25,12 @@ import io.smallrye.mutiny.Uni;
  * {@link FlagProvider#isCacheable()}. The configuration property takes precedence over the provider's declaration.
  * <p>
  * CDI qualifiers declared on the bean class are ignored when the flag manager looks up the cache.
+ * <p>
+ * Implementations must not block the caller thread unless blocking is allowed. Blocking operations include remote service
+ * calls, database queries, distributed cache lookups, etc. An implementation can use
+ * {@link io.quarkus.runtime.BlockingOperationControl#isBlockingAllowed()} to detect if blocking is allowed on the current
+ * thread. If blocking is not allowed but an implementation still needs to perform a blocking operation then it has to
+ * offload the execution on a worker thread.
  *
  * @see FlagProvider
  */
