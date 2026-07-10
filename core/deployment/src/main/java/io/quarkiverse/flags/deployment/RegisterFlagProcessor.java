@@ -35,6 +35,7 @@ import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.IntValue;
 import io.quarkiverse.flags.RegisterFlag;
 import io.quarkiverse.flags.StringValue;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.runtime.impl.ConfigFlagProvider;
 import io.quarkiverse.flags.spi.ComponentOrder;
@@ -66,6 +67,7 @@ public class RegisterFlagProcessor {
     private static final DotName REGISTER_FLAG = DotName.createSimple(RegisterFlag.class);
     private static final DotName WITH_METADATA = DotName.createSimple(WithMetadata.class);
     private static final DotName WITH_METADATA_LIST = DotName.createSimple(WithMetadata.List.class);
+    private static final DotName WITH_EVALUATOR = DotName.createSimple(WithEvaluator.class);
     private static final DotName COMPUTATION_CONTEXT = DotName.createSimple(Flag.ComputationContext.class);
     private static final DotName FLAG_VALUE = DotName.createSimple(Flag.Value.class);
 
@@ -90,10 +92,9 @@ public class RegisterFlagProcessor {
                 throw new IllegalStateException(
                         "Duplicate @RegisterFlag name detected: " + flagName);
             }
-            String evaluator = annotation.value("evaluator") != null ? annotation.value("evaluator").asString() : "";
             Map<String, String> metadata = collectMetadata(annotation.target());
             registeredFlags.produce(new RegisteredFlagBuildItem(
-                    annotation.target().asDeclaration(), flagName, evaluator, metadata));
+                    annotation.target().asDeclaration(), flagName, metadata));
         }
     }
 
@@ -283,10 +284,7 @@ public class RegisterFlagProcessor {
                 MethodDesc.of(Flag.Builder.class, "setOrigin", Flag.Builder.class, String.class),
                 builder, Const.of(providerClassName));
 
-        Map<String, String> metadata = new HashMap<>(item.getMetadata());
-        if (!item.getEvaluator().isEmpty()) {
-            metadata.put(FlagEvaluator.META_KEY, item.getEvaluator());
-        }
+        Map<String, String> metadata = item.getMetadata();
         if (!metadata.isEmpty()) {
             List<Expr> mapArgs = new ArrayList<>();
             for (Map.Entry<String, String> e : metadata.entrySet()) {
@@ -431,6 +429,15 @@ public class RegisterFlagProcessor {
 
         for (AnnotationInstance wm : withMetadataList) {
             metadata.put(wm.value("key").asString(), wm.value("value").asString());
+        }
+
+        AnnotationInstance withEvaluator = target.declaredAnnotation(WITH_EVALUATOR);
+        if (withEvaluator != null) {
+            if (metadata.containsKey(FlagEvaluator.META_KEY)) {
+                throw new IllegalStateException(
+                        "@WithEvaluator and @WithMetadata(key = \"evaluator\", ...) cannot both be used on the same target");
+            }
+            metadata.put(FlagEvaluator.META_KEY, withEvaluator.value().asString());
         }
         return metadata;
     }

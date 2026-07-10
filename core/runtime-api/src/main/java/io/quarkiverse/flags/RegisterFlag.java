@@ -19,6 +19,7 @@ import java.lang.annotation.Target;
  * Fields must be {@code volatile} or {@code final} to ensure thread-safe visibility.
  *
  * @see WithMetadata
+ * @see WithEvaluator
  * @see Flag#get(String)
  */
 @Target({ ElementType.FIELD, ElementType.METHOD })
@@ -44,11 +45,4 @@ public @interface RegisterFlag {
      */
     String name() default ELEMENT_NAME;
 
-    /**
-     * The identifier of a {@link io.quarkiverse.flags.spi.FlagEvaluator} to use. If set, the compute result is passed as the
-     * initial value to the evaluator.
-     *
-     * @see io.quarkiverse.flags.spi.FlagEvaluator#META_KEY
-     */
-    String evaluator() default "";
 }

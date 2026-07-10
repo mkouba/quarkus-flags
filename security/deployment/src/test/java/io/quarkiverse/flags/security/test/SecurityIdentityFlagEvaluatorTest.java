@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.security.SecurityIdentityFlagEvaluator;
 import io.quarkus.security.identity.CurrentIdentityAssociation;
@@ -107,7 +108,8 @@ public class SecurityIdentityFlagEvaluatorTest {
 
     public static class SecurityFlags {
 
-        @RegisterFlag(evaluator = SecurityIdentityFlagEvaluator.ID)
+        @RegisterFlag
+        @WithEvaluator(SecurityIdentityFlagEvaluator.ID)
         @WithMetadata(key = SecurityIdentityFlagEvaluator.AUTHENTICATED, value = "true")
         @WithMetadata(key = SecurityIdentityFlagEvaluator.ROLES_ALLOWED, value = "admin")
         static volatile boolean foxtrot = true;
