@@ -122,6 +122,7 @@ The annotated field is read and the annotated method is invoked during each flag
 ----
 import io.quarkiverse.flags.RegisterFlag;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 
 public class MyFlags {
@@ -135,7 +136,8 @@ public class MyFlags {
     @RegisterFlag(name = "custom-name") <3>
     static volatile String greeting = "hello";
 
-    @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID) <4>
+    @RegisterFlag
+    @WithEvaluator(TimeSpanFlagEvaluator.ID) <4>
     @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2026-07-01T00:00:00+00:00[UTC]")
     static final boolean summerSale = true;
 
@@ -149,7 +151,7 @@ public class MyFlags {
 <1> A boolean flag named `newCheckout` (derived from the field name) with an initial value of `true`. The value is re-read from the field on every computation so changes to the field are reflected. Fields must be `volatile` or `final` to ensure thread-safe visibility.
 <2> An integer flag named `maxRetries`.
 <3> A string flag with an explicit name `custom-name`.
-<4> A boolean flag using the built-in `TimeSpanFlagEvaluator`. The `@WithMetadata` annotation adds metadata entries to the flag.
+<4> The `@WithEvaluator` annotation specifies the built-in `TimeSpanFlagEvaluator` to use. The `@WithMetadata` annotation adds metadata entries to the flag.
 <5> A method-based flag. The method can optionally accept a single `Flag.ComputationContext` parameter.
 
 Supported field/return types are: `boolean`/`Boolean`, `int`/`Integer`, `String`, `BigDecimal`, and `Flag.Value`.

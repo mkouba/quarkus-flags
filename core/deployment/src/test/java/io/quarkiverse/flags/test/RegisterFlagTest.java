@@ -19,6 +19,7 @@ import io.quarkiverse.flags.Flag.ComputationContext;
 import io.quarkiverse.flags.Flag.Value;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
@@ -138,7 +139,8 @@ public class RegisterFlagTest {
         @WithMetadata(key = "foo", value = "bar")
         static volatile boolean hotel = true;
 
-        @RegisterFlag(evaluator = "negateEval")
+        @RegisterFlag
+        @WithEvaluator("negateEval")
         static volatile boolean india = true;
 
         static volatile int julietValue = 10;

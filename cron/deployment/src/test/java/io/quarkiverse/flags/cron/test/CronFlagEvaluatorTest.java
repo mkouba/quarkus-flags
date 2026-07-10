@@ -15,6 +15,7 @@ import io.quarkiverse.flags.Flag;
 import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.InMemoryFlagProvider;
 import io.quarkiverse.flags.RegisterFlag;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.cron.CronFlagEvaluator;
 import io.quarkus.test.QuarkusUnitTest;
@@ -75,11 +76,13 @@ public class CronFlagEvaluatorTest {
 
     public static class CronFlags {
 
-        @RegisterFlag(evaluator = CronFlagEvaluator.ID)
+        @RegisterFlag
+        @WithEvaluator(CronFlagEvaluator.ID)
         @WithMetadata(key = CronFlagEvaluator.CRON_EXPR, value = "* * * * *")
         static volatile boolean foxtrot = true;
 
-        @RegisterFlag(evaluator = CronFlagEvaluator.ID)
+        @RegisterFlag
+        @WithEvaluator(CronFlagEvaluator.ID)
         @WithMetadata(key = CronFlagEvaluator.CRON_EXPR, value = "* * 31 2 *")
         static volatile boolean golf = true;
     }

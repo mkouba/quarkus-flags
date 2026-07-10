@@ -10,14 +10,12 @@ final class RegisteredFlagBuildItem extends MultiBuildItem {
 
     private final Declaration declaration;
     private final String flagName;
-    private final String evaluator;
     private final Map<String, String> metadata;
 
-    RegisteredFlagBuildItem(Declaration declaration, String flagName, String evaluator,
+    RegisteredFlagBuildItem(Declaration declaration, String flagName,
             Map<String, String> metadata) {
         this.declaration = declaration;
         this.flagName = flagName;
-        this.evaluator = evaluator;
         this.metadata = metadata;
     }
 
@@ -27,10 +25,6 @@ final class RegisteredFlagBuildItem extends MultiBuildItem {
 
     String getFlagName() {
         return flagName;
-    }
-
-    String getEvaluator() {
-        return evaluator;
     }
 
     Map<String, String> getMetadata() {

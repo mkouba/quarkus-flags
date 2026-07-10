@@ -18,6 +18,7 @@ import io.quarkiverse.flags.Flags;
 import io.quarkiverse.flags.RegisterFlag;
 import io.quarkiverse.flags.StringValue;
 import io.quarkiverse.flags.TimeSpanFlagEvaluator;
+import io.quarkiverse.flags.WithEvaluator;
 import io.quarkiverse.flags.WithMetadata;
 import io.quarkiverse.flags.spi.FlagEvaluator;
 import io.quarkiverse.flags.spi.FlagManager;
@@ -121,11 +122,13 @@ public class TimeSpanFlagEvaluatorTest {
 
     public static class TimeSpanFlags {
 
-        @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID)
+        @RegisterFlag
+        @WithEvaluator(TimeSpanFlagEvaluator.ID)
         @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2011-11-01T10:15:30+01:00[Europe/Prague]")
         static final boolean foxtrot = true;
 
-        @RegisterFlag(evaluator = TimeSpanFlagEvaluator.ID)
+        @RegisterFlag
+        @WithEvaluator(TimeSpanFlagEvaluator.ID)
         @WithMetadata(key = TimeSpanFlagEvaluator.START_TIME, value = "2115-11-01T10:15:30+01:00[Europe/Prague]")
         static final boolean golf = true;
     }
