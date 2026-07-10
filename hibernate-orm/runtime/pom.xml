@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-hibernate-orm-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>quarkus-flags-hibernate-orm</artifactId>
     <name>Quarkus Feature Flags - Hibernate ORM - Runtime</name>
@@ -62,4 +62,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>1.0.0</tag>
+  </scm>
 </project>
