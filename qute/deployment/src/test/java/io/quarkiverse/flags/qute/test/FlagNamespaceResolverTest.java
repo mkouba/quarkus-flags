@@ -29,6 +29,8 @@ public class FlagNamespaceResolverTest {
     public void testFlag() {
         assertEquals("true", Qute.fmt("{flag:bool('alpha')}").render());
         assertEquals("false", Qute.fmt("{flag:disabled('alpha')}").render());
+        assertEquals("true", Qute.fmt("{flag:on('alpha')}").render());
+        assertEquals("false", Qute.fmt("{flag:off('alpha')}").render());
         assertEquals("true", Qute.fmt("{flag:string(data.0)}", "bravo"));
         assertEquals("5", Qute.fmt("{flag:int(\"charlie\")}").render());
         assertEquals("ok", Qute.fmt("{#if flag:enabled('alpha')}ok{/if}").render());
@@ -39,6 +41,8 @@ public class FlagNamespaceResolverTest {
         assertEquals("none", Qute.fmt("{flag:bool('nonexistent').or('none')}").render());
         assertEquals("none", Qute.fmt("{flag:enabled('nonexistent').or('none')}").render());
         assertEquals("none", Qute.fmt("{flag:disabled('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:on('nonexistent').or('none')}").render());
+        assertEquals("none", Qute.fmt("{flag:off('nonexistent').or('none')}").render());
         assertEquals("none", Qute.fmt("{flag:string('nonexistent').or('none')}").render());
         assertEquals("none", Qute.fmt("{flag:int('nonexistent').or('none')}").render());
         assertEquals("none", Qute.fmt("{flag:decimal('nonexistent').or('none')}").render());
@@ -59,6 +63,8 @@ public class FlagNamespaceResolverTest {
         // default values - non-existent flag, default returned
         assertEquals("99", Qute.fmt("{flag:int('nonexistent', 99)}").render());
         assertEquals("false", Qute.fmt("{flag:bool('nonexistent', false)}").render());
+        assertEquals("false", Qute.fmt("{flag:on('nonexistent', false)}").render());
+        assertEquals("true", Qute.fmt("{flag:off('nonexistent', true)}").render());
         String allFlags = Qute.fmt("""
                 {#for flag in flag:flags}{flag.feature}{#if flag_hasNext}:{/if}{/for}
                 """).render();

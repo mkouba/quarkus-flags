@@ -36,7 +36,9 @@ public class FlagNamespaceResolver implements NamespaceResolver {
         // flag:bool('delta-feature')
         // flag:bool('delta-feature', true)
         // flag:enabled('delta-feature')
+        // flag:on('delta-feature')
         // flag:disabled('delta-feature')
+        // flag:off('delta-feature')
         // flag:string('delta-feature')
         // flag:int('delta-feature')
         // flag:int('delta-feature', 42)
@@ -66,9 +68,9 @@ public class FlagNamespaceResolver implements NamespaceResolver {
                         return resolveWithDefault(ctx, flag.get(), defaultValue);
                     }
                     return switch (ctx.getName()) {
-                        case "bool", "enabled" -> cast(
+                        case "bool", "enabled", "on" -> cast(
                                 flag.get().compute().map(Value::asBoolean).subscribeAsCompletionStage());
-                        case "disabled" -> cast(
+                        case "disabled", "off" -> cast(
                                 flag.get().compute().map(v -> !v.asBoolean()).subscribeAsCompletionStage());
                         case "string" -> cast(
                                 flag.get().compute().map(Value::asString).subscribeAsCompletionStage());
@@ -85,12 +87,12 @@ public class FlagNamespaceResolver implements NamespaceResolver {
 
     private CompletionStage<Object> resolveWithDefault(EvalContext ctx, Flag flag, Object defaultValue) {
         return switch (ctx.getName()) {
-            case "bool", "enabled" -> {
+            case "bool", "enabled", "on" -> {
                 requireType(defaultValue, Boolean.class, ctx);
                 yield cast(flag.compute().map(v -> v.asBoolean((Boolean) defaultValue))
                         .subscribeAsCompletionStage());
             }
-            case "disabled" -> {
+            case "disabled", "off" -> {
                 requireType(defaultValue, Boolean.class, ctx);
                 boolean disabledDefault = (Boolean) defaultValue;
                 yield cast(flag.compute().map(v -> {
