@@ -49,17 +49,21 @@ You can use https://quarkus.io/guides/qute-reference#strict_rendering[Qute defau
 ```html
 {flag:enabled('my-feature')} <1>
 {flag:bool('my-feature')} <2>
-{flag:disabled('my-feature')} <3>
-{flag:string('my-feature')} <4>
-{flag:int('my-feature')} <5>
-{flag:decimal('my-feature')} <6>
+{flag:on('my-feature')} <3>
+{flag:disabled('my-feature')} <4>
+{flag:off('my-feature')} <5>
+{flag:string('my-feature')} <6>
+{flag:int('my-feature')} <7>
+{flag:decimal('my-feature')} <8>
 ```
 <1> Returns `true` if the flag value is `true`, `false` otherwise.
 <2> Same as `enabled`.
-<3> Returns `true` if the flag value is `false` (negated boolean).
-<4> Returns the flag value as a string.
-<5> Returns the flag value as an integer.
-<6> Returns the flag value as a decimal (`BigDecimal`).
+<3> Same as `enabled`.
+<4> Returns `true` if the flag value is `false` (negated boolean).
+<5> Same as `disabled`.
+<6> Returns the flag value as a string.
+<7> Returns the flag value as an integer.
+<8> Returns the flag value as a decimal (`BigDecimal`).
 
 == Other methods
 
@@ -76,7 +80,7 @@ If the flag does not exist, `io.quarkus.qute.Results.NotFound` is returned.
 
 == Default values
 
-The value accessor methods (`bool`, `enabled`, `disabled`, `string`, `int`, `decimal`) accept an optional default value as the second parameter.
+The value accessor methods (`bool`, `enabled`, `on`, `disabled`, `off`, `string`, `int`, `decimal`) accept an optional default value as the second parameter.
 The default value is returned if the flag is not found or if the underlying value cannot be converted to the requested type.
 
 ```html
