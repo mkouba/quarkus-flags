@@ -39,3 +39,11 @@ quarkus.flags.runtime.delta.meta.rollout-percentage=20 <3>
 <1> Flag `delta` is enabled by default.
 <2> The `UsernameRolloutFlagEvaluator` is used to compute the current value of the feature flag.
 <3> Enable the flag for the given percentage of users.
+
+The `rollout-percentage` must be a value between `0` and `100` (inclusive):
+
+* `0` - the flag is disabled for all users,
+* `100` - the flag is enabled for all users (including anonymous users),
+* `1` - `99` - the flag is enabled for the given percentage of users; an anonymous user is never enabled.
+
+NOTE: The `rollout-percentage` is only taken into account when the flag value is `true`. A flag that is disabled by default (`value=false`) stays disabled for all users regardless of the percentage. Also, if the `rollout-percentage` metadata is not set then an enabled flag is enabled for all users.

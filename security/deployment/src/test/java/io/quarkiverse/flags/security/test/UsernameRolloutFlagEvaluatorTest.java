@@ -1,6 +1,8 @@
 package io.quarkiverse.flags.security.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -70,6 +72,53 @@ public class UsernameRolloutFlagEvaluatorTest {
         assertTrue(enabledUsernames30.size() > enabledUsernames10.size());
         // Users enabled in the first round should be enabled in the second round
         assertTrue(enabledUsernames30.containsAll(enabledUsernames10));
+    }
+
+    @ActivateRequestContext
+    @Test
+    public void testRolloutBoundaries() {
+        Set<String> usernames = new HashSet<>();
+        int total = 500;
+        for (int i = 0; i < total; i++) {
+            usernames.add(generateUsername());
+        }
+
+        // 0% - disabled for everyone
+        inMemoryFlagProvider.addFlag(Flag.builder(FEATURE)
+                .setEnabled(true)
+                .setMetadata(
+                        Map.of("evaluator", UsernameRolloutFlagEvaluator.ID,
+                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "0")));
+        assertTrue(assertDeltaFlag(usernames).isEmpty());
+        // 0% - even an anonymous user is disabled
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder().setAnonymous(true).build());
+        assertFalse(flags.findAndAwait(FEATURE).orElseThrow().isEnabled());
+        inMemoryFlagProvider.removeFlag(FEATURE);
+
+        // 100% - enabled for everyone
+        inMemoryFlagProvider.addFlag(Flag.builder(FEATURE)
+                .setEnabled(true)
+                .setMetadata(
+                        Map.of("evaluator", UsernameRolloutFlagEvaluator.ID,
+                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "100")));
+        assertEquals(usernames, assertDeltaFlag(usernames));
+        // 100% - an anonymous user is enabled too (unlike the 1-99 bucketing)
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder().setAnonymous(true).build());
+        assertTrue(flags.findAndAwait(FEATURE).orElseThrow().isEnabled());
+        inMemoryFlagProvider.removeFlag(FEATURE);
+
+        // Out-of-range percentage is rejected
+        inMemoryFlagProvider.addFlag(Flag.builder(FEATURE)
+                .setEnabled(true)
+                .setMetadata(
+                        Map.of("evaluator", UsernameRolloutFlagEvaluator.ID,
+                                RolloutFlagEvaluator.ROLLOUT_PERCENTAGE, "150")));
+        identityAssociation.setIdentity(QuarkusSecurityIdentity.builder()
+                .setPrincipal(new QuarkusPrincipal(generateUsername()))
+                .build());
+        Flag invalidFlag = flags.findAndAwait(FEATURE).orElseThrow();
+        assertThrows(IllegalStateException.class, invalidFlag::isEnabled);
+        inMemoryFlagProvider.removeFlag(FEATURE);
     }
 
     private Set<String> assertDeltaFlag(Set<String> usernames) {
