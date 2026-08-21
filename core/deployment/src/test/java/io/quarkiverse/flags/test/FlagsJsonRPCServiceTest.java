@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.quarkiverse.flags.runtime.impl.InMemoryFlagCache;
 import io.quarkus.devui.tests.DevUIJsonRPCTest;
 import io.quarkus.test.QuarkusDevModeTest;
 
@@ -22,6 +23,7 @@ public class FlagsJsonRPCServiceTest extends DevUIJsonRPCTest {
             .withApplicationRoot(root -> root.addAsResource(new StringAsset("""
                     quarkus.flags.build.alpha.value=true
                     quarkus.flags.build.bravo.value=42
+                    quarkus.flags.cache.enabled=true
                     """), "application.properties"));
 
     public FlagsJsonRPCServiceTest() {
@@ -104,6 +106,50 @@ public class FlagsJsonRPCServiceTest extends DevUIJsonRPCTest {
             assertNotNull(evaluators.get(i).get("id"));
             assertNotNull(evaluators.get(i).get("className"));
         }
+    }
+
+    @Test
+    public void testGetCacheData() throws Exception {
+        JsonNode cache = super.executeJsonRPCMethod("getCacheData");
+        assertNotNull(cache);
+        assertTrue(cache.get("enabled").asBoolean());
+        assertNotNull(cache.get("defaultTtl"));
+        assertEquals(InMemoryFlagCache.class.getName(), cache.get("implementationClass").asText());
+
+        JsonNode providers = cache.get("providers");
+        assertNotNull(providers);
+        assertTrue(providers.isArray());
+        assertTrue(providers.size() >= 1);
+        for (int i = 0; i < providers.size(); i++) {
+            assertNotNull(providers.get(i).get("id"));
+            assertNotNull(providers.get(i).get("cachingEnabled"));
+            assertNotNull(providers.get(i).get("ttl"));
+        }
+    }
+
+    @Test
+    public void testInvalidateCache() throws Exception {
+        JsonNode result = super.executeJsonRPCMethod("invalidateCache");
+        assertNotNull(result);
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
+    public void testInvalidateProviderCache() throws Exception {
+        JsonNode providers = super.executeJsonRPCMethod("getFlagProvidersData");
+        String configProviderId = null;
+        for (int i = 0; i < providers.size(); i++) {
+            String id = providers.get(i).get("id").asText();
+            if (id.contains("config")) {
+                configProviderId = id;
+                break;
+            }
+        }
+        assertNotNull(configProviderId);
+
+        JsonNode result = super.executeJsonRPCMethod("invalidateProviderCache", Map.of("id", configProviderId));
+        assertNotNull(result);
+        assertTrue(result.asBoolean());
     }
 
     private static JsonNode findByFeature(JsonNode array, String feature) {

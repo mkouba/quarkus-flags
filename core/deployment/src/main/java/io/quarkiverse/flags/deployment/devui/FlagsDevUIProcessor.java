@@ -41,6 +41,10 @@ public class FlagsDevUIProcessor {
                 .icon("font-awesome-solid:calculator")
                 .componentLink("qwc-evaluators.js"));
 
+        pageBuildItem.addPage(Page.webComponentPageBuilder()
+                .icon("font-awesome-solid:database")
+                .componentLink("qwc-cache.js"));
+
         cardPages.produce(pageBuildItem);
     }
 
