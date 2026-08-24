@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.flags</groupId>
         <artifactId>quarkus-flags-cache-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>quarkus-flags-cache-deployment</artifactId>
     <name>Quarkus Feature Flags - Cache - Deployment</name>
@@ -79,4 +79,8 @@
             </build>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>1.0.1</tag>
+  </scm>
 </project>
